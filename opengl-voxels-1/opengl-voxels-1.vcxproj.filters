@@ -91,5 +91,14 @@
     <None Include="shaders\simple.frag">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="shaders\testGeom.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\testGeom.geom">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\testGeom.vert">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

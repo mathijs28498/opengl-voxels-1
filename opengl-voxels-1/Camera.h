@@ -36,10 +36,10 @@ private:
 	float walkSpeed;
 	float mouseSensitivity;
 
-	float yaw = 90.0f;
+	float yaw = -90.0f;
 	float pitch = 0.0f;
 	glm::vec2 oldMousePos = glm::vec2(-1.0f, -1.0f);
-	glm::vec3 cameraDir = glm::vec3(0.0f, 0.0f, 1.0f);
+	glm::vec3 cameraDir = glm::vec3(0.0f, 0.0f, -1.0f);
 
 	glm::vec3 getForwardVec3() {
 		return glm::normalize(cameraDir * glm::vec3(1, 0, 1));
