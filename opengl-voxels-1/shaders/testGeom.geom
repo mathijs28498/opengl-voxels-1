@@ -6,11 +6,15 @@ layout(triangle_strip, max_vertices = 24) out;
 //flat in int gEnabledFaces[];
 //flat out lowp vec3 fColor;
 
+out vec3 fColor;
+
 uniform float voxSize = 0.25;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
+
+uniform vec3 gColor;
 
 void AddQuad(vec4 center, vec4 dy, vec4 dx) {
     gl_Position = center + (dx - dy);
@@ -32,6 +36,8 @@ void main() {
     vec4 position = gl_in[0].gl_Position;
     vec4 center = vec4(position.xyz * voxSize * 2, 1);
     mat4 mvp = proj * view * model;
+//    fColor = vec3(1 - cos(length(position) * voxSize) / 2 + 0.5, sin(length(position) * voxSize) / 2 + 0.5, cos(length(position) * voxSize) / 2 + 0.5);
+    fColor = vec3((position.y + 30) / 30 , 1 - (position.y + 20) / 30, (position.y) / 30);
     
     // FRONT
     gl_Position = mvp * (center + vec4(-voxSize, -voxSize, voxSize, 0));

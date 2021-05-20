@@ -17,7 +17,7 @@ public:
 	int height;
 
 	Camera() {};
-	Camera(GLFWwindow* window, glm::vec3 startPosition, float walkSpeed, float mouseSensitivity, const int WIDTH, const int HEIGHT);
+	Camera(GLFWwindow* window, glm::vec3 startPosition, float walkSpeed, float mouseSensitivity, float speedMultiplier, const int WIDTH, const int HEIGHT);
 	void setProjMatrix();
 	void setViewMatrix();
 
@@ -33,7 +33,9 @@ public:
 	}
 
 private:
-	float walkSpeed;
+	float normalWalkSpeed;
+	float speedMultiplier;
+	float actualWalkSpeed;
 	float mouseSensitivity;
 
 	float yaw = -90.0f;

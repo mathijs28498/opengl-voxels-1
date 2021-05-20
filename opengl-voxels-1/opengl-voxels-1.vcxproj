@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="FastNoiseLite.h" />
     <ClInclude Include="GLHelperFunctions.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />

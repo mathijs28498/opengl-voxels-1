@@ -1,8 +1,10 @@
 #include "Camera.h"
 
-Camera::Camera(GLFWwindow* window, glm::vec3 startPosition, float walkSpeed, float mouseSensitivity, const int WIDTH, const int HEIGHT) {
+Camera::Camera(GLFWwindow* window, glm::vec3 startPosition, float walkSpeed, float speedMultiplier, float mouseSensitivity, const int WIDTH, const int HEIGHT) {
 	cameraPos = startPosition;
-	this->walkSpeed = walkSpeed;
+	normalWalkSpeed = walkSpeed;
+	actualWalkSpeed = walkSpeed;
+	this->speedMultiplier = speedMultiplier;
 	this->mouseSensitivity = mouseSensitivity;
 	this->width = WIDTH;
 	this->height = HEIGHT;
@@ -16,7 +18,7 @@ Camera::Camera(GLFWwindow* window, glm::vec3 startPosition, float walkSpeed, flo
 }
 
 void Camera::setProjMatrix() {
-	proj = glm::perspective(glm::radians(fov), (width + 0.0f) / height, 0.1f, 100.0f);
+	proj = glm::perspective(glm::radians(fov), (width + 0.0f) / height, 0.1f, 1000.0f);
 }
 
 void Camera::setViewMatrix() {
@@ -50,17 +52,21 @@ void Camera::moveCamera(GLFWwindow* window) {
 		camPosChanged = true;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_REPEAT) {
-		cameraPos.y -= walkSpeed;
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+		cameraPos.y -= actualWalkSpeed;
 		camPosChanged = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_REPEAT) {
-		cameraPos.y += walkSpeed;
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		cameraPos.y += actualWalkSpeed;
 		camPosChanged = true;
 	}
 
+	// TODO: Make this a callback
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+	}
+
 	if (camPosChanged) {
-		if (glm::length(addPos) > 0.001f) cameraPos += glm::normalize(addPos) * static_cast<float>(walkSpeed);
+		if (glm::length(addPos) > 0.001f) cameraPos += glm::normalize(addPos) * static_cast<float>(actualWalkSpeed);
 		setViewMatrix();
 	}
 }
@@ -73,7 +79,7 @@ void Camera::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos
 		return;
 	}
 
-	glm::vec2 diff =cam->oldMousePos - newPos;
+	glm::vec2 diff = cam->oldMousePos - newPos;
 	cam->oldMousePos = newPos;
 
 	cam->yaw -= diff.x * cam->mouseSensitivity;
