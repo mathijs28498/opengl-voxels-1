@@ -7,14 +7,13 @@
 
 class Model {
 public:
-	Model(const char* path) {
-		loadModel(path);
-	}
-	void draw(Shader& shader);
+	Model(glm::vec3 scaling, uint32_t xAmount, uint32_t yAmount, uint32_t zAmount);
+	void draw(Shader* shader);
 
 private:
-	std::vector<Mesh> meshes;
-	std::string directory;
+	glm::vec3 scale;
+	uint32_t xAmount, yAmount, zAmount;
+	uint32_t cubeVAO;
 
 	void loadModel(std::string path);
 };
