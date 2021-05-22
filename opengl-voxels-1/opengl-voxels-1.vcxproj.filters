@@ -36,7 +36,7 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Model.cpp">
+    <ClCompile Include="Chunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
@@ -62,7 +62,7 @@
     <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
+    <ClInclude Include="Chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
@@ -94,13 +94,13 @@
     <None Include="shaders\simple.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\testGeom.frag">
+    <None Include="shaders\instancing.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\testGeom.geom">
+    <None Include="shaders\instancing.geom">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\testGeom.vert">
+    <None Include="shaders\instancing.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

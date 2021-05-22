@@ -150,7 +150,7 @@
     <ClCompile Include="GLHelperFunctions.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="VertexData.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -160,7 +160,7 @@
     <ClInclude Include="FastNoiseLite.h" />
     <ClInclude Include="GLHelperFunctions.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
+    <ClInclude Include="Chunk.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="VertexData.h" />
     <ClInclude Include="Window.h" />
@@ -172,9 +172,9 @@
     <None Include="shaders\object.vert" />
     <None Include="shaders\simple.vert" />
     <None Include="shaders\simple.frag" />
-    <None Include="shaders\testGeom.frag" />
-    <None Include="shaders\testGeom.geom" />
-    <None Include="shaders\testGeom.vert" />
+    <None Include="shaders\instancing.frag" />
+    <None Include="shaders\instancing.geom" />
+    <None Include="shaders\instancing.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
