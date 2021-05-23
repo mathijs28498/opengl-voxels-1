@@ -170,8 +170,6 @@
     <None Include="shaders\light.vert" />
     <None Include="shaders\object.frag" />
     <None Include="shaders\object.vert" />
-    <None Include="shaders\simple.vert" />
-    <None Include="shaders\simple.frag" />
     <None Include="shaders\instancing.frag" />
     <None Include="shaders\instancing.geom" />
     <None Include="shaders\instancing.vert" />
