@@ -28,18 +28,18 @@ int main() {
 		const float voxSize = 0.25f;
 
 		std::vector<Chunk>chunks{
-			Chunk("", xAmount, zAmount, glm::vec2(0, 0), voxSize),
+			Chunk(xAmount, zAmount, glm::vec2(0, 0), voxSize),
 
-			Chunk("", xAmount, zAmount, glm::vec2(xAmount, 0), voxSize),
-			Chunk("", xAmount, zAmount, glm::vec2(0, zAmount), voxSize),
-			Chunk("", xAmount, zAmount, glm::vec2(xAmount, zAmount), voxSize),
+			Chunk(xAmount, zAmount, glm::vec2(xAmount, 0), voxSize),
+			Chunk(xAmount, zAmount, glm::vec2(0, zAmount), voxSize),
+			Chunk(xAmount, zAmount, glm::vec2(xAmount, zAmount), voxSize),
 
-			Chunk("", xAmount, zAmount, glm::vec2(-xAmount, 0), voxSize),
-			Chunk("", xAmount, zAmount, glm::vec2(0, -zAmount), voxSize),
-			Chunk("", xAmount, zAmount, glm::vec2(-xAmount, -zAmount), voxSize),
+			Chunk(xAmount, zAmount, glm::vec2(-xAmount, 0), voxSize),
+			Chunk(xAmount, zAmount, glm::vec2(0, -zAmount), voxSize),
+			Chunk(xAmount, zAmount, glm::vec2(-xAmount, -zAmount), voxSize),
 
-			Chunk("", xAmount, zAmount, glm::vec2(xAmount, -zAmount), voxSize),
-			Chunk("", xAmount, zAmount, glm::vec2(-xAmount, zAmount), voxSize),
+			Chunk(xAmount, zAmount, glm::vec2(xAmount, -zAmount), voxSize),
+			Chunk(xAmount, zAmount, glm::vec2(-xAmount, zAmount), voxSize),
 		};
 
 		double lastTime = glfwGetTime();

@@ -9,7 +9,7 @@
 #include <set>
 #include <iostream>
 
-Chunk::Chunk(std::string path, uint32_t xAmount, uint32_t zAmount, glm::vec2 chunkCenter, const float voxSize) {
+Chunk::Chunk(uint32_t xAmount, uint32_t zAmount, glm::vec2 chunkCenter, const float voxSize) {
 	this->chunkCenter = chunkCenter;
 	this->voxSize = voxSize;
 
@@ -20,8 +20,8 @@ Chunk::Chunk(std::string path, uint32_t xAmount, uint32_t zAmount, glm::vec2 chu
 
 	for (uint32_t zi = 0; zi < zAmount; zi++) {
 		for (uint32_t xi = 0; xi < xAmount; xi++) {
-			int32_t x = xi + chunkCenter.x;
-			int32_t z = zi + chunkCenter.y;
+			int32_t x = xi + chunkCenter.x -  xAmount / 2.0f;
+			int32_t z = zi + chunkCenter.y - zAmount / 2.0f;
 			float data = fnlGetNoise2D(&noise, x, z) * 50;
 			data += fnlGetNoise2D(&noise, x * 10, z * 10) * 3;
 			data += fnlGetNoise2D(&noise, x * 100, z * 100) * 0.1f;

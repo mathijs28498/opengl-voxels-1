@@ -15,7 +15,7 @@ struct VoxelData {
 
 class Chunk {
 public:
-	Chunk(std::string path, uint32_t xAmount, uint32_t zAmount, glm::vec2 chunkCenter, const float voxSize);
+	Chunk(uint32_t xAmount, uint32_t zAmount, glm::vec2 chunkCenter, const float voxSize);
 	void draw(Shader* shader);
 
 private:
