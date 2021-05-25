@@ -146,6 +146,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Octree.cpp" />
+    <ClCompile Include="TerrainVoxel.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLHelperFunctions.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -161,7 +163,9 @@
     <ClInclude Include="GLHelperFunctions.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Chunk.h" />
+    <ClInclude Include="Octree.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="TerrainVoxel.h" />
     <ClInclude Include="VertexData.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

@@ -1,6 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
 
+const float VOX_SIZE = 0.0625f;
+
 struct Material {
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
