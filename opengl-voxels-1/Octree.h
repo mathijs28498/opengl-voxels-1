@@ -1,46 +1,36 @@
 #pragma once
 
-#include "glm/glm.hpp"
+#include "Shader.h"
+
+#include <glm/glm.hpp>
 
 #include <vector>
 
-namespace oct {
-	int* getColorFromInt(int colorInt);
-	int getIntFromColor(const int* colorArray);
+int* getColorFromInt(int colorInt);
+int getIntFromColor(const int* colorArray);
 
-	struct BoundingBox {
-		glm::vec3 start;
-		float size;
 
-		bool contains(glm::vec3 pos);
-	};
+class OctreeNode {
+public:
+	OctreeNode(const int* pos, int size, OctreeNode* parent = nullptr);
 
-	class OctreeNode {
-	public:
-		OctreeNode(BoundingBox boundary, OctreeNode* parent);
-		void insert(glm::vec3 pos, int color);
+	void draw(Shader* shader) const;
+	void drawBoundingBox(Shader* shader) const;
+private:
+	const int* pos;
+	int size;
+	OctreeNode* parent;
+	OctreeNode* children[8];
+	bool hasChildren;
 
-	private:
-		BoundingBox boundary;
-		OctreeNode* parent;
-		bool hasChildren;
-		OctreeNode* children[8];
-		int32_t color;
-		uint32_t lod;
+};
 
-		void subdivide();
-		void insertIntoChildren(glm::vec3 pos, int color);
-	};
+class Octree {
+public:
+	Octree(const int* pos, int size);
 
-	class Octree {
-	public:
-		Octree(BoundingBox boundary);
-		~Octree();
-
-		void insert(glm::vec3 pos, int color);
-		void fillVAO(uint32_t lod);
-	private:
-		OctreeNode* rootNode;
-		std::vector<uint32_t> VAOs;
-	};
-}
+	void draw(Shader* shader) const;
+	void drawBoundingBoxes(Shader* shader) const;
+private:
+	OctreeNode* root;
+};

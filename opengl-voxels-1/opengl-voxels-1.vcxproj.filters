@@ -121,5 +121,14 @@
     <None Include="shaders\instancing.vert">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="shaders\octreeBoundingBox.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\octreeBoundingBox.geom">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\octreeBoundingBox.vert">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

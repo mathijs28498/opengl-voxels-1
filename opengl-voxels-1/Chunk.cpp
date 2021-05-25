@@ -73,7 +73,6 @@ void Chunk::draw(Shader* shader) {
 	shader->setVec3("gColor", glm::vec3(0, 1, 0));
 	shader->setFloat("voxSize", voxSize);
 
-	size_t temp = voxels.size();
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_POINTS, 0, voxels.size());
 	glBindVertexArray(0);

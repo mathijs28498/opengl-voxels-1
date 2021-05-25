@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "GLHelperFunctions.h"
 #include "Chunk.h"
+#include "Octree.h"
 
 #include <iostream>
 
@@ -25,6 +26,10 @@ int main() {
 		//Camera cam(window.window, glm::vec3(0, 1.5f, 2), 0.1f * 1, 5, 0.1f, WIDTH, HEIGHT);
 
 		Shader simpleShaderGeom("shaders/instancing.vert", "shaders/instancing.geom", "shaders/instancing.frag");
+		Shader octreeShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
+
+		int temp[] = { 0, 0, 0 };
+		Octree tree(temp, 10);
 
 		double lastTime = glfwGetTime();
 		double lastTime2 = glfwGetTime();
@@ -43,9 +48,9 @@ int main() {
 			processInput(window.window);
 			window.beginLoop();
 
-			simpleShaderGeom.use();
-			cam.setUniforms(&simpleShaderGeom);
-
+			octreeShader.use();
+			cam.setUniforms(&octreeShader);
+			tree.drawBoundingBoxes(&octreeShader);
 
 
 			window.endLoop();

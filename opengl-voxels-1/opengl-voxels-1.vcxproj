@@ -177,6 +177,9 @@
     <None Include="shaders\instancing.frag" />
     <None Include="shaders\instancing.geom" />
     <None Include="shaders\instancing.vert" />
+    <None Include="shaders\octreeBoundingBox.frag" />
+    <None Include="shaders\octreeBoundingBox.geom" />
+    <None Include="shaders\octreeBoundingBox.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
