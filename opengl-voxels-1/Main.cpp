@@ -22,14 +22,18 @@ void processInput(GLFWwindow* window) {
 int main() {
 	try {
 		Window window(WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-		Camera cam(window.window, glm::vec3(0, 1.5f, 2), 0.1f * 5, 5, 0.1f, WIDTH, HEIGHT);
-		//Camera cam(window.window, glm::vec3(0, 1.5f, 2), 0.1f * 1, 5, 0.1f, WIDTH, HEIGHT);
+		Camera cam(window.window, glm::vec3(0, 1.5f, 2), 0.001f, 5, 0.1f, WIDTH, HEIGHT);
 
-		Shader simpleShaderGeom("shaders/instancing.vert", "shaders/instancing.geom", "shaders/instancing.frag");
-		Shader octreeShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
+		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
+		Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
 
-		int temp[] = { 0, 0, 0 };
-		Octree tree(temp, 10);
+		Octree tree = Octree({0, 0, 0}, 1024);
+		tree.insert({ {0, 0, 0}, {1, 0, 0} });
+		tree.insert({ {1, 0, 0}, {1, 0, 0} });
+		tree.insert({ {2, 0, 0}, {1, 0, 0} });
+		tree.calculateBoundingBoxVAO();
+		tree.calculateVoxelVAO();
+		Chunk chunk(100, 100, {0, 0}, VOX_SIZE);
 
 		double lastTime = glfwGetTime();
 		double lastTime2 = glfwGetTime();
@@ -44,14 +48,20 @@ int main() {
 				lastTime2 = currentTime;
 			}
 
-			// TODO: Make input a callback
+
+			//// TODO: Make input a callback
 			processInput(window.window);
 			window.beginLoop();
 
-			octreeShader.use();
-			cam.setUniforms(&octreeShader);
-			tree.drawBoundingBoxes(&octreeShader);
+			boundingBoxShader.use();
+			cam.setUniforms(&boundingBoxShader);
+			tree.drawBoundingBoxes(&boundingBoxShader);
 
+			voxelShader.use();
+			cam.setUniforms(&voxelShader);
+			tree.drawVoxels(&voxelShader);
+
+			//chunk.draw(&voxelShader);
 
 			window.endLoop();
 

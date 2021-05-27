@@ -11,7 +11,6 @@ Window::Window(int width, int height, const char* title, glm::vec4 backgroundCol
 #endif
 	window = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
-
 	if (window == NULL) {
 		throw std::runtime_error("Failed to create GLFW window!");
 		glfwTerminate();
@@ -25,6 +24,7 @@ Window::Window(int width, int height, const char* title, glm::vec4 backgroundCol
 
 	glViewport(0, 0, width, height);
 	glfwSetFramebufferSizeCallback(window, frameBufferSizeCallback);
+	glfwSwapInterval(0);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);

@@ -112,13 +112,13 @@
     <None Include="shaders\object.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\instancing.frag">
+    <None Include="shaders\voxelInstancing.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\instancing.geom">
+    <None Include="shaders\voxelInstancing.geom">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\instancing.vert">
+    <None Include="shaders\voxelInstancing.vert">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="shaders\octreeBoundingBox.frag">

@@ -174,9 +174,9 @@
     <None Include="shaders\light.vert" />
     <None Include="shaders\object.frag" />
     <None Include="shaders\object.vert" />
-    <None Include="shaders\instancing.frag" />
-    <None Include="shaders\instancing.geom" />
-    <None Include="shaders\instancing.vert" />
+    <None Include="shaders\voxelInstancing.frag" />
+    <None Include="shaders\voxelInstancing.geom" />
+    <None Include="shaders\voxelInstancing.vert" />
     <None Include="shaders\octreeBoundingBox.frag" />
     <None Include="shaders\octreeBoundingBox.geom" />
     <None Include="shaders\octreeBoundingBox.vert" />

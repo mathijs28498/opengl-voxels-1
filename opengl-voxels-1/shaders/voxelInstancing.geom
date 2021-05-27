@@ -8,7 +8,6 @@ out vec3 fColor;
 
 uniform float voxSize;
 
-uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 
@@ -33,21 +32,20 @@ bool IsCulled(vec4 normal) {
 
 // TODO ERROR: Maybe this doesn't work (voxSize is now / 2)
 void main() {
-    float realSize = voxSize / 2;
     vec4 position = gl_in[0].gl_Position;
     vec4 center = vec4(position.xyz * voxSize, 1);
-    mat4 mvp = proj * view * model;
-//    fColor = vec3(1 - cos(length(position) * realSize) / 2 + 0.5, sin(length(position) * realSize) / 2 + 0.5, cos(length(position) * realSize) / 2 + 0.5);
+    mat4 mvp = proj * view;
+//    fColor = vec3(1 - cos(length(position) * voxSize) / 2 + 0.5, sin(length(position) * voxSize) / 2 + 0.5, cos(length(position) * voxSize) / 2 + 0.5);
     fColor = gColor[0];
     
-    vec4 luf = vec4(-realSize, realSize, realSize, 0);
-    vec4 ruf = vec4(realSize, realSize, realSize, 0);
-    vec4 ldf = vec4(-realSize, -realSize, realSize, 0);
-    vec4 rdf = vec4(realSize, -realSize, realSize, 0);
-    vec4 lub = vec4(-realSize, realSize, -realSize, 0);
-    vec4 rub = vec4(realSize, realSize, -realSize, 0);
-    vec4 ldb = vec4(-realSize, -realSize, -realSize, 0);
-    vec4 rdb = vec4(realSize, -realSize, -realSize, 0);
+    vec4 luf = vec4(0, voxSize, voxSize, 0);
+    vec4 ruf = vec4(voxSize, voxSize, voxSize, 0);
+    vec4 ldf = vec4(0, 0, voxSize, 0);
+    vec4 rdf = vec4(voxSize, 0, voxSize, 0);
+    vec4 lub = vec4(0, voxSize, 0, 0);
+    vec4 rub = vec4(voxSize, voxSize, 0, 0);
+    vec4 ldb = vec4(0, 0, 0, 0);
+    vec4 rdb = vec4(voxSize, 0, 0, 0);
 
     // FRONT
     addQuad(mvp, center, ruf, rdf, luf, ldf);

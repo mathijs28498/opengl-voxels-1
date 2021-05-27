@@ -53,20 +53,20 @@ void Camera::moveCamera(GLFWwindow* window) {
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-		cameraPos.y -= actualWalkSpeed;
+		cameraPos.y -= actualWalkSpeed * static_cast<float>(glfwGetTime());
 		camPosChanged = true;
 	}
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		cameraPos.y += actualWalkSpeed;
+		cameraPos.y += actualWalkSpeed * static_cast<float>(glfwGetTime());
 		camPosChanged = true;
 	}
 
-	// TODO: Make this a callback
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-	}
+	//// TODO: Make this a callback
+	//if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+	//}
 
 	if (camPosChanged) {
-		if (glm::length(addPos) > 0.001f) cameraPos += glm::normalize(addPos) * static_cast<float>(actualWalkSpeed);
+		if (glm::length(addPos) > 0.001f) cameraPos += glm::normalize(addPos) * static_cast<float>(actualWalkSpeed) * static_cast<float>(glfwGetTime());
 		setViewMatrix();
 	}
 }
