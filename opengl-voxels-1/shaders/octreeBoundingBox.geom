@@ -32,7 +32,7 @@ void main() {
     float realSize = voxSize * gSize[0];
     vec4 corner = vec4(position.xyz * voxSize, 1);
     mat4 mvp = proj * view;
-    fColor = color;
+    fColor = gColor[0];
 
     vec4 luf = vec4(0, realSize, realSize, 0);
     vec4 ruf = vec4(realSize, realSize, realSize, 0);

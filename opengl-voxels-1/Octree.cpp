@@ -1,7 +1,11 @@
 #include "Octree.h"
 #include "VertexData.h"
 
+#define FNL_IMPL
+#include "FastNoiseLite.h"
+
 #include <stdexcept>
+#include <chrono>
 
 /// BEGIN OCTREE_NODE ///
 
@@ -73,9 +77,8 @@ void OctreeNode::drawVoxels(Shader* shader) const {
 // TODO: Make different lod
 void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud) {
 	if (!hasChildren) {
-		for (Voxel voxel : voxels) {
-			voxelCloud->push_back(voxel);
-			//pointCloud->push_back({ {static_cast<float>(pos[0]), static_cast<float>(pos[1]), static_cast<float>(pos[2])}, static_cast<float>(size) });
+		for (size_t i = 0; i < voxels.size(); i++) {
+			voxelCloud->push_back(voxels[i]);
 		}
 	} else {
 		for (OctreeNode* child : children) {
@@ -84,12 +87,15 @@ void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud) {
 	}
 }
 // TODO: Make different colour for each layer
-void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointCloud) {
+void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointCloud, uint8_t depth) {
 	if (!hasChildren) {
-		pointCloud->push_back({ {static_cast<float>(pos[0]), static_cast<float>(pos[1]), static_cast<float>(pos[2])}, static_cast<float>(size) });
+		pointCloud->push_back({
+			{static_cast<float>(pos[0]), static_cast<float>(pos[1]), static_cast<float>(pos[2])},
+			{(sin(static_cast<float>(depth)) + 1) / 2, (cos(static_cast<float>(depth)) + 1) / 2, 1 - (sin(static_cast<float>(depth)) + 1) / 2},
+			static_cast<float>(size) });
 	} else {
 		for (OctreeNode* child : children) {
-			child->calculateBoundingBoxVAO(pointCloud);
+			child->calculateBoundingBoxVAO(pointCloud, depth + 1);
 		}
 	}
 }
@@ -98,14 +104,20 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 
 /// BEGIN OCTREE ///
 
+// TODO: Fix size being double the size than normal
 Octree::Octree(const std::vector<int> pos, int size) {
 	OctreeNode node = OctreeNode(pos, size);
 	root = node;
+	this->pos = pos;
+	this->size = size;
 	glGenVertexArrays(1, &voxelVAO);
 	glGenVertexArrays(1, &boundingBoxVAO);
 }
 
-void Octree::drawBoundingBoxes(Shader* shader) const {
+void Octree::drawBoundingBoxes(Shader* shader, Camera* cam) const {
+	shader->use();
+	cam->setUniforms(shader);
+
 	shader->setFloat("voxSize", VOX_SIZE);
 	shader->setVec3("color", 1, 1, 0);
 
@@ -114,7 +126,10 @@ void Octree::drawBoundingBoxes(Shader* shader) const {
 	glBindVertexArray(0);
 }
 
-void Octree::drawVoxels(Shader* shader) {
+void Octree::drawVoxels(Shader* shader, Camera* cam) const {
+	shader->use();
+	cam->setUniforms(shader);
+
 	shader->setFloat("voxSize", VOX_SIZE);
 
 	glBindVertexArray(voxelVAO);
@@ -128,7 +143,7 @@ void Octree::insert(Voxel voxel) {
 
 void Octree::calculateBoundingBoxVAO() {
 	std::vector<BoundingBoxPoint> pointCloud;
-	root.calculateBoundingBoxVAO(&pointCloud);
+	root.calculateBoundingBoxVAO(&pointCloud, 0);
 	amountOfBoundingboxes = pointCloud.size();
 
 	uint32_t VBO;
@@ -141,8 +156,11 @@ void Octree::calculateBoundingBoxVAO() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(BoundingBoxPoint), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(BoundingBoxPoint), (void*)offsetof(BoundingBoxPoint, size));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(BoundingBoxPoint), (void*)offsetof(BoundingBoxPoint, color));
 	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(BoundingBoxPoint), (void*)offsetof(BoundingBoxPoint, size));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -150,6 +168,13 @@ void Octree::calculateBoundingBoxVAO() {
 }
 
 void Octree::calculateVoxelVAO() {
+	using std::chrono::high_resolution_clock;
+	using std::chrono::duration_cast;
+	using std::chrono::duration;
+	using std::chrono::milliseconds;
+
+	auto t1 = high_resolution_clock::now();
+
 	std::vector<Voxel> voxelCloud;
 	root.calculateVAO(&voxelCloud);
 	amountOfVoxels = voxelCloud.size();
@@ -171,6 +196,32 @@ void Octree::calculateVoxelVAO() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
+
+	duration<double, std::milli> ms = high_resolution_clock::now() - t1;
+	std::cout << ms.count() << '\n';
+
+}
+
+void Octree::makeNoiseTerrain() {
+	int32_t chunkPos[] = {pos[0], pos[2] };
+	fnl_state noise = fnlCreateState();
+	noise.noise_type = FNL_NOISE_PERLIN;
+
+	for (int32_t zi = 0; zi < size; zi++) {
+		for (int32_t xi = 0; xi < size; xi++) {
+			float x = static_cast<float>(xi + chunkPos[0]);
+			float z = static_cast<float>(zi + chunkPos[1]);
+			float data = (fnlGetNoise2D(&noise, x, z) + 1) * 50;
+			data += fnlGetNoise2D(&noise, x * 10, z * 10) * 3;
+			data += fnlGetNoise2D(&noise, x * 100, z * 100) * 0.1f;
+
+			float y = std::round(data);
+
+			insert({ {x, y, z}, {0, 0, 0} });
+			insert({ {x, y - 1, z}, {0, 0, 0} });
+		}
+	}
+
 }
 
 /// END OCTREE ///

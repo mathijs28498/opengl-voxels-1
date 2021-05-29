@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Shader.h"
+#include "Camera.h"
 
 #include <glm/glm.hpp>
 
@@ -11,6 +12,7 @@ int getIntFromColor(const int* colorArray);
 
 struct BoundingBoxPoint {
 	float position[3];
+	float color[3];
 	float size;
 };
 
@@ -31,7 +33,7 @@ public:
 	bool containsPoint(Voxel voxel) const;
 
 	void calculateVAO(std::vector<Voxel>* voxelCloud);
-	void calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointCloud);
+	void calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointCloud, uint8_t depth);
 
 	void drawVoxels(Shader* shader) const;
 private:
@@ -50,10 +52,13 @@ public:
 	void insert(Voxel voxel);
 	void calculateBoundingBoxVAO();
 	void calculateVoxelVAO();
+	void makeNoiseTerrain();
 
-	void drawVoxels(Shader* shader);
-	void drawBoundingBoxes(Shader* shader) const;
+	void drawVoxels(Shader* shader, Camera* cam) const;
+	void drawBoundingBoxes(Shader* shader, Camera* cam) const;
 private:
+	std::vector<int32_t> pos;
+	int32_t size;
 	OctreeNode root;
 	// TODO: Make this a vector/hashmap with multiple LOD
 	uint32_t voxelVAO;
