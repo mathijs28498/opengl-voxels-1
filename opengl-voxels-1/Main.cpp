@@ -29,12 +29,12 @@ void processInput(GLFWwindow* window) {
 int main() {
 	try {
 		Window window(WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-		Camera cam(window.window, glm::vec3(4, 5, 10), 0.01f, 5, 0.1f, WIDTH, HEIGHT);
+		Camera cam(window.window, glm::vec3(4, 5, 10), 0.005f, 5, 0.1f, WIDTH, HEIGHT);
 
 		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
 
-		uint32_t octreeSize = 512;
+		uint32_t octreeSize = 256;
 
 		std::vector<Octree> trees;
 		trees.push_back(Octree({ 0, 0, 0 }, octreeSize));

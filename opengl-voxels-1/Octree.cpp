@@ -6,6 +6,7 @@
 
 #include <stdexcept>
 #include <chrono>
+#include <glm/gtx/rotate_vector.hpp>
 
 /// BEGIN OCTREE_NODE ///
 
@@ -129,6 +130,22 @@ void Octree::drawBoundingBoxes(Shader* shader, Camera* cam) const {
 void Octree::drawVoxels(Shader* shader, Camera* cam) const {
 	shader->use();
 	cam->setUniforms(shader);
+	static float angle = -40;
+	angle += 0.05f;
+	if (angle > 360 - 40) 
+		angle -= 360;
+	float realAngle = angle;
+
+	float lightIntensity = (angle + 30) / 120;
+	if (lightIntensity > 1) lightIntensity = 2 - lightIntensity;
+	if (lightIntensity < 0) {
+		realAngle = 270;
+		lightIntensity = 0;
+		angle += 0.1f;
+	}
+
+	shader->setVec3("lightDir", glm::rotate(glm::vec3(-1, 0, 0), glm::radians(realAngle), glm::vec3(-1, 0, 1)));
+	shader->setFloat("lightIntensity", lightIntensity);
 
 	shader->setFloat("voxSize", VOX_SIZE);
 
