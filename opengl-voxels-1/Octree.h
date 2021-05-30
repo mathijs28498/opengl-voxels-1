@@ -2,6 +2,7 @@
 
 #include "Shader.h"
 #include "Camera.h"
+#include "VertexData.h"
 
 #include <glm/glm.hpp>
 
@@ -14,11 +15,6 @@ struct BoundingBoxPoint {
 	float position[3];
 	float color[3];
 	float size;
-};
-
-struct Voxel {
-	float position[3];
-	float color[3];
 };
 
 class OctreeNode {

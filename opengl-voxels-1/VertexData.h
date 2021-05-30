@@ -18,6 +18,11 @@ struct Light {
 	glm::vec3 specular;
 };
 
+struct Voxel {
+	float position[3];
+	float color[3];
+};
+
 extern float cubeVertices[];
 
 extern float vertices[];

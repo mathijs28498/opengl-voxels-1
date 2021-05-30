@@ -1,5 +1,4 @@
 #include "Octree.h"
-#include "VertexData.h"
 
 #define FNL_IMPL
 #include "FastNoiseLite.h"
@@ -146,7 +145,7 @@ void Octree::drawVoxels(Shader* shader, Camera* cam) const {
 	}
 
 	shader->setVec3("lightDir", glm::rotate(glm::vec3(-1, 0, 0), glm::radians(realAngle), glm::vec3(-1, 0, 1)));
-	shader->setFloat("lightIntensity", lightIntensity);
+	shader->setFloat("lightIntensity", 1);
 
 	shader->setFloat("voxSize", VOX_SIZE);
 

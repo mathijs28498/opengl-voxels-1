@@ -2,6 +2,7 @@
 #include "GLHelperFunctions.h"
 #include "Chunk.h"
 #include "Octree.h"
+#include "Model.h"
 
 #include <iostream>
 
@@ -31,40 +32,35 @@ int main() {
 		Window window(WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		Camera cam(window.window, glm::vec3(4, 5, 10), 0.005f, 5, 0.1f, WIDTH, HEIGHT);
 
+		Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
+
+		Model human("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/human_test_24h.vox");
 
 		uint32_t octreeSize = 256;
 
 		std::vector<Octree> trees;
 		trees.push_back(Octree({ 0, 0, 0 }, octreeSize));
-		//trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 1 }, octreeSize));
-		//trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 2 }, octreeSize));
-		/*trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 3 }, octreeSize));
+		/*trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 1 }, octreeSize));
+		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 2 }, octreeSize));
+		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 3 }, octreeSize));
 		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 4 }, octreeSize));
 		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 5 }, octreeSize));
-		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 6 }, octreeSize));*/
-		//trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, 0 }, octreeSize));
-		//trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 1 }, octreeSize));
-		/*trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 2 }, octreeSize));
+		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 6 }, octreeSize));
+		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, 0 }, octreeSize));
+		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 1 }, octreeSize));
+		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 2 }, octreeSize));
 		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 3 }, octreeSize));
 		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 4 }, octreeSize));
 		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 5 }, octreeSize));
 		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 6 }, octreeSize));*/
-		/*trees.push_back(Octree({ -static_cast<int32_t>(octreeSize), 0, 0 }, octreeSize));
-		trees.push_back(Octree({ -static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) }, octreeSize));*/
+		std::cout << octreeSize * octreeSize * 2 * trees.size() << '\n';
 		for (size_t i = 0; i < trees.size(); i++) {
-
-			//trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize * i) }, octreeSize));
 			trees[i].makeNoiseTerrain();
 			trees[i].calculateBoundingBoxVAO();
 			trees[i].calculateVoxelVAO();
 		}
-		
-		/*Octree tree2 = Octree({0, 0, -static_cast<int32_t>(octreeSize)}, octreeSize);
-		tree2.makeNoiseTerrain();
-		tree2.calculateBoundingBoxVAO();
-		tree2.calculateVoxelVAO();*/
 
 		double lastTime = glfwGetTime();
 		double lastTime2 = glfwGetTime();
@@ -84,11 +80,13 @@ int main() {
 			processInput(window.window);
 			window.beginLoop();
 
+			human.draw(&terrainVoxelShader, &cam);
+
 			for (size_t i = 0; i < trees.size(); i++) {
 				if (showBoundingBoxes) {
 					trees[i].drawBoundingBoxes(&boundingBoxShader, &cam);
 				}
-				trees[i].drawVoxels(&voxelShader, &cam);
+				trees[i].drawVoxels(&terrainVoxelShader, &cam);
 			}
 
 			window.endLoop();
