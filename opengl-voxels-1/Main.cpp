@@ -1,8 +1,8 @@
 #include "Window.h"
 #include "GLHelperFunctions.h"
-#include "Chunk.h"
 #include "Octree.h"
 #include "Model.h"
+#include "Scene.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 
