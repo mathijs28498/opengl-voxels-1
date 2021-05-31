@@ -23,7 +23,7 @@ class Model {
 public:
 	Model(const char* filePath);
 
-	void draw(Shader* shader, Camera* cam);
+	void draw(Shader* shader, Camera* cam, glm::mat4 model);
 private:
 	uint32_t VAO;
 	uint32_t amountOfVoxels;

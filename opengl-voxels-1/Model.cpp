@@ -11,13 +11,14 @@
 #include <intrin.h>
 
 Model::Model(const char* filePath) {
-	loadModel(filePath);
     glGenVertexArrays(1, &VAO);
+	loadModel(filePath);
 }
 
-void Model::draw(Shader* shader, Camera* cam) {
+void Model::draw(Shader* shader, Camera* cam, glm::mat4 model) {
     shader->use();
     cam->setUniforms(shader);
+    shader->setMat4("model", model);
 
     float mult = 0.1f;
     static float angle = -40;
@@ -39,31 +40,19 @@ void Model::draw(Shader* shader, Camera* cam) {
 
     shader->setFloat("voxSize", VOX_SIZE); 
 
-    // TODO: Does only draw a single voxel at probably 0, 0, 0
     glBindVertexArray(VAO);
     glDrawArrays(GL_POINTS, 0, amountOfVoxels);
     glBindVertexArray(0);
 }
 
 void Model::calculateVAO(std::vector<Voxel>* voxels) {
-    //uint32_t VBO;
-    //glGenBuffers(1, &VBO);
-
-    // TODO: Does only draw a single voxel at probably 0, 0, 0
-    std::vector<Voxel> temp{
-        {{0, 0, 0}, {1, 0, 0} },
-        {{1, 0, 0}, {1, 0, 0} },
-        {{2, 0, 0}, {1, 0, 0} },
-        {{1, 1, 0}, {1, 0, 0} },
-        {{2, 2, 0}, {1, 0, 0} },
-    };
-
     uint32_t VBO;
     glGenBuffers(1, &VBO);
+
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, temp.size() * sizeof(Voxel), temp.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, voxels->size() * sizeof(Voxel), voxels->data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)0);
     glEnableVertexAttribArray(0);
@@ -74,20 +63,6 @@ void Model::calculateVAO(std::vector<Voxel>* voxels) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindVertexArray(0);
-
-
-    /*glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, temp.size() * sizeof(Voxel), temp.data(), GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*) 0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*) offsetof(Voxel, color));
-    glEnableVertexAttribArray(1);
-
-    glBindVertexArray(0);*/
 }
 
 // TODO: Fix for multiple chunks
@@ -127,7 +102,7 @@ void Model::loadModel(const char* filePath) {
     }
 
     bytePointer += 4 * 2;
-    constexpr size_t rgbaAmount = 256;
+    constexpr size_t rgbaAmount = 255;
     std::vector<QuadUint8Struct> voxRGBAs(rgbaAmount);
     for (int i = 0; i < rgbaAmount; i++) {
         voxRGBAs[i] = QuadUint8Struct::getQuadUint8Struct(&bytes, &bytePointer);
@@ -136,10 +111,10 @@ void Model::loadModel(const char* filePath) {
     std::vector<Voxel> voxels(voxAmount);
     for (size_t i = 0; i < voxAmount; i++) {
         QuadUint8Struct voxXYZI = voxXYZIs[i];
-        QuadUint8Struct voxRGBA = voxRGBAs[voxXYZIs[i].d];
+        QuadUint8Struct voxRGBA = voxRGBAs[voxXYZIs[i].d - 1];
 
         voxels[i] = {
-            (float)voxXYZI.a, (float)voxXYZI.b, (float)voxXYZI.c,
+            (float)voxXYZI.a, (float)voxXYZI.c, (float)voxXYZI.b,
             (float)voxRGBA.a / 255.0f, (float)voxRGBA.b / 255.0f, (float)voxRGBA.c / 255.0f,
         };
     }

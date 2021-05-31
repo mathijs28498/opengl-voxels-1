@@ -31,7 +31,7 @@ void processInput(GLFWwindow* window) {
 
 int main() {
 	try {
-		char test = 0xff;
+		unsigned char test = 0xff;
 		uint32_t test2 = (uint32_t)test;
 		uint32_t test3 = (uint8_t)test;
 

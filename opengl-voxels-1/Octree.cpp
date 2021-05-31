@@ -129,7 +129,7 @@ void Octree::drawBoundingBoxes(Shader* shader, Camera* cam) const {
 void Octree::drawVoxels(Shader* shader, Camera* cam) const {
 	shader->use();
 	cam->setUniforms(shader);
-	float mult = 0.1f;
+	float mult = 1;
 	static float angle = -40;
 	angle += 0.05f * mult;
 	if (angle > 360 - 40) 
@@ -145,7 +145,7 @@ void Octree::drawVoxels(Shader* shader, Camera* cam) const {
 	}
 
 	shader->setVec3("lightDir", glm::rotate(glm::vec3(-1, 0, 0), glm::radians(realAngle), glm::vec3(-1, 0, 1)));
-	shader->setFloat("lightIntensity", 1);
+	shader->setFloat("lightIntensity", lightIntensity);
 
 	shader->setFloat("voxSize", VOX_SIZE);
 

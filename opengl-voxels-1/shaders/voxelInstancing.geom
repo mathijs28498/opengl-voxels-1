@@ -10,6 +10,7 @@ out vec3 normal;
 
 uniform float voxSize;
 
+uniform mat4 model = mat4(1.0);
 uniform mat4 view;
 uniform mat4 proj;
 
@@ -40,7 +41,7 @@ bool IsCulled(vec4 normal) {
 void main() {
     vec4 position = gl_in[0].gl_Position;
     vec4 center = vec4(position.xyz * voxSize, 1);
-    mat4 mvp = proj * view;
+    mat4 mvp = proj * view * model;
 //    fColor = vec3(1 - cos(length(position) * voxSize) / 2 + 0.5, sin(length(position) * voxSize) / 2 + 0.5, cos(length(position) * voxSize) / 2 + 0.5);
     fColor = gColor[0];
 
