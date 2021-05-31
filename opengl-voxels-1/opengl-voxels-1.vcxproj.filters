@@ -19,57 +19,102 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{a6d735f6-e47e-4366-b8fb-ab1c3475c810}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\General">
+      <UniqueIdentifier>{d5ec4305-b3f4-4984-956f-08a7a7a9fe94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\General">
+      <UniqueIdentifier>{89996706-00d0-4dd3-bc26-91b96f633789}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{9b687d2f-5fa5-4947-9e0c-ff97d52da2df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects">
+      <UniqueIdentifier>{a11f5473-7eb3-438e-b041-640003e83470}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Unused">
+      <UniqueIdentifier>{7c081830-1deb-4150-80ba-408e2b99698d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Unused">
+      <UniqueIdentifier>{d10b5001-fc6e-4f3a-8deb-355b9fee70e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Global">
+      <UniqueIdentifier>{90b7e08f-20e9-49b5-ac1a-65ff00dd003c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Global">
+      <UniqueIdentifier>{8a67f51c-097a-449c-9a73-307312bb666b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="glad.c">
       <Filter>Library Files</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\General</Filter>
     </ClCompile>
-    <ClCompile Include="GLHelperFunctions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexData.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="Window.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="Octree.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Chunk.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\Unused</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="GLHelperFunctions.cpp">
+      <Filter>Source Files\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexData.cpp">
+      <Filter>Source Files\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneralHelperFunctions.cpp">
+      <Filter>Source Files\Global</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GLHelperFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\General</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Octree.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Chunk.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\Unused</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="FastNoiseLite.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="GLHelperFunctions.h">
+      <Filter>Header Files\Global</Filter>
     </ClInclude>
     <ClInclude Include="VertexData.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneralHelperFunctions.h">
+      <Filter>Header Files\Global</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -85,10 +130,25 @@
     <None Include="shaders\object.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\simple.vert">
+    <None Include="shaders\voxelInstancing.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\simple.frag">
+    <None Include="shaders\voxelInstancing.geom">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\voxelInstancingTerrain.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\octreeBoundingBox.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\octreeBoundingBox.geom">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\octreeBoundingBox.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\voxelInstancing.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

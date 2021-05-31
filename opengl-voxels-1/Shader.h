@@ -15,6 +15,7 @@ public:
 	uint32_t ID;
 
 	Shader(const char* vertexPath, const char* fragmentPath);
+	Shader(const char* vertexPath, const char* geometryPath, const char* fragmentPath);
 	void use();
 
 
@@ -57,4 +58,5 @@ public:
 	void setVec4(const std::string& name, float v0, float v1, float v2, float v3) const;*/
 private:
 	void getShaderCode(const char* shaderPath, std::string* vectorCode);
+	uint32_t createShader(const char* shaderPath, GLuint type);
 };

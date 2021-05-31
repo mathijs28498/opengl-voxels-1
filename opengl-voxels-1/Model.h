@@ -1,19 +1,34 @@
 #pragma once
 
 #include "Shader.h"
-#include "Mesh.h"
+#include "Camera.h"
+#include "VertexData.h"
 
-#include <iostream>
+#include <vector>
+
+struct QuadUint8Struct {
+	uint8_t a, b, c, d;
+
+	static QuadUint8Struct getQuadUint8Struct(std::vector<char>* bytes, size_t* bytePointer) {
+		return {
+			(uint8_t)(*bytes)[(*bytePointer)++],
+			(uint8_t)(*bytes)[(*bytePointer)++],
+			(uint8_t)(*bytes)[(*bytePointer)++],
+			(uint8_t)(*bytes)[(*bytePointer)++]
+		};
+	}
+};
 
 class Model {
 public:
-	Model(glm::vec3 scaling, uint32_t xAmount, uint32_t yAmount, uint32_t zAmount);
-	void draw(Shader* shader);
+	Model(const char* filePath);
 
+	void draw(Shader* shader, Camera* cam);
 private:
-	glm::vec3 scale;
-	uint32_t xAmount, yAmount, zAmount;
-	uint32_t cubeVAO;
+	uint32_t VAO;
+	uint32_t amountOfVoxels;
+	glm::vec3 position;
 
-	void loadModel(std::string path);
+	void loadModel(const char* filePath);
+	void calculateVAO(std::vector<Voxel>* voxels);
 };
