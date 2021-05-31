@@ -11,14 +11,15 @@
 #include <intrin.h>
 
 Model::Model(const char* filePath) {
+    position = glm::vec3(0);
     glGenVertexArrays(1, &VAO);
 	loadModel(filePath);
 }
 
-void Model::draw(Shader* shader, Camera* cam, glm::mat4 model) {
+void Model::draw(Shader* shader, Camera* cam) {
     shader->use();
     cam->setUniforms(shader);
-    shader->setMat4("model", model);
+    shader->setMat4("model", glm::translate(glm::mat4(1), position));
 
     float mult = 0.1f;
     static float angle = -40;

@@ -31,25 +31,12 @@ void processInput(GLFWwindow* window) {
 
 int main() {
 	try {
-		char test = 0xff;
-		uint32_t test2 = (uint32_t)test;
-		uint32_t test3 = (uint8_t)test;
-
-
 		Window window(WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		Camera cam(window.window, glm::vec3(4, 5, 10), 0.01f, 5, 0.1f, WIDTH, HEIGHT);
 
 		Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
-
-		Model model0("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/castle.vox");
-		Model model1("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/teapot.vox");
-		Model model2("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/menger.vox");
-		Model model3("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/shelf.vox");
-		Model model4("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/room.vox");
-		Model model5("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/monu9.vox");
-		Model model6("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/nature.vox");
 
 		uint32_t octreeSize = 256;
 
@@ -93,14 +80,6 @@ int main() {
 			// TODO: Make input a callback
 			processInput(window.window);
 			window.beginLoop();
-
-			/*model0.draw(&voxelShader, &cam, glm::translate(glm::mat4(1), glm::vec3(0, 0, 0) * VOX_SIZE));
-			model1.draw(&voxelShader, &cam, glm::translate(glm::mat4(1), glm::vec3(100, 0, 0) * VOX_SIZE));
-			model2.draw(&voxelShader, &cam, glm::translate(glm::mat4(1), glm::vec3(-100, 0, 0) * VOX_SIZE));
-			model3.draw(&voxelShader, &cam, glm::translate(glm::mat4(1), glm::vec3(0, 0, 100) * VOX_SIZE));
-			model4.draw(&voxelShader, &cam, glm::translate(glm::mat4(1), glm::vec3(100, 0, 100) * VOX_SIZE));
-			model5.draw(&voxelShader, &cam, glm::translate(glm::mat4(1), glm::vec3(-100, 0, 100) * VOX_SIZE));
-			model6.draw(&voxelShader, &cam, glm::translate(glm::mat4(1), glm::vec3(0, 0, -150) * VOX_SIZE));*/
 
 			for (size_t i = 0; i < trees.size(); i++) {
 				if (showBoundingBoxes) {

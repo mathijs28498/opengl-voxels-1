@@ -23,10 +23,11 @@ class Model {
 public:
 	Model(const char* filePath);
 
-	void draw(Shader* shader, Camera* cam, glm::mat4 model);
+	void draw(Shader* shader, Camera* cam);
 private:
 	uint32_t VAO;
 	uint32_t amountOfVoxels;
+	glm::vec3 position;
 
 	void loadModel(const char* filePath);
 	void calculateVAO(std::vector<Voxel>* voxels);
