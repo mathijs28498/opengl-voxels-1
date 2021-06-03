@@ -3,10 +3,13 @@
 #include "Octree.h"
 #include "Model.h"
 #include "Scene.h"
+#include "Component.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 
 #include <iostream>
+
+#define quote(x) #x
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -32,40 +35,54 @@ void processInput(GLFWwindow* window) {
 int main() {
 	try {
 		Window window(WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-		Camera cam(window.window, glm::vec3(4, 5, 10), 0.01f, 5, 0.1f, WIDTH, HEIGHT);
+		Camera cam(window.window, glm::vec3(4, 5, 10), 0.001f, 5, 0.1f, WIDTH, HEIGHT);
 
-		Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
+		//Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
-		Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
+		//Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
 
-		uint32_t octreeSize = 256;
+		Scene scene;
 
-		std::vector<Octree> trees;
-		trees.push_back(Octree({ 0, 0, 0 }, octreeSize));
-		/*trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 1 }, octreeSize));
-		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 2 }, octreeSize));
-		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 3 }, octreeSize));
-		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 4 }, octreeSize));
-		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 5 }, octreeSize));
-		trees.push_back(Octree({ 0, 0, -static_cast<int32_t>(octreeSize) * 6 }, octreeSize));
-		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, 0 }, octreeSize));
-		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 1 }, octreeSize));
-		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 2 }, octreeSize));
-		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 3 }, octreeSize));
-		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 4 }, octreeSize));
-		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 5 }, octreeSize));
-		trees.push_back(Octree({ static_cast<int32_t>(octreeSize), 0, -static_cast<int32_t>(octreeSize) * 6 }, octreeSize));*/
-		std::cout << octreeSize * octreeSize * 2 * trees.size() << '\n';
-		for (size_t i = 0; i < trees.size(); i++) {
-			trees[i].makeNoiseTerrain();
-			trees[i].calculateBoundingBoxVAO();
-			trees[i].calculateVoxelVAO();
-		}
-		
+		std::vector<Voxel> voxels{
+			{{0, 0, 0}, {1, 0, 0}},
+			{{0, 1, 0}, {1, 0, 0}},
+			{{0, 2, 0}, {1, 0, 0}},
+			{{0, 3, 0}, {1, 0, 0}},
+			{{0, 4, 0}, {1, 0, 0}},
+			{{0, 5, 0}, {1, 0, 0}},
+		};
+
+		uint32_t VAO, VBO;
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+
+		glBindVertexArray(VAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, voxels.size() * sizeof(Voxel), voxels.data(), GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)offsetof(Voxel, color));
+		glEnableVertexAttribArray(1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindVertexArray(0);
+
+
+		Entity entity;
+		entity.insertComponent(new Transform{ { 0, 0, 0 } });
+		entity.insertComponent(new CameraComp{ cam });
+		entity.insertComponent(new VoxelRenderer{ &voxelShader, &cam, VAO, (uint32_t) voxels.size() });
+
+		scene.addEntity(&entity);
 
 		double lastTime = glfwGetTime();
 		double lastTime2 = glfwGetTime();
 
+		scene.start();
 		while (!window.shouldClose()) {
 			// Measure speed
 			double currentTime = glfwGetTime();
@@ -81,12 +98,7 @@ int main() {
 			processInput(window.window);
 			window.beginLoop();
 
-			for (size_t i = 0; i < trees.size(); i++) {
-				if (showBoundingBoxes) {
-					trees[i].drawBoundingBoxes(&boundingBoxShader, &cam);
-				}
-				trees[i].drawVoxels(&terrainVoxelShader, &cam);
-			}
+			scene.update();
 
 			window.endLoop();
 
