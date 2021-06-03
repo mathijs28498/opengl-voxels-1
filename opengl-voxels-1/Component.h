@@ -29,7 +29,7 @@ struct VoxelRenderer : Component {
 	uint32_t voxelAmount;
 };
 
-// TODO: Deconstruct camera and use it in voxelrenderer (have a main camera)
+// TODO: Untangle camera and use it in voxelrenderer (have a main camera)
 struct CameraComp : Component {
 	CameraComp(Camera camera) : camera(camera) {};
 	Camera camera;
@@ -48,8 +48,12 @@ public:
 	bool hasRequirement(std::string requirement);
 	Component* getComponent(std::string key);
 
-private:
+protected:
 	std::map<std::string, Component*> components;
+};
+
+class MainCamera : Entity {
+	MainCamera();
 };
 
 template <typename T>

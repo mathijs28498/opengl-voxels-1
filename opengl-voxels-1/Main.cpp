@@ -35,58 +35,30 @@ void processInput(GLFWwindow* window) {
 int main() {
 	try {
 		Window window(WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-		Camera cam(window.window, glm::vec3(4, 5, 10), 0.001f, 5, 0.1f, WIDTH, HEIGHT);
+		Camera cam(window.window, glm::vec3(4, 5, 10), 0.01f, 5, 0.1f, WIDTH, HEIGHT);
 
 		//Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		//Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
 
+		Model model("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/monu10.vox");
+		Model model2("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/monu10.vox");
+
 		Scene scene;
-
-		std::vector<Voxel> voxels{
-			{{10, 0, 0}, {1, 1, 1}},
-			{{10, 1, 0}, {1, 1, 1}},
-			{{10, 2, 0}, {1, 1, 1}},
-			{{10, 3, 0}, {1, 1, 1}},
-			{{10, 4, 0}, {1, 1, 1}},
-			{{10, 5, 0}, {1, 1, 1}},
-			{{10, 7, 0}, {1, 1, 1}},
-			{{10, 8, 0}, {1, 1, 1}},
-			{{10, 9, 0}, {1, 1, 1}},
-			{{10, 10, 0}, {1, 1, 1}},
-			{{10, 11, 0}, {1, 1, 1}},
-			{{10, 12, 0}, {1, 1, 1}},
-			{{10, 14, 0}, {1, 1, 1}},
-			{{10, 17, 0}, {1, 1, 1}},
-			{{10, 19, 0}, {1, 1, 1}},
-		};
-
-		uint32_t VAO, VBO;
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-
-		glBindVertexArray(VAO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, voxels.size() * sizeof(Voxel), voxels.data(), GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)offsetof(Voxel, color));
-		glEnableVertexAttribArray(1);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glBindVertexArray(0);
 
 
 		Entity entity;
 		entity.insertComponent(new Transform{ { 0, 0, 0 } });
-		entity.insertComponent(new CameraComp{ cam });
-		entity.insertComponent(new VoxelRenderer{ &voxelShader, &cam, VAO, (uint32_t) voxels.size() });
+		VoxelRenderer r = model.getVoxelRenderer(&voxelShader, &cam);
+		entity.insertComponent(&r);
+
+		Entity entity2;
+		entity2.insertComponent(new Transform{ { 0, 0, 30 } });
+		VoxelRenderer r2 = model2.getVoxelRenderer(&voxelShader, &cam);
+		entity2.insertComponent(&r2);
 
 		scene.addEntity(&entity);
+		scene.addEntity(&entity2);
 
 		double lastTime = glfwGetTime();
 		double lastTime2 = glfwGetTime();
