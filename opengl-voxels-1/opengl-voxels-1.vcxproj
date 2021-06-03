@@ -116,12 +116,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glm-0.9.9.7\glm;C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glad\include;C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glew\glew-2.1.0\include;C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glfw\glfw-3.3.4.bin.WIN64\include;C:\Users\mathi\OneDrive\Documenten\opengl_libraries\read-image-header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\libraries\include\glm;$(ProjectDir)\libraries\include\glfw;$(ProjectDir)\libraries\include\glew;$(ProjectDir)\libraries\include\glad;$(ProjectDir)\libraries\include\read-image-header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glew\glew-2.1.0\lib\Release\x64;C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glfw\glfw-3.3.4.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\libraries\bin\glew;$(ProjectDir)\libraries\bin\glfw-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -133,14 +133,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glm-0.9.9.7\glm;C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glad\include;C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glew\glew-2.1.0\include;C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glfw\glfw-3.3.4.bin.WIN64\include;C:\Users\mathi\OneDrive\Documenten\opengl_libraries\read-image-header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\libraries\include\glm;$(ProjectDir)\libraries\include\glfw;$(ProjectDir)\libraries\include\glew;$(ProjectDir)\libraries\include\glad;$(ProjectDir)\libraries\include\read-image-header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glew\glew-2.1.0\lib\Release\x64;C:\Users\mathi\OneDrive\Documenten\opengl_libraries\glfw\glfw-3.3.4.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\libraries\bin\glew;$(ProjectDir)\libraries\bin\glfw-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
