@@ -6,29 +6,23 @@
 #include <glm/glm.hpp>
 #include<map>
 
-// TODO: Make these not auto anymore
-constexpr auto ComponentCount = 32;
-constexpr auto SystemCount = 8;
-
 struct Component {
 	virtual void ignored() {};
-	const std::string type;
-	Component(const std::string type) : type(type) {};
 };
 
 struct Transform : Component {
-	Transform(glm::vec3 pos) : Component("Transform"), position(pos) {};
+	Transform(glm::vec3 pos) : position(pos) {};
 	glm::vec3 position;
 };
 
 struct Velocity : Component {
-	Velocity(glm::vec3 vel) : Component("Velocity"), vel(vel) {};
+	Velocity(glm::vec3 vel) : vel(vel) {};
 	glm::vec3 vel;
 };
 
 struct VoxelRenderer : Component {
 	VoxelRenderer(Shader* shader, Camera* camera, uint32_t VAO, uint32_t voxelAmount) : 
-		Component("VoxelRenderer"), shader(shader), camera(camera), VAO(VAO), voxelAmount(voxelAmount) {};
+		shader(shader), camera(camera), VAO(VAO), voxelAmount(voxelAmount) {};
 	Shader* shader;
 	Camera* camera;
 	uint32_t VAO;
@@ -37,7 +31,7 @@ struct VoxelRenderer : Component {
 
 // TODO: Deconstruct camera and use it in voxelrenderer (have a main camera)
 struct CameraComp : Component {
-	CameraComp(Camera camera) : Component("CameraComp"), camera(camera) {};
+	CameraComp(Camera camera) : camera(camera) {};
 	Camera camera;
 };
 
@@ -57,3 +51,8 @@ public:
 private:
 	std::map<std::string, Component*> components;
 };
+
+template <typename T>
+T* getComponentFromEntity(Entity* entity) {
+	return dynamic_cast<T*>(entity->getComponent(typeid(T).name()));
+}

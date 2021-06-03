@@ -4,13 +4,13 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 void VoxelRenderSystem::start(Entity* entity) {
-	Transform* transform = dynamic_cast<Transform*>(entity->getComponent("Transform"));
-	VoxelRenderer* renderer = dynamic_cast<VoxelRenderer*>(entity->getComponent("VoxelRenderer"));
+    Transform* transform = getComponentFromEntity<Transform>(entity);
+    VoxelRenderer* renderer = getComponentFromEntity<VoxelRenderer>(entity);
 }
 
 void VoxelRenderSystem::update(Entity* entity) {
-	Transform* transform = dynamic_cast<Transform*>(entity->getComponent("Transform"));
-	VoxelRenderer* renderer = dynamic_cast<VoxelRenderer*>(entity->getComponent("VoxelRenderer"));
+    Transform* transform = getComponentFromEntity<Transform>(entity);
+    VoxelRenderer* renderer = getComponentFromEntity<VoxelRenderer>(entity);
 
     renderer->shader->use();
     renderer->camera->setUniforms(renderer->shader);
@@ -31,8 +31,8 @@ void VoxelRenderSystem::update(Entity* entity) {
         angle += 0.3f * mult;
     }
 
-    renderer->shader->setVec3("lightDir", glm::rotate(glm::vec3(-1, 0, 0), glm::radians(realAngle), glm::vec3(-1, 0, 1)));
-    renderer->shader->setFloat("lightIntensity", lightIntensity);
+    renderer->shader->setVec3("lightDir", glm::rotate(glm::vec3(-1, 0, 0), glm::radians(90.0f), glm::vec3(-1, 0, 1)));
+    renderer->shader->setFloat("lightIntensity", 1);
 
     renderer->shader->setFloat("voxSize", VOX_SIZE);
 

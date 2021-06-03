@@ -36,7 +36,7 @@ private:
 
 class VoxelRenderSystem : public System {
 public:
-	VoxelRenderSystem() : System({ "Transform", "VoxelRenderer" }) {};
+	VoxelRenderSystem() : System({ typeid(Transform).name(), typeid(VoxelRenderer).name() }) {};
 
 protected:
 	void System::start(Entity* entity);

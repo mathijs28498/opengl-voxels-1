@@ -3,10 +3,10 @@
 #include <stdexcept>
 
 void Entity::insertComponent(Component* component) {
-	if (components.count(component->type))
-		throw std::runtime_error("Entity already contains " + component->type + " component");
+	if (components.count(typeid(*component).name()))
+		throw std::runtime_error("Entity already contains component");
 
-	components.insert({ component->type, component });
+	components.insert({ typeid(*component).name(), component });
 };
 
 bool Entity::hasRequirement(std::string requirement) {
