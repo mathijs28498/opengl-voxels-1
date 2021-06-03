@@ -4,9 +4,10 @@
 #include "Camera.h"
 
 #include <glm/glm.hpp>
-#include<map>
+#include <map>
 
 struct Component {
+	// Virtual member necessary to cast derived classes to this base class
 	virtual void ignored() {};
 };
 
@@ -21,7 +22,7 @@ struct Velocity : Component {
 };
 
 struct VoxelRenderer : Component {
-	VoxelRenderer(Shader* shader, Camera* camera, uint32_t VAO, uint32_t voxelAmount) : 
+	VoxelRenderer(Shader* shader, Camera* camera, uint32_t VAO, uint32_t voxelAmount) :
 		shader(shader), camera(camera), VAO(VAO), voxelAmount(voxelAmount) {};
 	Shader* shader;
 	Camera* camera;
@@ -31,12 +32,13 @@ struct VoxelRenderer : Component {
 
 // TODO: Untangle camera and use it in voxelrenderer (have a main camera)
 struct CameraComp : Component {
-	CameraComp(Camera camera) : camera(camera) {};
-	Camera camera;
+	CameraComp(Camera* camera) : camera(camera) {};
+	Camera* camera;
 };
 
 class Entity {
 public:
+	Entity() {};
 	~Entity() {
 		// TODO: Components are created on the heap, probably need to be deleted here but gives an error
 		/*for (auto i = components.rbegin(); i != components.rend(); ++i) {
@@ -49,11 +51,14 @@ public:
 	Component* getComponent(std::string key);
 
 protected:
+	Entity(std::map<std::string, Component*> components) : components(components) {};
 	std::map<std::string, Component*> components;
 };
 
 class MainCamera : Entity {
-	MainCamera();
+public:
+	void insertComponent(Component* component) = delete;
+	void setCamera(CameraComp* camera);
 };
 
 template <typename T>

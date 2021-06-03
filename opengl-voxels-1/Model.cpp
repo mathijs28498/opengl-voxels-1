@@ -16,8 +16,8 @@ Model::Model(const char* filePath) {
 	loadModel(filePath);
 }
 
-VoxelRenderer Model::getVoxelRenderer(Shader* shader, Camera* cam) {
-    return VoxelRenderer{ shader, cam, VAO, amountOfVoxels };
+VoxelRenderer Model::getVoxelRenderer(Shader* shader, Camera* camera) {
+    return VoxelRenderer{ shader, camera, VAO, amountOfVoxels };
 }
 
 void Model::draw(Shader* shader, Camera* cam) {

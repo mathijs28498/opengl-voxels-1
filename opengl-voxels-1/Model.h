@@ -25,7 +25,7 @@ public:
 	Model(const char* filePath);
 
 	void draw(Shader* shader, Camera* cam);
-	VoxelRenderer getVoxelRenderer(Shader* shader, Camera* cam);
+	VoxelRenderer getVoxelRenderer(Shader* shader, Camera* camera);
 private:
 	uint32_t VAO;
 	uint32_t amountOfVoxels;

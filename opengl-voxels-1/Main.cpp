@@ -45,6 +45,7 @@ int main() {
 		Model model2("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/monu10.vox");
 
 		Scene scene;
+		scene.setMainCameraComponent(new CameraComp(&cam));
 
 
 		Entity entity;

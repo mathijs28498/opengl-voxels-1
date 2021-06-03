@@ -41,7 +41,13 @@ public:
 protected:
 	void System::start(Entity* entity);
 	void System::update(Entity* entity);
+};
 
-private:
+class MainCameraSystem : public System {
+public:
+	MainCameraSystem() : System({ typeid(MainCamera).name() }) {};
 
+protected:
+	void System::start(Entity* entity);
+	void System::update(Entity* entity);
 };

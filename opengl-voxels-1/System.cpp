@@ -40,3 +40,13 @@ void VoxelRenderSystem::update(Entity* entity) {
     glDrawArrays(GL_POINTS, 0, renderer->voxelAmount);
     glBindVertexArray(0);
 }
+
+void MainCameraSystem::start(Entity* entity) {
+    Transform* transform = getComponentFromEntity<Transform>(entity);
+    VoxelRenderer* renderer = getComponentFromEntity<VoxelRenderer>(entity);
+}
+
+void MainCameraSystem::update(Entity* entity) {
+    Transform* transform = getComponentFromEntity<Transform>(entity);
+    VoxelRenderer* renderer = getComponentFromEntity<VoxelRenderer>(entity);
+}

@@ -18,6 +18,7 @@ void Scene::start() {
 };
 
 void Scene::update() {
+
 	for (System* system : systems) {
 		for (auto i = entities.rbegin(); i != entities.rend(); ++i) {
 			system->doUpdate(*i);

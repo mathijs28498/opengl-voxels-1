@@ -16,3 +16,10 @@ bool Entity::hasRequirement(std::string requirement) {
 Component* Entity::getComponent(std::string requirement) {
 	return components[requirement];
 };
+
+void MainCamera::setCamera(CameraComp* camera) {
+	if (components.count(typeid(CameraComp).name()))
+		components.insert({ typeid(CameraComp).name(), camera });
+	else
+		components[typeid(CameraComp).name()] = camera;
+}
