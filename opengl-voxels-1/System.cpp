@@ -31,8 +31,8 @@ void VoxelRenderSystem::update(Entity* entity) {
         angle += 0.3f * mult;
     }
 
-    renderer->shader->setVec3("lightDir", glm::rotate(glm::vec3(-1, 0, 0), glm::radians(90.0f), glm::vec3(-1, 0, 1)));
-    renderer->shader->setFloat("lightIntensity", 1);
+    renderer->shader->setVec3("lightDir", glm::rotate(glm::vec3(-1, 0, 0), glm::radians(angle), glm::vec3(-1, 0, 1)));
+    renderer->shader->setFloat("lightIntensity", lightIntensity);
 
     renderer->shader->setFloat("voxSize", VOX_SIZE);
 

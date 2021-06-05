@@ -1,4 +1,5 @@
 #version 330 core
+in vec3 fViewPos;
 in vec3 fColor;
 in vec3 fragPos;
 in vec3 normal;
@@ -6,13 +7,12 @@ in vec3 normal;
 out vec4 FragColor;
 
 uniform vec3 lightDir;
-uniform vec3 viewPos;
 uniform float lightIntensity;
 
 vec3 calcDirLight(vec3 viewDir);
 
 void main() { 
-    FragColor = vec4(calcDirLight(viewPos - fragPos), 1.0);   
+    FragColor = vec4(calcDirLight(fViewPos - fragPos), 1.0);   
 //    FragColor = vec4(fColor, 1.0);   
 }  
 

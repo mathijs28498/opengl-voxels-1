@@ -124,5 +124,6 @@ void Model::loadModel(const char* filePath) {
         };
     }
 
+    std::cout << "amount of voxels: " << amountOfVoxels << '\n';
     calculateVAO(&voxels);
 }

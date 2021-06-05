@@ -30,6 +30,7 @@ void Camera::setUniforms(const Shader* shader) {
 	shader->setMat4("view", view);
 	shader->setMat4("proj", proj);
 	shader->setVec3("viewPos", cameraPos);
+	shader->setVec3("viewDir", cameraDir);
 }
 
 // TODO: Exchange glfwgettime for a deltatime thing
