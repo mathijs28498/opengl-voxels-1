@@ -16,8 +16,8 @@ Model::Model(const char* filePath) {
 	loadModel(filePath);
 }
 
-VoxelRenderer Model::getVoxelRenderer(Shader* shader, Camera* camera) {
-    return VoxelRenderer{ shader, camera, VAO, amountOfVoxels };
+VoxelRenderer* Model::getVoxelRenderer(Shader* shader, Camera* camera) {
+    return new VoxelRenderer{ shader, camera, VAO, amountOfVoxels };
 }
 
 void Model::draw(Shader* shader, Camera* cam) {
@@ -124,6 +124,6 @@ void Model::loadModel(const char* filePath) {
         };
     }
 
-    std::cout << "amount of voxels: " << amountOfVoxels << '\n';
+    std::cout << "amount of voxels in model: " << amountOfVoxels << '\n';
     calculateVAO(&voxels);
 }

@@ -1,6 +1,9 @@
 #include "Window.h"
 
 void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
 	reinterpret_cast<Scene*>(glfwGetWindowUserPointer(window))->keyCallback(key, action);
 }
 void mouseCursorCallback(GLFWwindow* window, double xpos, double ypos) {

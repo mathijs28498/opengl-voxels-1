@@ -12,62 +12,60 @@
 const int WIDTH = 800;
 const int HEIGHT = 600;
 const char* TITLE = "Voxels everywhere";
-const int xAmount = 100;
-const int zAmount = 100;
-bool showBoundingBoxes = false;
 
-void processInput(GLFWwindow* window) {
-	//Camera* cam = reinterpret_cast<Camera*>(glfwGetWindowUserPointer(window));
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, true);
-	}
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-		showBoundingBoxes = true;
-	}
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-		showBoundingBoxes = false;
-	}
-	//cam->moveCamera(window);
+void addCameraEntity(Scene* scene, Camera* cam) {
+	Entity* cameraEntity = new Entity;
+	cameraEntity->insertComponent(new CameraComp(cam));
+	cameraEntity->insertComponent(new KeyInput);
+	cameraEntity->insertComponent(new MouseCursorInput);
+	scene->addEntity(cameraEntity);
+}
+
+void addOctreeEntity(Scene* scene, Shader* terrainVoxelShader, Shader* boundingBoxShader, Camera* cam) {
+	Octree* octree = new Octree({ 0, 0, 0 }, 256);
+	octree->makeNoiseTerrain();
+	octree->calculateVoxelVAO();
+	octree->calculateBoundingBoxVAO();
+
+	Entity* entity = new Entity;
+	entity->insertComponent(new Transform{ {0, 0, 0} });
+	entity->insertComponent(new KeyInput);
+	entity->insertComponent(octree->getVoxelRenderer(terrainVoxelShader, cam));
+	entity->insertComponent(octree->getBoundingBoxRenderer(boundingBoxShader, cam, false));
+	scene->addEntity(entity);
+}
+
+
+void addModelEntity(Scene* scene, glm::vec3 pos, Model* model, Shader* terrainVoxelShader, Camera* cam) {
+	Entity* entity = new Entity;
+	entity->insertComponent(new Transform(pos));
+	entity->insertComponent(model->getVoxelRenderer(terrainVoxelShader, cam));
+	scene->addEntity(entity);
 }
 
 int main() {
 
 	try {
 		Window window(WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-		Camera cam(window.window, glm::vec3(30, 15, 20), 0.01f, 5, 0.1f, WIDTH, HEIGHT);
+		Camera cam(window.window, glm::vec3(0, 15, 20), 0.01f, 5, 0.1f, WIDTH, HEIGHT);
 
 
 		Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
 
-		Model model("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/monu10.vox");
+		Model monu("models/monu10.vox");
+		Model teapot("models/teapot.vox");
 
 		Scene scene;
-		//scene.setMainCameraComponent(new CameraComp(&cam));
-
-		Entity* cameraEntity = new Entity;
-		cameraEntity->insertComponent(new CameraComp(&cam));
-		cameraEntity->insertComponent(new KeyInput);
-		cameraEntity->insertComponent(new MouseCursorInput);
-		scene.addEntity(cameraEntity);
-
 		window.setScenePointer(&scene);
+		addCameraEntity(&scene, &cam);
+		addOctreeEntity(&scene, &terrainVoxelShader, &boundingBoxShader, &cam);
+		addModelEntity(&scene, glm::vec3(30 * VOX_SIZE, 45*VOX_SIZE, 30 * VOX_SIZE), &monu, &voxelShader, &cam);
+		addModelEntity(&scene, glm::vec3(100 * VOX_SIZE, 45*VOX_SIZE, 0), &teapot, &voxelShader, &cam);
 
-		Octree octree({0, 0, 0}, 256);
-		octree.makeNoiseTerrain();
-		octree.calculateVoxelVAO();
-		octree.calculateBoundingBoxVAO();
-
-		Entity* entity = new Entity;
-		entity->insertComponent(new Transform{ {0, 0, 0} });
-		entity->insertComponent(new KeyInput);
-		VoxelRenderer vr = octree.getVoxelRenderer(&terrainVoxelShader, &cam);
-		BoundingBoxRenderer br = octree.getBoundingBoxRenderer(&boundingBoxShader, &cam, false);
-		entity->insertComponent(&vr);
-		entity->insertComponent(&br);
-		scene.addEntity(entity);
-
+		// TODO: Make better benchmark
+		// TODO: Make a deltaTime variable
 		double lastTime = glfwGetTime();
 		double lastTime2 = glfwGetTime();
 
@@ -82,9 +80,6 @@ int main() {
 				lastTime2 = currentTime;
 			}
 
-
-			// TODO: Make input a callback
-			processInput(window.window);
 			window.beginLoop();
 
 			scene.update();

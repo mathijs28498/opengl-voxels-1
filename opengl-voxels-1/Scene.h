@@ -9,7 +9,6 @@
 
 class Scene {
 public:
-	Scene() : mainCamera(new MainCamera()) {};
 	// TODO: Probably need to do garbage collection but this gives an error (entities are on heap)
 	/*~Scene() {
 	* delete mainCamera;
@@ -17,8 +16,6 @@ public:
 			delete entities[i];
 		}
 	};*/
-	void setMainCameraComponent(CameraComp* cameraComp) { mainCamera->setCamera(cameraComp); };
-	MainCamera* getMainCamera() { return mainCamera; };
 
 	void addEntity(Entity* entity);
 
@@ -30,7 +27,5 @@ public:
 	void fixedUpdate();
 
 private:
-	MainCamera* mainCamera;
-	//Octree terrain;
 	std::vector<Entity*> entities{};
 };
