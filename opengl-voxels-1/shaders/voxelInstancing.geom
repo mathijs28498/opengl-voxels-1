@@ -3,6 +3,7 @@ layout(points) in;
 layout(triangle_strip, max_vertices = 24) out;
 
 in vec3 gColor[];
+in int gEnabledFaces[];
 
 out vec3 fColor;
 out vec3 fragPos;
@@ -44,7 +45,8 @@ void main() {
     vec4 relativeCenterTop = relativeCenter + voxSize;
     float relativeVoxSize = voxSize / relativeCenter.w;
     relativeCenter /= relativeCenter.w;
-    if (relativeCenter.x + relativeVoxSize < -1.1 || relativeCenter.x + relativeVoxSize > 1 || relativeCenter.y + relativeVoxSize < -1.1 || relativeCenter.y > 1) {
+    // TODO: Improve this
+    if (relativeCenter.x + relativeVoxSize < -1.5 || relativeCenter.x + relativeVoxSize > 1.5 || relativeCenter.y + relativeVoxSize < -1.5 || relativeCenter.y > 1.5) {
         return;
     }
 
@@ -65,35 +67,28 @@ void main() {
 
     // FRONT
     normal = vec3(0, 0, 1);
-    // TODO: Take into account the position of the blocks, now culling happens too fast sometimes
-    float testDot = dot(-viewDir, normal);
-    if (testDot > 0.01 || true) 
         addQuad(mvp, center, ruf, rdf, luf, ldf);
 
     // BACK
     normal = vec3(0, 0, -1);
-    if (testDot < -0.01 || true) 
         addQuad(mvp, center, lub, ldb, rub, rdb);
     
     // LEFT
     normal = vec3(1, 0, 0 );
-    testDot = dot(-viewDir, normal);
-    if (testDot < -0.01 || true) 
+//    testDot = dot(-viewDir, normal);
         addQuad(mvp, center, luf, ldf, lub, ldb);
 
     // RIGHT
     normal = vec3(-1, 0, 0);
-    if (testDot > 0.01 || true) 
         addQuad(mvp, center, rub, rdb, ruf, rdf);
     
     // TOP
     normal = vec3(0, 1, 0);
-    testDot = dot(-viewDir, normal);
-    if (testDot > 0.01 || true) 
+//    testDot = dot(-viewDir, normal);
         addQuad(mvp, center, rub, ruf, lub, luf);
 
     // BOT
     normal = vec3(0, -1, 0);
-    if (testDot < -0.01 || true) 
+//    if ((test & 0x20) != 0) 
         addQuad(mvp, center, ldb, ldf, rdb, rdf);
 }

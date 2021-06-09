@@ -1,4 +1,4 @@
-#include "System.h"
+#include "SustainedSystem.h"
 #include "VertexData.h"
 
 #include <glm/gtx/rotate_vector.hpp>
@@ -16,7 +16,7 @@ void VoxelRenderSystem::update(Entity* entity) {
     renderer->camera->setUniforms(renderer->shader);
     renderer->shader->setMat4("model", glm::translate(glm::mat4(1), transform->position));
 
-    float mult = 0.1f;
+    float mult = 0.5f;
     static float angle = -40;
     angle += 0.05f * mult;
     if (angle > 360 - 40)
@@ -41,12 +41,19 @@ void VoxelRenderSystem::update(Entity* entity) {
     glBindVertexArray(0);
 }
 
-void MainCameraSystem::start(Entity* entity) {
+void VoxelRenderSystem::fixedUpdate(Entity* entity) {
     Transform* transform = getComponentFromEntity<Transform>(entity);
     VoxelRenderer* renderer = getComponentFromEntity<VoxelRenderer>(entity);
 }
 
+void MainCameraSystem::start(Entity* entity) {
+    Transform* transform = getComponentFromEntity<Transform>(entity);
+}
+
 void MainCameraSystem::update(Entity* entity) {
     Transform* transform = getComponentFromEntity<Transform>(entity);
-    VoxelRenderer* renderer = getComponentFromEntity<VoxelRenderer>(entity);
+}
+
+void MainCameraSystem::fixedUpdate(Entity* entity) {
+    Transform* transform = getComponentFromEntity<Transform>(entity);
 }

@@ -125,6 +125,9 @@
     <ClInclude Include="Component.h">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="SustainedSystem.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
     <ClInclude Include="System.h">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>

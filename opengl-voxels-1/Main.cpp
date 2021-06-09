@@ -34,9 +34,9 @@ int main() {
 
 	try {
 		Window window(WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-		Camera cam(window.window, glm::vec3(4, 5, 10), 0.1f, 5, 0.1f, WIDTH, HEIGHT);
+		Camera cam(window.window, glm::vec3(0, 0, 10), 0.01f, 5, 0.1f, WIDTH, HEIGHT);
 
-		//Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
+		Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		//Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
 
@@ -45,13 +45,23 @@ int main() {
 		Scene scene;
 		scene.setMainCameraComponent(new CameraComp(&cam));
 
-		for (int i = 0; i < 10; i++) {
+		Octree octree({0, 0, 0}, 256);
+		octree.makeNoiseTerrain();
+		octree.calculateVoxelVAO();
+
+		Entity* entity = new Entity;
+		entity->insertComponent(new Transform{ {0, 0, 0} }); 
+		VoxelRenderer r = octree.getVoxelVoxelRenderer(&terrainVoxelShader, &cam);
+		entity->insertComponent(&r);
+		scene.addEntity(entity);
+
+		/*for (int i = 0; i < 10; i++) {
 			Entity* entity = new Entity;
 			entity->insertComponent(new Transform{ { 30 * i - 30 * 5, 0, 0 } });
 			VoxelRenderer r = model.getVoxelRenderer(&voxelShader, &cam);
 			entity->insertComponent(&r);
 			scene.addEntity(entity);
-		}
+		}*/
 
 		/*for (int i = 0; i < 10; i++) {
 			Entity* entity = new Entity;

@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "VertexData.h"
+#include "Component.h"
 
 #include <glm/glm.hpp>
 
@@ -52,6 +53,9 @@ public:
 
 	void drawVoxels(Shader* shader, Camera* cam) const;
 	void drawBoundingBoxes(Shader* shader, Camera* cam) const;
+
+	VoxelRenderer getVoxelVoxelRenderer(Shader* shader, Camera* camera); 
+	VoxelRenderer getBoundingBoxVoxelRenderer(Shader* shader, Camera* camera);
 private:
 	std::vector<int32_t> pos;
 	int32_t size;

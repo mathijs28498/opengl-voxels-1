@@ -241,6 +241,14 @@ void Octree::makeNoiseTerrain() {
 
 }
 
+VoxelRenderer Octree::getVoxelVoxelRenderer(Shader* shader, Camera* camera) {
+	return VoxelRenderer{ shader, camera, voxelVAO, static_cast<uint32_t>(amountOfVoxels) };
+}
+
+VoxelRenderer Octree::getBoundingBoxVoxelRenderer(Shader* shader, Camera* camera) {
+	return VoxelRenderer{ shader, camera, boundingBoxVAO, static_cast<uint32_t>(amountOfVoxels) };
+}
+
 /// END OCTREE ///
 
 int getIntFromColor(const int* colorArray) {

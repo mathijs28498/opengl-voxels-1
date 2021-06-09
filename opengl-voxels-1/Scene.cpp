@@ -1,7 +1,7 @@
 #include "Scene.h"
-#include "System.h"
+#include "SustainedSystem.h"
 
-std::vector<System*> systems{
+std::vector<SustainedSystem*> systems{
 	new VoxelRenderSystem(),
 };
 
@@ -10,7 +10,7 @@ void Scene::addEntity(Entity* entity) {
 }
 
 void Scene::start() {
-	for (System* system : systems) {
+	for (SustainedSystem* system : systems) {
 		for (auto i = entities.rbegin(); i != entities.rend(); ++i) {
 			system->doStart(*i);
 		}
@@ -19,7 +19,7 @@ void Scene::start() {
 
 void Scene::update() {
 
-	for (System* system : systems) {
+	for (SustainedSystem* system : systems) {
 		for (auto i = entities.rbegin(); i != entities.rend(); ++i) {
 			system->doUpdate(*i);
 		}
