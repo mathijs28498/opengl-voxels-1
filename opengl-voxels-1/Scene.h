@@ -22,6 +22,8 @@ public:
 
 	void addEntity(Entity* entity);
 
+	void keyCallBack(GLFWwindow* window, int key, int action);
+
 	void start();
 	void update();
 	//void fixedUpdate();

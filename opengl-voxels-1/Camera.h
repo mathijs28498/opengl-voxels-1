@@ -32,7 +32,14 @@ public:
 		this->height = height;
 	}
 
-private:
+	glm::vec3 getForwardVec3() {
+		return glm::normalize(cameraDir * glm::vec3(1, 0, 1));
+	}
+
+	glm::vec3 getRightVec3() {
+		return glm::cross(glm::vec3(0, 1, 0), getForwardVec3());
+	}
+
 	float normalWalkSpeed;
 	float speedMultiplier;
 	float actualWalkSpeed;
@@ -42,12 +49,5 @@ private:
 	float pitch = 0.0f;
 	glm::vec2 oldMousePos = glm::vec2(-1.0f, -1.0f);
 	glm::vec3 cameraDir = glm::vec3(0.0f, 0.0f, -1.0f);
-
-	glm::vec3 getForwardVec3() {
-		return glm::normalize(cameraDir * glm::vec3(1, 0, 1));
-	}
-
-	glm::vec3 getRightVec3() {
-		return glm::cross(glm::vec3(0, 1, 0), getForwardVec3());
-	}
+private:
 };

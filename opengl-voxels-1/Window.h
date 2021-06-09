@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Camera.h"
+#include "Scene.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -18,7 +19,8 @@ public:
 
 	void beginLoop();
 	void endLoop();
-	
+
+	void setScenePointer(Scene* scene);
 
 private:
 	glm::vec4 backgroundColor;

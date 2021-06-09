@@ -36,6 +36,17 @@ struct CameraComp : Component {
 	Camera* camera;
 };
 
+struct KeyInput : Component {
+	KeyInput() {
+		std::fill_n(keyPress, GLFW_KEY_LAST, false);
+		std::fill_n(keyRepeat, GLFW_KEY_LAST, false);
+		std::fill_n(keyRelease, GLFW_KEY_LAST, false);
+	}
+	bool keyPress[GLFW_KEY_LAST];
+	bool keyRepeat[GLFW_KEY_LAST];
+	bool keyRelease[GLFW_KEY_LAST];
+};
+
 class Entity {
 public:
 	Entity() {};

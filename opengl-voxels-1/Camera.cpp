@@ -8,7 +8,7 @@ Camera::Camera(GLFWwindow* window, glm::vec3 startPosition, float walkSpeed, flo
 	this->mouseSensitivity = mouseSensitivity;
 	this->width = WIDTH;
 	this->height = HEIGHT;
-	glfwSetWindowUserPointer(window, this);
+	//glfwSetWindowUserPointer(window, this);
 
 	glfwSetCursorPosCallback(window, this->cursorPositionCallback);
 	glfwSetScrollCallback(window, scrollCallback);
@@ -74,7 +74,7 @@ void Camera::moveCamera(GLFWwindow* window) {
 }
 
 void Camera::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
-	Camera* cam = reinterpret_cast<Camera*>(glfwGetWindowUserPointer(window));
+	/*Camera* cam = reinterpret_cast<Camera*>(glfwGetWindowUserPointer(window));
 	glm::vec2 newPos(xpos, ypos);
 	if (cam->oldMousePos == glm::vec2(-1, -1)) {
 		cam->oldMousePos = newPos;
@@ -95,15 +95,15 @@ void Camera::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos
 	cam->cameraDir.x = cos(glm::radians(cam->yaw)) * cos(glm::radians(cam->pitch));
 	cam->cameraDir.y = sin(glm::radians(cam->pitch));
 	cam->cameraDir.z = sin(glm::radians(cam->yaw)) * cos(glm::radians(cam->pitch));
-	cam->setViewMatrix();
+	cam->setViewMatrix();*/
 }
 
 void Camera::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-	Camera* cam = reinterpret_cast<Camera*>(glfwGetWindowUserPointer(window));
-	cam->fov -= (float)yoffset;
+	//Camera* cam = reinterpret_cast<Camera*>(glfwGetWindowUserPointer(window));
+	/*cam->fov -= (float)yoffset;
 	if (cam->fov < 1.0f)
 		cam->fov = 1.0f;
 	if (cam->fov > 45.0f)
 		cam->fov = 45.0f;
-	cam->setProjMatrix();
+	cam->setProjMatrix();*/
 }

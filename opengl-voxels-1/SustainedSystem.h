@@ -7,26 +7,60 @@
 
 // TODO: Make systems that are only called on events
 class SustainedSystem : public System {
+public:
+	void doStart(Entity* entity) {
+		if (hasComponents(entity))
+			start(entity);
+	};
+
+	void doUpdate(Entity* entity) {
+		if (hasComponents(entity))
+			update(entity);
+	};
+
+	void doFixedUpdate(Entity* entity) {
+		if (hasComponents(entity))
+			update(entity);
+	};
+
 protected:
 	SustainedSystem(std::vector<std::string> requirements) : System(requirements) {};
+
+protected:
+	virtual void start(Entity* entity) = 0;
+	virtual void update(Entity* entity) = 0;
+	virtual void fixedUpdate(Entity* entity) = 0;
 };
 
+// TODO: Make it possible to just put a component name
 class VoxelRenderSystem : public SustainedSystem {
 public:
 	VoxelRenderSystem() : SustainedSystem({ typeid(Transform).name(), typeid(VoxelRenderer).name() }) {};
 
 protected:
-	void SustainedSystem::start(Entity* entity);
+	void SustainedSystem::start(Entity* entity) {}
 	void SustainedSystem::update(Entity* entity);
-	void SustainedSystem::fixedUpdate(Entity* entity);
+	void SustainedSystem::fixedUpdate(Entity* entity) {}
 };
 
-class MainCameraSystem : public SustainedSystem {
+class CameraMoveSystem : public SustainedSystem {
 public:
-	MainCameraSystem() : SustainedSystem({ typeid(MainCamera).name() }) {};
+	// TODO: Make it so you only have to put class name as argument
+	CameraMoveSystem() : SustainedSystem({ typeid(CameraComp).name(), typeid(KeyInput).name() }) {};
 
 protected:
-	void SustainedSystem::start(Entity* entity);
+	void SustainedSystem::start(Entity* entity) {}
 	void SustainedSystem::update(Entity* entity);
-	void SustainedSystem::fixedUpdate(Entity* entity);
+	void SustainedSystem::fixedUpdate(Entity* entity) {}
 };
+
+class ResetKeyInputSystem : public SustainedSystem {
+public:
+	ResetKeyInputSystem() : SustainedSystem({ typeid(KeyInput).name() }) {};
+
+protected:
+	void SustainedSystem::start(Entity* entity) {}
+	void SustainedSystem::update(Entity* entity);
+	void SustainedSystem::fixedUpdate(Entity* entity) {}
+};
+

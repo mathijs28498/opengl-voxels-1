@@ -17,7 +17,7 @@ const int zAmount = 100;
 bool showBoundingBoxes = false;
 
 void processInput(GLFWwindow* window) {
-	Camera* cam = reinterpret_cast<Camera*>(glfwGetWindowUserPointer(window));
+	//Camera* cam = reinterpret_cast<Camera*>(glfwGetWindowUserPointer(window));
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
@@ -27,14 +27,15 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
 		showBoundingBoxes = false;
 	}
-	cam->moveCamera(window);
+	//cam->moveCamera(window);
 }
 
 int main() {
 
 	try {
 		Window window(WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-		Camera cam(window.window, glm::vec3(0, 0, 10), 0.01f, 5, 0.1f, WIDTH, HEIGHT);
+		Camera cam(window.window, glm::vec3(30, 15, 20), 0.01f, 5, 0.1f, WIDTH, HEIGHT);
+
 
 		Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
@@ -43,7 +44,14 @@ int main() {
 		Model model("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/monu10.vox");
 
 		Scene scene;
-		scene.setMainCameraComponent(new CameraComp(&cam));
+		//scene.setMainCameraComponent(new CameraComp(&cam));
+
+		Entity* cameraEntity = new Entity;
+		cameraEntity->insertComponent(new CameraComp(&cam));
+		cameraEntity->insertComponent(new KeyInput);
+		scene.addEntity(cameraEntity);
+
+		window.setScenePointer(&scene);
 
 		Octree octree({0, 0, 0}, 256);
 		octree.makeNoiseTerrain();
@@ -54,38 +62,6 @@ int main() {
 		VoxelRenderer r = octree.getVoxelVoxelRenderer(&terrainVoxelShader, &cam);
 		entity->insertComponent(&r);
 		scene.addEntity(entity);
-
-		/*for (int i = 0; i < 10; i++) {
-			Entity* entity = new Entity;
-			entity->insertComponent(new Transform{ { 30 * i - 30 * 5, 0, 0 } });
-			VoxelRenderer r = model.getVoxelRenderer(&voxelShader, &cam);
-			entity->insertComponent(&r);
-			scene.addEntity(entity);
-		}*/
-
-		/*for (int i = 0; i < 10; i++) {
-			Entity* entity = new Entity;
-			entity->insertComponent(new Transform{ { 30 * i - 30 * 5, 0, 30 } });
-			VoxelRenderer r = model.getVoxelRenderer(&voxelShader, &cam);
-			entity->insertComponent(&r);
-			scene.addEntity(entity);
-		}
-
-		for (int i = 0; i < 10; i++) {
-			Entity* entity = new Entity;
-			entity->insertComponent(new Transform{ { 30 * i - 30 * 5, 0, 30 * 2 } });
-			VoxelRenderer r = model.getVoxelRenderer(&voxelShader, &cam);
-			entity->insertComponent(&r);
-			scene.addEntity(entity);
-		}
-
-		for (int i = 0; i < 10; i++) {
-			Entity* entity = new Entity;
-			entity->insertComponent(new Transform{ { 30 * i - 30 * 5, 0, -30 } });
-			VoxelRenderer r = model.getVoxelRenderer(&voxelShader, &cam);
-			entity->insertComponent(&r);
-			scene.addEntity(entity);
-		}*/
 
 		double lastTime = glfwGetTime();
 		double lastTime2 = glfwGetTime();
