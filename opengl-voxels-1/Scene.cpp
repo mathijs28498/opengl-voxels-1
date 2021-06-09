@@ -3,21 +3,32 @@
 #include "EventSystem.h"
 
 std::vector<SustainedSystem*> systems{
-	new VoxelRenderSystem(),
 	new CameraMoveSystem(),
+	new VoxelRenderSystem(),
+	new BoundingBoxRendererSystem(),
+
 	new ResetKeyInputSystem(),
 };
 
 KeyboardSystem keyboardSystem;
+CameraMouseCursorSystem cameraMouseCursorSystem;
 
 void Scene::addEntity(Entity* entity) {
 	entities.push_back(entity);
 }
 
-void Scene::keyCallBack(GLFWwindow* window, int key, int action) {
+void Scene::keyCallback(int key, int action) {
 	for (SustainedSystem* system : systems) {
 		for (auto i = entities.rbegin(); i != entities.rend(); ++i) {
-			keyboardSystem.doEvent(*i, window, key, action);
+			keyboardSystem.doEvent(*i, key, action);
+		}
+	}
+};
+
+void Scene::mouseCursorCallback(double xpos, double ypos) {
+	for (SustainedSystem* system : systems) {
+		for (auto i = entities.rbegin(); i != entities.rend(); ++i) {
+			cameraMouseCursorSystem.doEvent(*i, xpos, ypos);
 		}
 	}
 };
@@ -31,10 +42,17 @@ void Scene::start() {
 };
 
 void Scene::update() {
-
 	for (SustainedSystem* system : systems) {
 		for (auto i = entities.rbegin(); i != entities.rend(); ++i) {
 			system->doUpdate(*i);
+		}
+	}
+}
+
+void Scene::fixedUpdate() {
+	for (SustainedSystem* system : systems) {
+		for (auto i = entities.rbegin(); i != entities.rend(); ++i) {
+			system->doFixedUpdate(*i);
 		}
 	}
 };

@@ -1,7 +1,10 @@
 #include "Window.h"
 
 void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	reinterpret_cast<Scene*>(glfwGetWindowUserPointer(window))->keyCallBack(window, key, action);
+	reinterpret_cast<Scene*>(glfwGetWindowUserPointer(window))->keyCallback(key, action);
+}
+void mouseCursorCallback(GLFWwindow* window, double xpos, double ypos) {
+	reinterpret_cast<Scene*>(glfwGetWindowUserPointer(window))->mouseCursorCallback(xpos, ypos);
 }
 
 Window::Window(int width, int height, const char* title, glm::vec4 backgroundColor) {
@@ -30,6 +33,7 @@ Window::Window(int width, int height, const char* title, glm::vec4 backgroundCol
 	glfwSwapInterval(0);
 
 	glfwSetKeyCallback(window, keyCallBack);
+	glfwSetCursorPosCallback(window, mouseCursorCallback);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);

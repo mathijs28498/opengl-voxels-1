@@ -22,11 +22,12 @@ public:
 
 	void addEntity(Entity* entity);
 
-	void keyCallBack(GLFWwindow* window, int key, int action);
+	void keyCallback(int key, int action);
+	void mouseCursorCallback(double xpos, double ypos);
 
 	void start();
 	void update();
-	//void fixedUpdate();
+	void fixedUpdate();
 
 private:
 	MainCamera* mainCamera;

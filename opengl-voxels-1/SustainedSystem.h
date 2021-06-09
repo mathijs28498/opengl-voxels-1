@@ -43,6 +43,16 @@ protected:
 	void SustainedSystem::fixedUpdate(Entity* entity) {}
 };
 
+class BoundingBoxRendererSystem : public SustainedSystem {
+public:
+	BoundingBoxRendererSystem() : SustainedSystem({ typeid(Transform).name(), typeid(BoundingBoxRenderer).name(), typeid(KeyInput).name() }) {};
+
+protected:
+	void SustainedSystem::start(Entity* entity) {}
+	void SustainedSystem::update(Entity* entity);
+	void SustainedSystem::fixedUpdate(Entity* entity) {}
+};
+
 class CameraMoveSystem : public SustainedSystem {
 public:
 	// TODO: Make it so you only have to put class name as argument

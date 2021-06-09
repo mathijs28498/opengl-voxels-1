@@ -39,7 +39,7 @@ int main() {
 
 		Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
-		//Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
+		Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
 
 		Model model("C:/Users/mathi/Downloads/chromeDownloads/MagicaVoxel-0.99.6.2-win32/MagicaVoxel-0.99.6.2-win32/vox/monu10.vox");
 
@@ -49,6 +49,7 @@ int main() {
 		Entity* cameraEntity = new Entity;
 		cameraEntity->insertComponent(new CameraComp(&cam));
 		cameraEntity->insertComponent(new KeyInput);
+		cameraEntity->insertComponent(new MouseCursorInput);
 		scene.addEntity(cameraEntity);
 
 		window.setScenePointer(&scene);
@@ -56,11 +57,15 @@ int main() {
 		Octree octree({0, 0, 0}, 256);
 		octree.makeNoiseTerrain();
 		octree.calculateVoxelVAO();
+		octree.calculateBoundingBoxVAO();
 
 		Entity* entity = new Entity;
-		entity->insertComponent(new Transform{ {0, 0, 0} }); 
-		VoxelRenderer r = octree.getVoxelVoxelRenderer(&terrainVoxelShader, &cam);
-		entity->insertComponent(&r);
+		entity->insertComponent(new Transform{ {0, 0, 0} });
+		entity->insertComponent(new KeyInput);
+		VoxelRenderer vr = octree.getVoxelRenderer(&terrainVoxelShader, &cam);
+		BoundingBoxRenderer br = octree.getBoundingBoxRenderer(&boundingBoxShader, &cam, false);
+		entity->insertComponent(&vr);
+		entity->insertComponent(&br);
 		scene.addEntity(entity);
 
 		double lastTime = glfwGetTime();

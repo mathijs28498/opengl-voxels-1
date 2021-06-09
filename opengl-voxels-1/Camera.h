@@ -22,10 +22,6 @@ public:
 	void setViewMatrix();
 
 	void setUniforms(const Shader* shader);
-	void moveCamera(GLFWwindow* window);
-
-	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
-	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 	void setWidthHeight(int width, int height) {
 		this->width = width;
@@ -47,7 +43,5 @@ public:
 
 	float yaw = -90.0f;
 	float pitch = 0.0f;
-	glm::vec2 oldMousePos = glm::vec2(-1.0f, -1.0f);
 	glm::vec3 cameraDir = glm::vec3(0.0f, 0.0f, -1.0f);
-private:
 };

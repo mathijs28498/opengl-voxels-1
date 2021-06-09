@@ -104,7 +104,6 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 
 /// BEGIN OCTREE ///
 
-// TODO: Fix size being double the size than normal
 Octree::Octree(const std::vector<int> pos, int size) {
 	OctreeNode node = OctreeNode(pos, size);
 	root = node;
@@ -112,46 +111,6 @@ Octree::Octree(const std::vector<int> pos, int size) {
 	this->size = size;
 	glGenVertexArrays(1, &voxelVAO);
 	glGenVertexArrays(1, &boundingBoxVAO);
-}
-
-void Octree::drawBoundingBoxes(Shader* shader, Camera* cam) const {
-	shader->use();
-	cam->setUniforms(shader);
-
-	shader->setFloat("voxSize", VOX_SIZE);
-	shader->setVec3("color", 1, 1, 0);
-
-	glBindVertexArray(boundingBoxVAO);
-	glDrawArrays(GL_POINTS, 0, amountOfBoundingboxes);
-	glBindVertexArray(0);
-}
-
-void Octree::drawVoxels(Shader* shader, Camera* cam) const {
-	shader->use();
-	cam->setUniforms(shader);
-	float mult = 1;
-	static float angle = -40;
-	angle += 0.05f * mult;
-	if (angle > 360 - 40) 
-		angle -= 360;
-	float realAngle = angle;
-
-	float lightIntensity = (angle + 30) / 120;
-	if (lightIntensity > 1) lightIntensity = 2 - lightIntensity;
-	if (lightIntensity < 0) {
-		realAngle = 270;
-		lightIntensity = 0;
-		angle += 0.3f * mult;
-	}
-
-	shader->setVec3("lightDir", glm::rotate(glm::vec3(-1, 0, 0), glm::radians(realAngle), glm::vec3(-1, 0, 1)));
-	shader->setFloat("lightIntensity", lightIntensity);
-
-	shader->setFloat("voxSize", VOX_SIZE);
-
-	glBindVertexArray(voxelVAO);
-	glDrawArrays(GL_POINTS, 0, amountOfVoxels);
-	glBindVertexArray(0);
 }
 
 void Octree::insert(Voxel voxel) {
@@ -241,12 +200,12 @@ void Octree::makeNoiseTerrain() {
 
 }
 
-VoxelRenderer Octree::getVoxelVoxelRenderer(Shader* shader, Camera* camera) {
+VoxelRenderer Octree::getVoxelRenderer(Shader* shader, Camera* camera) {
 	return VoxelRenderer{ shader, camera, voxelVAO, static_cast<uint32_t>(amountOfVoxels) };
 }
 
-VoxelRenderer Octree::getBoundingBoxVoxelRenderer(Shader* shader, Camera* camera) {
-	return VoxelRenderer{ shader, camera, boundingBoxVAO, static_cast<uint32_t>(amountOfVoxels) };
+BoundingBoxRenderer Octree::getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show) {
+	return BoundingBoxRenderer{ shader, camera, boundingBoxVAO, static_cast<uint32_t>(amountOfVoxels), show };
 }
 
 /// END OCTREE ///

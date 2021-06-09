@@ -15,12 +15,25 @@ class KeyboardSystem : public EventSystem {
 public:
 	KeyboardSystem() : EventSystem({ typeid(KeyInput).name() }) {}
 
-	void doEvent(Entity* entity, GLFWwindow* window, int key, int action) {
+	void doEvent(Entity* entity, int key, int action) {
 		if (hasComponents(entity))
-			event(entity, window, key, action);
+			event(entity, key, action);
 	};
 
 private:
-	void event(Entity* entity, GLFWwindow* window, int key, int action);
+	void event(Entity* entity, int key, int action);
+};
+
+class CameraMouseCursorSystem : public EventSystem {
+public:
+	CameraMouseCursorSystem() : EventSystem({ typeid(CameraComp).name(), typeid(MouseCursorInput).name() }) {}
+
+	void doEvent(Entity* entity, double xpos, double ypos) {
+		if (hasComponents(entity))
+			event(entity, xpos, ypos);
+	};
+
+private:
+	void event(Entity* entity, double xpos, double ypos);
 };
 

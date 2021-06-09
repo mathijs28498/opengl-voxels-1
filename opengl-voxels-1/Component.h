@@ -47,6 +47,21 @@ struct KeyInput : Component {
 	bool keyRelease[GLFW_KEY_LAST];
 };
 
+struct MouseCursorInput : Component {
+	MouseCursorInput() : pos(glm::vec2(-1)) {}
+	glm::vec2 pos;
+};
+
+struct BoundingBoxRenderer : Component {
+	BoundingBoxRenderer(Shader* shader, Camera* camera, uint32_t VAO, uint32_t boundingBoxAmount, bool show) :
+		shader(shader), camera(camera), VAO(VAO), boundingBoxAmount(boundingBoxAmount), show(show) {};
+	Shader* shader;
+	Camera* camera;
+	uint32_t VAO;
+	uint32_t boundingBoxAmount;
+	bool show;
+};
+
 class Entity {
 public:
 	Entity() {};
