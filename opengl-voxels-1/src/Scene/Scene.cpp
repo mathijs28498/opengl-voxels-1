@@ -1,11 +1,13 @@
 #include "../Headers/Scene/Scene.h"
 #include "../Headers/ECS/SustainedSystem.h"
 #include "../Headers/ECS/EventSystem.h"
+#include "../Headers/ECS/OctreeECS.h"
 
 std::vector<SustainedSystem*> systems{
 	new CameraMoveSystem(),
 	new VoxelRenderSystem(),
 	new BoundingBoxRendererSystem(),
+	new OctreeSystem(),
 
 	new ResetKeyInputSystem(),
 };

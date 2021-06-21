@@ -35,7 +35,7 @@ protected:
 // TODO: Make it possible to just put a component name
 class VoxelRenderSystem : public SustainedSystem {
 public:
-	VoxelRenderSystem() : SustainedSystem({ typeid(TransformComp).name(), typeid(VoxelRendererComp).name() }) {};
+	VoxelRenderSystem() : SustainedSystem({ gcn(TransformComp()),  gcn(VoxelRendererComp()) }) {};
 
 protected:
 	void SustainedSystem::start(Entity* entity) {}
@@ -45,7 +45,7 @@ protected:
 
 class BoundingBoxRendererSystem : public SustainedSystem {
 public:
-	BoundingBoxRendererSystem() : SustainedSystem({ typeid(TransformComp).name(), typeid(BoundingBoxRendererComp).name(), typeid(KeyInputComp).name() }) {};
+	BoundingBoxRendererSystem() : SustainedSystem({ gcn(TransformComp()), gcn(BoundingBoxRendererComp()), gcn(KeyInputComp()) }) {};
 
 protected:
 	void SustainedSystem::start(Entity* entity) {}
@@ -56,7 +56,7 @@ protected:
 class CameraMoveSystem : public SustainedSystem {
 public:
 	// TODO: Make it so you only have to put class name as argument
-	CameraMoveSystem() : SustainedSystem({ typeid(CameraComp).name(), typeid(KeyInputComp).name() }) {};
+	CameraMoveSystem() : SustainedSystem({ gcn(CameraComp()), gcn(KeyInputComp()) }) {};
 
 protected:
 	void SustainedSystem::start(Entity* entity) {}
@@ -66,7 +66,7 @@ protected:
 
 class ResetKeyInputSystem : public SustainedSystem {
 public:
-	ResetKeyInputSystem() : SustainedSystem({ typeid(KeyInputComp).name() }) {};
+	ResetKeyInputSystem() : SustainedSystem({ gcn(KeyInputComp()) }) {};
 
 protected:
 	void SustainedSystem::start(Entity* entity) {}

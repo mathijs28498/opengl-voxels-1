@@ -4,6 +4,7 @@
 #include "Headers/Objects/Model.h"
 #include "Headers/Scene/Scene.h"
 #include "Headers/ECS/Component.h"
+#include "Headers/ECS/OctreeECS.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 
@@ -13,15 +14,15 @@ const int WIDTH = 800;
 const int HEIGHT = 600;
 const char* TITLE = "Voxels everywhere";
 
-void addCameraEntity(Scene* scene, Camera* cam) {
+void addCameraEntity(Scene& scene, Camera* cam) {
 	Entity* cameraEntity = new Entity;
 	cameraEntity->insertComponent(new CameraComp(cam));
 	cameraEntity->insertComponent(new KeyInputComp);
 	cameraEntity->insertComponent(new MouseCursorInputComp);
-	scene->addEntity(cameraEntity);
+	scene.addEntity(cameraEntity);
 }
 
-void addOctreeEntity(Scene* scene, Shader* terrainVoxelShader, Shader* boundingBoxShader, Camera* cam) {
+void addOctreeEntity(Scene& scene, Shader* terrainVoxelShader, Shader* boundingBoxShader, Camera* cam) {
 	Octree* octree = new Octree({ 0, 0, 0 }, 256);
 	octree->makeNoiseTerrain();
 	octree->calculateVoxelVAO();
@@ -32,15 +33,30 @@ void addOctreeEntity(Scene* scene, Shader* terrainVoxelShader, Shader* boundingB
 	entity->insertComponent(new KeyInputComp);
 	entity->insertComponent(octree->getVoxelRenderer(terrainVoxelShader, cam));
 	entity->insertComponent(octree->getBoundingBoxRenderer(boundingBoxShader, cam, false));
-	scene->addEntity(entity);
+	scene.addEntity(entity);
 }
 
 
-void addModelEntity(Scene* scene, glm::vec3 pos, Model* model, Shader* terrainVoxelShader, Camera* cam) {
+void addModelEntity(Scene& scene, glm::vec3 pos, Model* model, Shader* terrainVoxelShader, Camera* cam) {
 	Entity* entity = new Entity;
 	entity->insertComponent(new TransformComp(pos));
 	entity->insertComponent(model->getVoxelRenderer(terrainVoxelShader, cam));
-	scene->addEntity(entity);
+	scene.addEntity(entity);
+}
+
+void addOctreeCompEntity(Scene& scene, Shader* terrainVoxelShader, Camera* cam) {
+	Octree* octree = new Octree({ 0, 0, 0 }, 256);
+	octree->makeNoiseTerrain();
+	octree->calculateVoxelVAO();
+	//octree->calculateBoundingBoxVAO();
+
+	Entity* entity = new Entity;
+	entity->insertComponent(new TransformComp{ {0, 0, 0} });
+	entity->insertComponent(new OctreeComp);
+	//entity->insertComponent(new KeyInputComp);
+	entity->insertComponent(octree->getVoxelRenderer(terrainVoxelShader, cam));
+	//entity->insertComponent(octree->getBoundingBoxRenderer(boundingBoxShader, cam, false));
+	scene.addEntity(entity);
 }
 
 int main() {
@@ -59,10 +75,11 @@ int main() {
 
 		Scene scene;
 		window.setScenePointer(&scene);
-		addCameraEntity(&scene, &cam);
-		addOctreeEntity(&scene, &terrainVoxelShader, &boundingBoxShader, &cam);
-		addModelEntity(&scene, glm::vec3(30 * VOX_SIZE, 45*VOX_SIZE, 30 * VOX_SIZE), &monu, &voxelShader, &cam);
-		addModelEntity(&scene, glm::vec3(100 * VOX_SIZE, 45*VOX_SIZE, 0), &teapot, &voxelShader, &cam);
+		addCameraEntity(scene, &cam);
+		/*addOctreeEntity(scene, &terrainVoxelShader, &boundingBoxShader, &cam);
+		addModelEntity(scene, glm::vec3(30 * VOX_SIZE, 45*VOX_SIZE, 30 * VOX_SIZE), &monu, &voxelShader, &cam);
+		addModelEntity(scene, glm::vec3(100 * VOX_SIZE, 45*VOX_SIZE, 0), &teapot, &voxelShader, &cam);*/
+		addOctreeCompEntity(scene, &terrainVoxelShader, &cam);
 
 		// TODO: Make better benchmark
 		// TODO: Make a deltaTime variable

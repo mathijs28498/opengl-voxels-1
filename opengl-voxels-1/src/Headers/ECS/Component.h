@@ -6,22 +6,30 @@
 #include <glm/glm.hpp>
 #include <map>
 
+
+template <typename T>
+// Stands for getClassName
+std::string gcn(T c) { return typeid(c).name(); };
+
 struct Component {
 	// Virtual member necessary to cast derived classes to this base class
 	virtual void ignored() {};
 };
 
 struct TransformComp : Component {
+	TransformComp() {};
 	TransformComp(glm::vec3 pos) : position(pos) {};
 	glm::vec3 position;
 };
 
 struct VelocityComp : Component {
+	VelocityComp() {};
 	VelocityComp(glm::vec3 vel) : vel(vel) {};
 	glm::vec3 vel;
 };
 
 struct VoxelRendererComp : Component {
+	VoxelRendererComp() {};
 	VoxelRendererComp(Shader* shader, Camera* camera, uint32_t VAO, uint32_t voxelAmount) :
 		shader(shader), camera(camera), VAO(VAO), voxelAmount(voxelAmount) {};
 	Shader* shader;
@@ -32,6 +40,7 @@ struct VoxelRendererComp : Component {
 
 // TODO: Untangle camera and use it in voxelrenderer (have a main camera)
 struct CameraComp : Component {
+	CameraComp() {};
 	CameraComp(Camera* camera) : camera(camera) {};
 	Camera* camera;
 };
@@ -53,6 +62,7 @@ struct MouseCursorInputComp : Component {
 };
 
 struct BoundingBoxRendererComp : Component {
+	BoundingBoxRendererComp() {};
 	BoundingBoxRendererComp(Shader* shader, Camera* camera, uint32_t VAO, uint32_t boundingBoxAmount, bool show) :
 		shader(shader), camera(camera), VAO(VAO), boundingBoxAmount(boundingBoxAmount), show(show) {};
 	Shader* shader;

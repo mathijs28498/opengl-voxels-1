@@ -13,7 +13,7 @@ public:
 
 class KeyboardSystem : public EventSystem {
 public:
-	KeyboardSystem() : EventSystem({ typeid(KeyInputComp).name() }) {}
+	KeyboardSystem() : EventSystem({ gcn(KeyInputComp()) }) {}
 
 	void doEvent(Entity* entity, int key, int action) {
 		if (hasComponents(entity))
@@ -26,7 +26,7 @@ private:
 
 class CameraMouseCursorSystem : public EventSystem {
 public:
-	CameraMouseCursorSystem() : EventSystem({ typeid(CameraComp).name(), typeid(MouseCursorInputComp).name() }) {}
+	CameraMouseCursorSystem() : EventSystem({ gcn(CameraComp()), gcn(MouseCursorInputComp()) }) {}
 
 	void doEvent(Entity* entity, double xpos, double ypos) {
 		if (hasComponents(entity))
