@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "VertexData.h"
+#include "Component.h"
 
 #include <glm/glm.hpp>
 
@@ -50,8 +51,8 @@ public:
 	void calculateVoxelVAO();
 	void makeNoiseTerrain();
 
-	void drawVoxels(Shader* shader, Camera* cam) const;
-	void drawBoundingBoxes(Shader* shader, Camera* cam) const;
+	VoxelRenderer* getVoxelRenderer(Shader* shader, Camera* camera); 
+	BoundingBoxRenderer* getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show);
 private:
 	std::vector<int32_t> pos;
 	int32_t size;

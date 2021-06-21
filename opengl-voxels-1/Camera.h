@@ -22,26 +22,11 @@ public:
 	void setViewMatrix();
 
 	void setUniforms(const Shader* shader);
-	void moveCamera(GLFWwindow* window);
-
-	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
-	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 	void setWidthHeight(int width, int height) {
 		this->width = width;
 		this->height = height;
 	}
-
-private:
-	float normalWalkSpeed;
-	float speedMultiplier;
-	float actualWalkSpeed;
-	float mouseSensitivity;
-
-	float yaw = -90.0f;
-	float pitch = 0.0f;
-	glm::vec2 oldMousePos = glm::vec2(-1.0f, -1.0f);
-	glm::vec3 cameraDir = glm::vec3(0.0f, 0.0f, -1.0f);
 
 	glm::vec3 getForwardVec3() {
 		return glm::normalize(cameraDir * glm::vec3(1, 0, 1));
@@ -50,4 +35,13 @@ private:
 	glm::vec3 getRightVec3() {
 		return glm::cross(glm::vec3(0, 1, 0), getForwardVec3());
 	}
+
+	float normalWalkSpeed;
+	float speedMultiplier;
+	float actualWalkSpeed;
+	float mouseSensitivity;
+
+	float yaw = 0.0f;
+	float pitch = 0.0f;
+	glm::vec3 cameraDir = glm::vec3(1.0f, 0.0f, 0.0f);
 };

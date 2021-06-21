@@ -31,17 +31,23 @@
     <Filter Include="Source Files\Objects">
       <UniqueIdentifier>{a11f5473-7eb3-438e-b041-640003e83470}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Unused">
-      <UniqueIdentifier>{7c081830-1deb-4150-80ba-408e2b99698d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Unused">
-      <UniqueIdentifier>{d10b5001-fc6e-4f3a-8deb-355b9fee70e4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Global">
       <UniqueIdentifier>{90b7e08f-20e9-49b5-ac1a-65ff00dd003c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Global">
       <UniqueIdentifier>{8a67f51c-097a-449c-9a73-307312bb666b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{66973ee4-d843-4be4-8b86-41fba4ee6cbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene">
+      <UniqueIdentifier>{96e8c0ab-4e58-40e0-8e21-c07727716f64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ECS">
+      <UniqueIdentifier>{bd84eb3b-1d25-4a92-a2cf-fa6f3cbdda97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ECS">
+      <UniqueIdentifier>{8be4906f-cf02-439e-8a71-3fc7a2ed16a7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -63,12 +69,6 @@
     <ClCompile Include="Octree.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Chunk.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files\Unused</Filter>
-    </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
@@ -80,6 +80,18 @@
     </ClCompile>
     <ClCompile Include="GeneralHelperFunctions.cpp">
       <Filter>Source Files\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Source Files\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="SustainedSystem.cpp">
+      <Filter>Source Files\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="EventSystem.cpp">
+      <Filter>Source Files\ECS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -95,12 +107,6 @@
     <ClInclude Include="Octree.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Chunk.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files\Unused</Filter>
-    </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
@@ -115,6 +121,21 @@
     </ClInclude>
     <ClInclude Include="GeneralHelperFunctions.h">
       <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="SustainedSystem.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="System.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="EventSystem.h">
+      <Filter>Header Files\ECS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

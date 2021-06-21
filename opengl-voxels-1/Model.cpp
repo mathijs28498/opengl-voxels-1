@@ -16,6 +16,10 @@ Model::Model(const char* filePath) {
 	loadModel(filePath);
 }
 
+VoxelRenderer* Model::getVoxelRenderer(Shader* shader, Camera* camera) {
+    return new VoxelRenderer{ shader, camera, VAO, amountOfVoxels };
+}
+
 void Model::draw(Shader* shader, Camera* cam) {
     shader->use();
     cam->setUniforms(shader);
@@ -75,7 +79,7 @@ void Model::loadModel(const char* filePath) {
     input.close();
 
     size_t bytePointer = 4;
-    std::cout << "Version: "<< bytesToUint32(&bytes, &bytePointer) << '\n';
+    uint32_t versionNumber = bytesToUint32(&bytes, &bytePointer);
     
     if (!findWordInBytes(&bytes, &bytePointer, "SIZE", 4)) {
         throw std::runtime_error("Couldn't find 'SIZE' in vox file");
@@ -120,5 +124,6 @@ void Model::loadModel(const char* filePath) {
         };
     }
 
+    std::cout << "amount of voxels in model: " << amountOfVoxels << '\n';
     calculateVAO(&voxels);
 }
