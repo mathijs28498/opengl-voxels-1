@@ -11,18 +11,18 @@ struct Component {
 	virtual void ignored() {};
 };
 
-struct Transform : Component {
-	Transform(glm::vec3 pos) : position(pos) {};
+struct TransformComp : Component {
+	TransformComp(glm::vec3 pos) : position(pos) {};
 	glm::vec3 position;
 };
 
-struct Velocity : Component {
-	Velocity(glm::vec3 vel) : vel(vel) {};
+struct VelocityComp : Component {
+	VelocityComp(glm::vec3 vel) : vel(vel) {};
 	glm::vec3 vel;
 };
 
-struct VoxelRenderer : Component {
-	VoxelRenderer(Shader* shader, Camera* camera, uint32_t VAO, uint32_t voxelAmount) :
+struct VoxelRendererComp : Component {
+	VoxelRendererComp(Shader* shader, Camera* camera, uint32_t VAO, uint32_t voxelAmount) :
 		shader(shader), camera(camera), VAO(VAO), voxelAmount(voxelAmount) {};
 	Shader* shader;
 	Camera* camera;
@@ -36,8 +36,8 @@ struct CameraComp : Component {
 	Camera* camera;
 };
 
-struct KeyInput : Component {
-	KeyInput() {
+struct KeyInputComp : Component {
+	KeyInputComp() {
 		std::fill_n(keyPress, GLFW_KEY_LAST, false);
 		std::fill_n(keyRepeat, GLFW_KEY_LAST, false);
 		std::fill_n(keyRelease, GLFW_KEY_LAST, false);
@@ -47,13 +47,13 @@ struct KeyInput : Component {
 	bool keyRelease[GLFW_KEY_LAST];
 };
 
-struct MouseCursorInput : Component {
-	MouseCursorInput() : pos(glm::vec2(-1)) {}
+struct MouseCursorInputComp : Component {
+	MouseCursorInputComp() : pos(glm::vec2(-1)) {}
 	glm::vec2 pos;
 };
 
-struct BoundingBoxRenderer : Component {
-	BoundingBoxRenderer(Shader* shader, Camera* camera, uint32_t VAO, uint32_t boundingBoxAmount, bool show) :
+struct BoundingBoxRendererComp : Component {
+	BoundingBoxRendererComp(Shader* shader, Camera* camera, uint32_t VAO, uint32_t boundingBoxAmount, bool show) :
 		shader(shader), camera(camera), VAO(VAO), boundingBoxAmount(boundingBoxAmount), show(show) {};
 	Shader* shader;
 	Camera* camera;

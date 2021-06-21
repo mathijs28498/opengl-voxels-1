@@ -4,8 +4,8 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 void VoxelRenderSystem::update(Entity* entity) {
-    Transform* transform = getComponentFromEntity<Transform>(entity);
-    VoxelRenderer* renderer = getComponentFromEntity<VoxelRenderer>(entity);
+    TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
+    VoxelRendererComp* renderer = getComponentFromEntity<VoxelRendererComp>(entity);
 
     renderer->shader->use();
     renderer->camera->setUniforms(renderer->shader);
@@ -37,9 +37,9 @@ void VoxelRenderSystem::update(Entity* entity) {
 }
 
 void BoundingBoxRendererSystem::update(Entity* entity) {
-	Transform* transform = getComponentFromEntity<Transform>(entity);
-	BoundingBoxRenderer* renderer = getComponentFromEntity<BoundingBoxRenderer>(entity);
-	KeyInput* keyInput = getComponentFromEntity<KeyInput>(entity);
+	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
+	BoundingBoxRendererComp* renderer = getComponentFromEntity<BoundingBoxRendererComp>(entity);
+	KeyInputComp* keyInput = getComponentFromEntity<KeyInputComp>(entity);
 
 	if (keyInput->keyPress[GLFW_KEY_T]) {
 		renderer->show = !renderer->show;
@@ -60,7 +60,7 @@ void BoundingBoxRendererSystem::update(Entity* entity) {
 
 void CameraMoveSystem::update(Entity* entity) {
     CameraComp* mainCamera = getComponentFromEntity<CameraComp>(entity);
-    KeyInput* keyInput = getComponentFromEntity<KeyInput>(entity);
+    KeyInputComp* keyInput = getComponentFromEntity<KeyInputComp>(entity);
 	Camera* cam = mainCamera->camera;
 
 	glm::vec3 addPos(0, 0, 0);
@@ -99,7 +99,7 @@ void CameraMoveSystem::update(Entity* entity) {
 }
 
 void ResetKeyInputSystem::update(Entity* entity) {
-    KeyInput* keyInput = getComponentFromEntity<KeyInput>(entity);
+    KeyInputComp* keyInput = getComponentFromEntity<KeyInputComp>(entity);
 
     std::fill_n(keyInput->keyPress, GLFW_KEY_LAST, false);
     std::fill_n(keyInput->keyRelease, GLFW_KEY_LAST, false);

@@ -1,7 +1,7 @@
 #include "../Headers/ECS/EventSystem.h"
 
 void KeyboardSystem::event(Entity* entity, int key, int action) {
-	KeyInput* keyInput = getComponentFromEntity<KeyInput>(entity);
+	KeyInputComp* keyInput = getComponentFromEntity<KeyInputComp>(entity);
 
 	if (action == GLFW_PRESS) {
 		keyInput->keyPress[key] = true;
@@ -14,7 +14,7 @@ void KeyboardSystem::event(Entity* entity, int key, int action) {
 
 void CameraMouseCursorSystem::event(Entity* entity, double xpos, double ypos) {
 	CameraComp* cameraComp = getComponentFromEntity<CameraComp>(entity);
-	MouseCursorInput* mouseInput = getComponentFromEntity<MouseCursorInput>(entity);
+	MouseCursorInputComp* mouseInput = getComponentFromEntity<MouseCursorInputComp>(entity);
 	Camera* cam = cameraComp->camera;
 
 	// Make sure the mouseInput position is properly set the first movement

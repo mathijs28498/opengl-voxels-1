@@ -93,6 +93,9 @@
     <ClCompile Include="src\ECS\EventSystem.cpp">
       <Filter>Source Files\ECS</Filter>
     </ClCompile>
+    <ClCompile Include="src\ECS\OctreeECS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Headers\Camera.h">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="src\Headers\ECS\EventSystem.h">
       <Filter>Header Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Headers\ECS\OctreeECS.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

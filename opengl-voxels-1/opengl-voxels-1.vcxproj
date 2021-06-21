@@ -148,6 +148,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\ECS\Component.cpp" />
     <ClCompile Include="src\ECS\EventSystem.cpp" />
+    <ClCompile Include="src\ECS\OctreeECS.cpp" />
     <ClCompile Include="src\Global\GeneralHelperFunctions.cpp" />
     <ClCompile Include="src\Objects\Model.cpp" />
     <ClCompile Include="src\Objects\Octree.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="src\Headers\Camera.h" />
     <ClInclude Include="src\Headers\ECS\Component.h" />
     <ClInclude Include="src\Headers\ECS\EventSystem.h" />
+    <ClInclude Include="src\Headers\ECS\OctreeECS.h" />
     <ClInclude Include="src\Vendors\Noise\FastNoiseLite.h" />
     <ClInclude Include="src\Headers\Global\GeneralHelperFunctions.h" />
     <ClInclude Include="src\Headers\Global\GLHelperFunctions.h" />

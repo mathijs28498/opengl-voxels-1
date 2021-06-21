@@ -16,8 +16,8 @@ const char* TITLE = "Voxels everywhere";
 void addCameraEntity(Scene* scene, Camera* cam) {
 	Entity* cameraEntity = new Entity;
 	cameraEntity->insertComponent(new CameraComp(cam));
-	cameraEntity->insertComponent(new KeyInput);
-	cameraEntity->insertComponent(new MouseCursorInput);
+	cameraEntity->insertComponent(new KeyInputComp);
+	cameraEntity->insertComponent(new MouseCursorInputComp);
 	scene->addEntity(cameraEntity);
 }
 
@@ -28,8 +28,8 @@ void addOctreeEntity(Scene* scene, Shader* terrainVoxelShader, Shader* boundingB
 	octree->calculateBoundingBoxVAO();
 
 	Entity* entity = new Entity;
-	entity->insertComponent(new Transform{ {0, 0, 0} });
-	entity->insertComponent(new KeyInput);
+	entity->insertComponent(new TransformComp{ {0, 0, 0} });
+	entity->insertComponent(new KeyInputComp);
 	entity->insertComponent(octree->getVoxelRenderer(terrainVoxelShader, cam));
 	entity->insertComponent(octree->getBoundingBoxRenderer(boundingBoxShader, cam, false));
 	scene->addEntity(entity);
@@ -38,7 +38,7 @@ void addOctreeEntity(Scene* scene, Shader* terrainVoxelShader, Shader* boundingB
 
 void addModelEntity(Scene* scene, glm::vec3 pos, Model* model, Shader* terrainVoxelShader, Camera* cam) {
 	Entity* entity = new Entity;
-	entity->insertComponent(new Transform(pos));
+	entity->insertComponent(new TransformComp(pos));
 	entity->insertComponent(model->getVoxelRenderer(terrainVoxelShader, cam));
 	scene->addEntity(entity);
 }

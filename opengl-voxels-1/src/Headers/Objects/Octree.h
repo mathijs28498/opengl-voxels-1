@@ -51,8 +51,8 @@ public:
 	void calculateVoxelVAO();
 	void makeNoiseTerrain();
 
-	VoxelRenderer* getVoxelRenderer(Shader* shader, Camera* camera); 
-	BoundingBoxRenderer* getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show);
+	VoxelRendererComp* getVoxelRenderer(Shader* shader, Camera* camera); 
+	BoundingBoxRendererComp* getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show);
 private:
 	std::vector<int32_t> pos;
 	int32_t size;

@@ -200,12 +200,12 @@ void Octree::makeNoiseTerrain() {
 
 }
 
-VoxelRenderer* Octree::getVoxelRenderer(Shader* shader, Camera* camera) {
-	return new VoxelRenderer{ shader, camera, voxelVAO, static_cast<uint32_t>(amountOfVoxels) };
+VoxelRendererComp* Octree::getVoxelRenderer(Shader* shader, Camera* camera) {
+	return new VoxelRendererComp{ shader, camera, voxelVAO, static_cast<uint32_t>(amountOfVoxels) };
 }
 
-BoundingBoxRenderer* Octree::getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show) {
-	return new BoundingBoxRenderer{ shader, camera, boundingBoxVAO, static_cast<uint32_t>(amountOfVoxels), show };
+BoundingBoxRendererComp* Octree::getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show) {
+	return new BoundingBoxRendererComp{ shader, camera, boundingBoxVAO, static_cast<uint32_t>(amountOfVoxels), show };
 }
 
 /// END OCTREE ///
