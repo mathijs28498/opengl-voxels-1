@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Shader.h"
-#include "Camera.h"
-#include "VertexData.h"
-#include "Component.h"
+#include "../Shader.h"
+#include "../Camera.h"
+#include "../Global/VertexData.h"
+#include "../ECS/Component.h"
 
 #include <glm/glm.hpp>
 

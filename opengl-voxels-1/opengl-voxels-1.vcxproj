@@ -145,36 +145,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="EventSystem.cpp" />
-    <ClCompile Include="GeneralHelperFunctions.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="Octree.cpp" />
-    <ClCompile Include="glad.c" />
-    <ClCompile Include="GLHelperFunctions.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="SustainedSystem.cpp" />
-    <ClCompile Include="VertexData.cpp" />
-    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\ECS\Component.cpp" />
+    <ClCompile Include="src\ECS\EventSystem.cpp" />
+    <ClCompile Include="src\Global\GeneralHelperFunctions.cpp" />
+    <ClCompile Include="src\Objects\Model.cpp" />
+    <ClCompile Include="src\Objects\Octree.cpp" />
+    <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\Global\GLHelperFunctions.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Scene\Scene.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\ECS\SustainedSystem.cpp" />
+    <ClCompile Include="src\Global\VertexData.cpp" />
+    <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="EventSystem.h" />
-    <ClInclude Include="FastNoiseLite.h" />
-    <ClInclude Include="GeneralHelperFunctions.h" />
-    <ClInclude Include="GLHelperFunctions.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="Octree.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="SustainedSystem.h" />
-    <ClInclude Include="System.h" />
-    <ClInclude Include="VertexData.h" />
-    <ClInclude Include="Window.h" />
+    <ClInclude Include="src\Headers\Camera.h" />
+    <ClInclude Include="src\Headers\ECS\Component.h" />
+    <ClInclude Include="src\Headers\ECS\EventSystem.h" />
+    <ClInclude Include="src\Vendors\Noise\FastNoiseLite.h" />
+    <ClInclude Include="src\Headers\Global\GeneralHelperFunctions.h" />
+    <ClInclude Include="src\Headers\Global\GLHelperFunctions.h" />
+    <ClInclude Include="src\Headers\Objects\Model.h" />
+    <ClInclude Include="src\Headers\Objects\Octree.h" />
+    <ClInclude Include="src\Headers\Scene\Scene.h" />
+    <ClInclude Include="src\Headers\Shader.h" />
+    <ClInclude Include="src\Headers\ECS\SustainedSystem.h" />
+    <ClInclude Include="src\Headers\ECS\System.h" />
+    <ClInclude Include="src\Headers\Global\VertexData.h" />
+    <ClInclude Include="src\Headers\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\light.frag" />

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Component.h"
-#include "Octree.h"
+#include "../ECS/Component.h"
+#include "../Objects/Octree.h"
 
 #include <vector>
 

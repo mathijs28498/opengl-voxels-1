@@ -1,4 +1,4 @@
-#include "VertexData.h"
+#include "../Headers/Global/VertexData.h"
 
 float cubeVertices[]{
 	0.0f, 0.0f, 0.0f

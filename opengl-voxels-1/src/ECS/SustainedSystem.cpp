@@ -1,5 +1,5 @@
-#include "SustainedSystem.h"
-#include "VertexData.h"
+#include "../Headers/ECS/SustainedSystem.h"
+#include "../Headers/Global/VertexData.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 

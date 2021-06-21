@@ -1,6 +1,6 @@
-#include "Scene.h"
-#include "SustainedSystem.h"
-#include "EventSystem.h"
+#include "../Headers/Scene/Scene.h"
+#include "../Headers/ECS/SustainedSystem.h"
+#include "../Headers/ECS/EventSystem.h"
 
 std::vector<SustainedSystem*> systems{
 	new CameraMoveSystem(),

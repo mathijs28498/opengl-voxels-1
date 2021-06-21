@@ -1,4 +1,4 @@
-#include "GLHelperFunctions.h"
+#include "../Headers/Global/GLHelperFunctions.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 

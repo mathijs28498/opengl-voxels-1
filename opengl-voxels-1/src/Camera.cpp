@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "Headers/Camera.h"
 
 Camera::Camera(GLFWwindow* window, glm::vec3 startPosition, float walkSpeed, float speedMultiplier, float mouseSensitivity, const int WIDTH, const int HEIGHT) {
 	cameraPos = startPosition;

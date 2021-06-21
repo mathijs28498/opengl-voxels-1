@@ -1,4 +1,4 @@
-#include "GeneralHelperFunctions.h"
+#include "../Headers/Global/GeneralHelperFunctions.h"
 
 uint32_t bytesToUint32(std::vector<char>* bytes, size_t* bytePointer) {
 	uint32_t uint32 = 0x0000;

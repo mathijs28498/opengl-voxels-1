@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "Headers/Window.h"
 
 void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

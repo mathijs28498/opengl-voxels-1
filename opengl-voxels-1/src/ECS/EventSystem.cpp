@@ -1,4 +1,4 @@
-#include "EventSystem.h"
+#include "../Headers/ECS/EventSystem.h"
 
 void KeyboardSystem::event(Entity* entity, int key, int action) {
 	KeyInput* keyInput = getComponentFromEntity<KeyInput>(entity);

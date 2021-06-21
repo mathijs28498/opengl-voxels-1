@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Shader.h"
-#include "Camera.h"
+#include "../Shader.h"
+#include "../Camera.h"
 
 #include <glm/glm.hpp>
 #include <map>

@@ -1,5 +1,5 @@
-#include "Model.h"
-#include "GeneralHelperFunctions.h"
+#include "../Headers/Objects/Model.h"
+#include "../Headers/Global/GeneralHelperFunctions.h"
 
 #include <fstream>
 #include <fstream>

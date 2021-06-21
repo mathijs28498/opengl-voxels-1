@@ -1,9 +1,9 @@
-#include "Window.h"
-#include "GLHelperFunctions.h"
-#include "Octree.h"
-#include "Model.h"
-#include "Scene.h"
-#include "Component.h"
+#include "Headers/Window.h"
+#include "Headers/Global/GLHelperFunctions.h"
+#include "Headers/Objects/Octree.h"
+#include "Headers/Objects/Model.h"
+#include "Headers/Scene/Scene.h"
+#include "Headers/ECS/Component.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 

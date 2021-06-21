@@ -1,7 +1,7 @@
-#include "Octree.h"
+#include "../Headers/Objects/Octree.h"
 
 #define FNL_IMPL
-#include "FastNoiseLite.h"
+#include "../Vendors/Noise/FastNoiseLite.h"
 
 #include <stdexcept>
 #include <chrono>
