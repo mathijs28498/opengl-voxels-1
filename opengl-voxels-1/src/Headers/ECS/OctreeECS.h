@@ -2,14 +2,18 @@
 #include "Component.h"
 #include "SustainedSystem.h"
 #include "EventSystem.h"
+#include "../Objects/Octree.h"
 
 struct OctreeComp : public Component {
 	OctreeComp() {};
+	OctreeComp(std::vector<int> pos, uint32_t octreeSize) : pos(pos), octreeSize(octreeSize) {};
+	std::vector<int> pos;
+	uint32_t octreeSize;
 };
 
 class OctreeSystem : public SustainedSystem {
 public:
-	OctreeSystem() : SustainedSystem({ typeid(OctreeComp).name() , typeid(VoxelRendererComp).name() }) {};
+	OctreeSystem() : SustainedSystem({ gcn(TransformComp()), gcn(OctreeComp()) , gcn(VoxelRendererComp()) }) {};
 
 	void SustainedSystem::start(Entity* entity);
 	void SustainedSystem::update(Entity* entity);
@@ -18,5 +22,5 @@ public:
 
 class OctreeInsertSystem : public EventSystem {
 public:
-	OctreeInsertSystem() : EventSystem({ typeid(OctreeComp).name(), typeid(VoxelRendererComp).name() }) {};
+	OctreeInsertSystem() : EventSystem({ gcn(OctreeComp()) }) {};
 };

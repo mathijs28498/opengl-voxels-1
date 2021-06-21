@@ -44,7 +44,7 @@ private:
 
 class Octree {
 public:
-	Octree(const std::vector<int> pos, int size);
+	Octree(const std::vector<int> pos, uint32_t size);
 
 	void insert(Voxel voxel);
 	void calculateBoundingBoxVAO();
@@ -52,7 +52,8 @@ public:
 	void makeNoiseTerrain();
 
 	VoxelRendererComp* getVoxelRenderer(Shader* shader, Camera* camera); 
-	BoundingBoxRendererComp* getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show);
+	BoundingBoxRendererComp* getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show); 
+	void fillVoxelRenderer(VoxelRendererComp* renderer);
 private:
 	std::vector<int32_t> pos;
 	int32_t size;

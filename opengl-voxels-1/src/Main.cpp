@@ -45,17 +45,10 @@ void addModelEntity(Scene& scene, glm::vec3 pos, Model* model, Shader* terrainVo
 }
 
 void addOctreeCompEntity(Scene& scene, Shader* terrainVoxelShader, Camera* cam) {
-	Octree* octree = new Octree({ 0, 0, 0 }, 256);
-	octree->makeNoiseTerrain();
-	octree->calculateVoxelVAO();
-	//octree->calculateBoundingBoxVAO();
-
 	Entity* entity = new Entity;
-	entity->insertComponent(new TransformComp{ {0, 0, 0} });
-	entity->insertComponent(new OctreeComp);
-	//entity->insertComponent(new KeyInputComp);
-	entity->insertComponent(octree->getVoxelRenderer(terrainVoxelShader, cam));
-	//entity->insertComponent(octree->getBoundingBoxRenderer(boundingBoxShader, cam, false));
+	entity->insertComponent(new OctreeComp({ 0, 0, 0 }, 256));
+	entity->insertComponent(new VoxelRendererComp(terrainVoxelShader, cam, 0, 0));
+	entity->insertComponent(new TransformComp());
 	scene.addEntity(entity);
 }
 
@@ -70,8 +63,8 @@ int main() {
 		Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
 		Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
 
-		Model monu("models/monu10.vox");
-		Model teapot("models/teapot.vox");
+		/*Model monu("models/monu10.vox");
+		Model teapot("models/teapot.vox");*/
 
 		Scene scene;
 		window.setScenePointer(&scene);

@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 
+// TODO: Decrease this to 0.125f
 const float VOX_SIZE = 0.25f;
 
 struct Material {

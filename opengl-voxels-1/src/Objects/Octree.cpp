@@ -104,7 +104,7 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 
 /// BEGIN OCTREE ///
 
-Octree::Octree(const std::vector<int> pos, int size) {
+Octree::Octree(const std::vector<int> pos, uint32_t size) {
 	OctreeNode node = OctreeNode(pos, size);
 	root = node;
 	this->pos = pos;
@@ -154,6 +154,7 @@ void Octree::calculateVoxelVAO() {
 	std::vector<Voxel> voxelCloud;
 	root.calculateVAO(&voxelCloud);
 	amountOfVoxels = voxelCloud.size();
+	std::cout << amountOfVoxels << " voxels in octree\n";
 
 
 	uint32_t VBO;
@@ -174,7 +175,7 @@ void Octree::calculateVoxelVAO() {
 	glBindVertexArray(0);
 
 	duration<double, std::milli> ms = high_resolution_clock::now() - t1;
-	std::cout << ms.count() << '\n';
+	std::cout << ms.count() << "ms to build voxel chunk\n";
 
 }
 
@@ -193,8 +194,10 @@ void Octree::makeNoiseTerrain() {
 
 			float y = std::round(data);
 
-			insert({ {x, y, z}, {0, 0, 0} });
-			insert({ {x, y - 1, z}, {0, 0, 0} });
+			// TODO ERROR: REMOVE THE "/ 2" IN FOR LOOP
+			for (size_t i = y / 2; i < y; i++) {
+				insert(Voxel{ { x, static_cast<float>(i), z }, { 0, 0, 0 } });
+			}
 		}
 	}
 
@@ -202,6 +205,11 @@ void Octree::makeNoiseTerrain() {
 
 VoxelRendererComp* Octree::getVoxelRenderer(Shader* shader, Camera* camera) {
 	return new VoxelRendererComp{ shader, camera, voxelVAO, static_cast<uint32_t>(amountOfVoxels) };
+}
+
+void Octree::fillVoxelRenderer(VoxelRendererComp* renderer) {
+	renderer->VAO = voxelVAO;
+	renderer->voxelAmount = static_cast<uint32_t>(amountOfVoxels);
 }
 
 BoundingBoxRendererComp* Octree::getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show) {

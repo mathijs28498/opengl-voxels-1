@@ -6,6 +6,9 @@
 #include <glm/glm.hpp>
 #include <map>
 
+// TODO OPTIMIZE: Make global strings for each component so don't need to create an instance for system initialization
+// TODO AFTER: Change name of gcn back to getClassName
+//		std::string transformCompStr = gcn(TransformComp());
 
 template <typename T>
 // Stands for getClassName
