@@ -7,6 +7,8 @@
 #include <chrono>
 #include <glm/gtx/rotate_vector.hpp>
 
+constexpr uint32_t LEAF_SIZE = 16;
+
 /// BEGIN OCTREE_NODE ///
 
 OctreeNode::OctreeNode(std::vector<int> pos, int size, OctreeNode* parent) {
@@ -22,37 +24,40 @@ OctreeNode::OctreeNode(std::vector<int> pos, int size, OctreeNode* parent) {
 OctreeNode::OctreeNode() {}
 
 OctreeNode::~OctreeNode() {
-	for (OctreeNode* child : children) {
+	// TODO: Fix this
+	/*for (OctreeNode* child : children) {
 		delete child;
-	}
+	}*/
 }
 
-void OctreeNode::insert(Voxel voxel) {
-	if (size <= 16) {
+void OctreeNode::insert(Voxel* voxel, int32_t voxelPosInt[3]) {
+	if (size <= LEAF_SIZE) {
 		voxels.push_back(voxel);
 		return;
 	}
-	insertIntoChildren(voxel);
+	insertIntoChildren(voxel, voxelPosInt);
 
 }
 
-void OctreeNode::insertIntoChildren(Voxel voxel) {
+void OctreeNode::insertIntoChildren(Voxel* voxel, int32_t voxelPosInt[3]) {
 	if (!hasChildren) {
 		subdivide();
 	}
 
-	for (OctreeNode* node : children) {
-		if (node->containsPoint(voxel)) {
-			node->insert(voxel);
-			return;
-		}
-	}
+	int32_t childSize = children[0]->size;
+
+	int32_t childIndex = 
+		(voxelPosInt[0] - pos[0]) / childSize * 4 + 
+		(voxelPosInt[1] - pos[1]) / childSize * 2 + 
+		(voxelPosInt[2] - pos[2]) / childSize;
+
+	children[childIndex]->insert(voxel, voxelPosInt);
 }
 
-bool OctreeNode::containsPoint(Voxel voxel) const {
-	return voxel.position[0] >= pos[0] && voxel.position[0] <= pos[0] + size &&
-		voxel.position[1] >= pos[1] && voxel.position[1] <= pos[1] + size &&
-		voxel.position[2] >= pos[2] && voxel.position[2] <= pos[2] + size;
+bool OctreeNode::containsPoint(Voxel* voxel) const {
+	return voxel->position[0] >= pos[0] && voxel->position[0] <= pos[0] + size &&
+		voxel->position[1] >= pos[1] && voxel->position[1] <= pos[1] + size &&
+		voxel->position[2] >= pos[2] && voxel->position[2] <= pos[2] + size;
 }
 
 void OctreeNode::subdivide() {
@@ -75,17 +80,31 @@ void OctreeNode::drawVoxels(Shader* shader) const {
 }
 
 // TODO: Make different lod
-void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud) {
+void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod) {
 	if (!hasChildren) {
-		for (size_t i = 0; i < voxels.size(); i++) {
-			voxelCloud->push_back(voxels[i]);
+		if (lod == 1) {
+			for (size_t i = 0; i < voxels.size(); i++) {
+				voxelCloud->push_back(*voxels[i]);
+			}
+		} else {
+			uint32_t newSize = pow(2, lod - 1);
+			for (size_t i = 0; i < voxels.size(); i++) {
+				Voxel voxel = Voxel::getVoxelCopy(*voxels[i]);
+				if ((static_cast<uint32_t>(voxel.position[0]) % newSize) == 0 &&
+					(static_cast<uint32_t>(voxel.position[1]) % newSize) == 0 &&
+					(static_cast<uint32_t>(voxel.position[2]) % newSize) == 0) {
+					voxel.position[3] = newSize;
+					voxelCloud->push_back(voxel);
+				}
+			}
 		}
 	} else {
 		for (OctreeNode* child : children) {
-			child->calculateVAO(voxelCloud);
+			child->calculateVAO(voxelCloud, lod);
 		}
 	}
 }
+
 // TODO: Make different colour for each layer
 void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointCloud, uint8_t depth) {
 	if (!hasChildren) {
@@ -105,16 +124,16 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 /// BEGIN OCTREE ///
 
 Octree::Octree(const std::vector<int> pos, uint32_t size) {
-	OctreeNode node = OctreeNode(pos, size);
+	OctreeNode node = OctreeNode({ pos[0] - static_cast<int32_t>(size / 2), pos[1] - static_cast<int32_t>(size / 2), pos[2] - static_cast<int32_t>(size / 2) }, size);
 	root = node;
 	this->pos = pos;
 	this->size = size;
-	glGenVertexArrays(1, &voxelVAO);
+	//glGenVertexArrays(1, &voxelVAO);
 	glGenVertexArrays(1, &boundingBoxVAO);
 }
 
-void Octree::insert(Voxel voxel) {
-	root.insert(voxel);
+void Octree::insert(Voxel* voxel, int32_t voxelPosInt[3]) {
+	root.insert(voxel, voxelPosInt);
 }
 
 void Octree::calculateBoundingBoxVAO() {
@@ -143,7 +162,9 @@ void Octree::calculateBoundingBoxVAO() {
 	glBindVertexArray(0);
 }
 
-void Octree::calculateVoxelVAO() {
+void Octree::calculateVoxelVAO(uint32_t lod) {
+
+
 	using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
 	using std::chrono::duration;
@@ -152,19 +173,25 @@ void Octree::calculateVoxelVAO() {
 	auto t1 = high_resolution_clock::now();
 
 	std::vector<Voxel> voxelCloud;
-	root.calculateVAO(&voxelCloud);
-	amountOfVoxels = voxelCloud.size();
-	std::cout << amountOfVoxels << " voxels in octree\n";
+	root.calculateVAO(&voxelCloud, lod);
 
+	if (!voxelVAOs.count(lod)) {
+		uint32_t VAO;
+		glGenVertexArrays(1, &VAO);
+		voxelVAOs.insert({ lod, VAO });
+		voxelAmounts.insert({ lod, voxelCloud.size() });
+	}
+
+	std::cout << voxelAmounts[lod] << " voxels in octree\n";
 
 	uint32_t VBO;
 	glGenBuffers(1, &VBO);
-	glBindVertexArray(voxelVAO);
+	glBindVertexArray(voxelVAOs[lod]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, voxelCloud.size() * sizeof(Voxel), voxelCloud.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, voxelCloud.size() * sizeof(Voxel), voxelCloud.data(), GL_DYNAMIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)offsetof(Voxel, color));
@@ -175,17 +202,25 @@ void Octree::calculateVoxelVAO() {
 	glBindVertexArray(0);
 
 	duration<double, std::milli> ms = high_resolution_clock::now() - t1;
-	std::cout << ms.count() << "ms to build voxel chunk\n";
+	std::cout << ms.count() << "ms to build voxel chunk VAO\n";
 
 }
 
 void Octree::makeNoiseTerrain() {
-	int32_t chunkPos[] = {pos[0], pos[2] };
+
+	using std::chrono::high_resolution_clock;
+	using std::chrono::duration_cast;
+	using std::chrono::duration;
+	using std::chrono::milliseconds;
+
+	auto t1 = high_resolution_clock::now();
+
+	int32_t chunkPos[] = { pos[0], pos[2] };
 	fnl_state noise = fnlCreateState();
 	noise.noise_type = FNL_NOISE_PERLIN;
 
-	for (int32_t zi = 0; zi < size; zi++) {
-		for (int32_t xi = 0; xi < size; xi++) {
+	for (int32_t zi = -size / 2; zi < size / 2; zi++) {
+		for (int32_t xi = -size / 2; xi < size / 2; xi++) {
 			float x = static_cast<float>(xi + chunkPos[0]);
 			float z = static_cast<float>(zi + chunkPos[1]);
 			float data = (fnlGetNoise2D(&noise, x, z) + 1) * 50;
@@ -194,26 +229,63 @@ void Octree::makeNoiseTerrain() {
 
 			float y = std::round(data);
 
-			// TODO ERROR: REMOVE THE "/ 2" IN FOR LOOP
-			for (size_t i = y / 2; i < y; i++) {
-				insert(Voxel{ { x, static_cast<float>(i), z }, { 0, 0, 0 } });
+			//// TODO ERROR: REMOVE THE "/ 2" IN FOR LOOP
+			//float y = 40;
+			std::vector<float> color;
+			int32_t curY = y / 2;
+			int32_t voxelPosInt[] = { x, 0, z };
+			for (int32_t i = curY; i < y && i < 35; i++, curY++) {
+				voxelPosInt[1] = i;
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.149, 0.290, 0.890 } }, voxelPosInt);
+			}
+			for (size_t i = curY; i < y && i < 40; i++, curY++) {
+				voxelPosInt[1] = i;
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.133, 0.835, 0.968 } }, voxelPosInt);
+			}
+			for (size_t i = curY; i < y && i < 45; i++, curY++) {
+				voxelPosInt[1] = i;
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.886, 0.890, 0.149 } }, voxelPosInt);
+			}
+			for (size_t i = curY; i < y && i < 50; i++, curY++) {
+				voxelPosInt[1] = i;
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.176, 0.501, 0.309 } }, voxelPosInt);
+			}
+			for (size_t i = curY; i < y && i < 55; i++, curY++) {
+				voxelPosInt[1] = i;
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 },{ 0.760, 0.760, 0.760 } }, voxelPosInt);
+			}
+			for (size_t i = curY; i < y && i < 65; i++, curY++) {
+				voxelPosInt[1] = i;
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.462, 0.494, 0.498 } }, voxelPosInt);
+			}
+			for (size_t i = curY; i < y; i++, curY++) {
+				voxelPosInt[1] = i;
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 1, 1, 1 } }, voxelPosInt);
 			}
 		}
 	}
 
+
+	duration<double, std::milli> ms = high_resolution_clock::now() - t1;
+	std::cout << ms.count() << "ms to create voxel terrain chunk\n";
 }
 
-VoxelRendererComp* Octree::getVoxelRenderer(Shader* shader, Camera* camera) {
-	return new VoxelRendererComp{ shader, camera, voxelVAO, static_cast<uint32_t>(amountOfVoxels) };
+VoxelRendererComp* Octree::getVoxelRenderer(Shader* shader, Camera* camera, uint32_t lod) {
+	if (!voxelVAOs.count(lod))
+		calculateVoxelVAO(lod);
+	return new VoxelRendererComp{ shader, camera, voxelVAOs[lod], static_cast<uint32_t>(voxelAmounts[lod]) };
 }
 
-void Octree::fillVoxelRenderer(VoxelRendererComp* renderer) {
-	renderer->VAO = voxelVAO;
-	renderer->voxelAmount = static_cast<uint32_t>(amountOfVoxels);
+void Octree::fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod) {
+	if (!voxelVAOs.count(lod))
+		calculateVoxelVAO(lod);
+
+	renderer->VAO = voxelVAOs[lod];
+	renderer->voxelAmount = static_cast<uint32_t>(voxelAmounts[lod]);
 }
 
 BoundingBoxRendererComp* Octree::getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show) {
-	return new BoundingBoxRendererComp{ shader, camera, boundingBoxVAO, static_cast<uint32_t>(amountOfVoxels), show };
+	return new BoundingBoxRendererComp{ shader, camera, boundingBoxVAO, static_cast<uint32_t>(voxelAmounts[1]), show };
 }
 
 /// END OCTREE ///

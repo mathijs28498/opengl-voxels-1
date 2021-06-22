@@ -14,7 +14,9 @@ bool Entity::hasRequirement(std::string requirement) {
 };
 
 Component* Entity::getComponent(std::string requirement) {
-	return components[requirement];
+	if (components.count(requirement))
+		return components[requirement];
+	return nullptr;
 };
 
 void MainCamera::setCamera(CameraComp* camera) {

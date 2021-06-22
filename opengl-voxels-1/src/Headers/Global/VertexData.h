@@ -20,8 +20,18 @@ struct Light {
 };
 
 struct Voxel {
-	float position[3];
+	float position[4];
 	float color[3];
+
+	static Voxel getVoxelCopy(Voxel originalVoxel) {
+		Voxel voxel;
+		for (size_t i = 0; i < 4; i++) 
+			voxel.position[i] = originalVoxel.position[i];
+		for (size_t i = 0; i < 3; i++) 
+			voxel.color[i] = originalVoxel.color[i];
+
+		return voxel;
+	}
 };
 
 extern float cubeVertices[];

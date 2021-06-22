@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 
 #include "../Shader.h"
 #include "../Camera.h"
@@ -24,18 +25,20 @@ public:
 	OctreeNode();
 	~OctreeNode();
 
-	void insert(Voxel voxel);
+	void insert(Voxel* voxel, int32_t voxelPosInt[3]);
 	void subdivide();
-	void insertIntoChildren(Voxel voxel);
-	bool containsPoint(Voxel voxel) const;
+	void insertIntoChildren(Voxel* voxel, int32_t voxelPosInt[3]);
+	bool containsPoint(Voxel* voxel) const;
 
-	void calculateVAO(std::vector<Voxel>* voxelCloud);
+	void calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod);
 	void calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointCloud, uint8_t depth);
 
 	void drawVoxels(Shader* shader) const;
 private:
+	Voxel getAverageVoxelChildren();
+
 	std::vector<int> pos;
-	std::vector<Voxel> voxels;
+	std::vector<Voxel*> voxels;
 	int size;
 	OctreeNode* parent;
 	bool hasChildren;
@@ -44,23 +47,26 @@ private:
 
 class Octree {
 public:
-	Octree(const std::vector<int> pos, uint32_t size);
-
-	void insert(Voxel voxel);
-	void calculateBoundingBoxVAO();
-	void calculateVoxelVAO();
-	void makeNoiseTerrain();
-
-	VoxelRendererComp* getVoxelRenderer(Shader* shader, Camera* camera); 
-	BoundingBoxRendererComp* getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show); 
-	void fillVoxelRenderer(VoxelRendererComp* renderer);
-private:
 	std::vector<int32_t> pos;
 	int32_t size;
+
+	Octree() {};
+	Octree(const std::vector<int> pos, uint32_t size);
+
+	void insert(Voxel* voxel, int32_t voxelPosInt[3]);
+	void calculateBoundingBoxVAO();
+	void calculateVoxelVAO(uint32_t lod);
+	void makeNoiseTerrain();
+
+	VoxelRendererComp* getVoxelRenderer(Shader* shader, Camera* camera, uint32_t lod);
+	void fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod);
+	BoundingBoxRendererComp* getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show); 
+private:
 	OctreeNode root;
 	// TODO: Make this a vector/hashmap with multiple LOD
-	uint32_t voxelVAO;
-	size_t amountOfVoxels;
+	//uint32_t voxelVAO;
+	std::map<uint32_t, uint32_t> voxelVAOs;
+	std::map<uint32_t, uint32_t> voxelAmounts;
 	uint32_t boundingBoxVAO;
 	size_t amountOfBoundingboxes;
 };

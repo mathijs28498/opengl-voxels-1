@@ -15,6 +15,8 @@ template <typename T>
 std::string gcn(T c) { return typeid(c).name(); };
 
 struct Component {
+	bool enabled = true;
+
 	// Virtual member necessary to cast derived classes to this base class
 	virtual void ignored() {};
 };

@@ -3,7 +3,8 @@ layout(points) in;
 layout(triangle_strip, max_vertices = 24) out;
 
 in vec3 gColor[];
-in int gEnabledFaces[];
+in float gSizeMult[];
+
 
 out vec3 fColor;
 out vec3 fragPos;
@@ -51,19 +52,20 @@ void main() {
     }
 
     fColor = gColor[0];
+    float voxSizeReal = voxSize * gSizeMult[0];
 
-    vec4 luf = vec4(0, voxSize, voxSize, 0);
-    vec4 ruf = vec4(voxSize, voxSize, voxSize, 0);
-    vec4 ldf = vec4(0, 0, voxSize, 0);
-    vec4 rdf = vec4(voxSize, 0, voxSize, 0);
-    vec4 lub = vec4(0, voxSize, 0, 0);
-    vec4 rub = vec4(voxSize, voxSize, 0, 0);
+    vec4 luf = vec4(0, voxSizeReal, voxSizeReal, 0);
+    vec4 ruf = vec4(voxSizeReal, voxSizeReal, voxSizeReal, 0);
+    vec4 ldf = vec4(0, 0, voxSizeReal, 0);
+    vec4 rdf = vec4(voxSizeReal, 0, voxSizeReal, 0);
+    vec4 lub = vec4(0, voxSizeReal, 0, 0);
+    vec4 rub = vec4(voxSizeReal, voxSizeReal, 0, 0);
     vec4 ldb = vec4(0, 0, 0, 0);
-    vec4 rdb = vec4(voxSize, 0, 0, 0);
+    vec4 rdb = vec4(voxSizeReal, 0, 0, 0);
     
-    vec4 dx = mvp[0] * center / 2.0 * voxSize;
-    vec4 dy = mvp[1] * center / 2.0 * voxSize;
-    vec4 dz = mvp[2] * center / 2.0 * voxSize;
+//    vec4 dx = mvp[0] * center / 2.0 * voxSize;
+//    vec4 dy = mvp[1] * center / 2.0 * voxSize;
+//    vec4 dz = mvp[2] * center / 2.0 * voxSize;
 
     // FRONT
     normal = vec3(0, 0, 1);

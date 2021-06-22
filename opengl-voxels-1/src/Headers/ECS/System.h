@@ -10,7 +10,7 @@ protected:
 
 	bool hasComponents(Entity* entity) {
 		for (std::string requirement : requirements) {
-			if (!entity->hasRequirement(requirement))
+			if (!entity->hasRequirement(requirement) || !entity->getComponent(requirement)->enabled)
 				return false;
 		}
 		return true;

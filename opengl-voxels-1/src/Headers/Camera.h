@@ -9,7 +9,7 @@
 
 class Camera {
 public:
-	glm::vec3 cameraPos;
+	//glm::vec3 cameraPos;
 	glm::mat4 view;
 	glm::mat4 proj;
 	float fov = 45.0f;
@@ -17,8 +17,9 @@ public:
 	int height;
 
 	Camera() {};
-	Camera(GLFWwindow* window, glm::vec3 startPosition, float walkSpeed, float mouseSensitivity, float speedMultiplier, const int WIDTH, const int HEIGHT);
+	Camera(GLFWwindow* window, float walkSpeed, float mouseSensitivity, float speedMultiplier, const int WIDTH, const int HEIGHT);
 	void setProjMatrix();
+	void setViewMatrix(glm::vec3 cameraPos);
 	void setViewMatrix();
 
 	void setUniforms(const Shader* shader);
@@ -44,4 +45,7 @@ public:
 	float yaw = 0.0f;
 	float pitch = 0.0f;
 	glm::vec3 cameraDir = glm::vec3(1.0f, 0.0f, 0.0f);
+
+private:
+	glm::vec3 cameraPos;
 };

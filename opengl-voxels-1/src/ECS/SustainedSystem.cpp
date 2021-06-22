@@ -27,7 +27,7 @@ void VoxelRenderSystem::update(Entity* entity) {
     }
 
     renderer->shader->setVec3("lightDir", glm::rotate(glm::vec3(-1, 0, 0), glm::radians(angle), glm::vec3(-1, 0, 1)));
-    renderer->shader->setFloat("lightIntensity", lightIntensity);
+    renderer->shader->setFloat("lightIntensity", 1);
 
     renderer->shader->setFloat("voxSize", VOX_SIZE);
 
@@ -40,6 +40,7 @@ void BoundingBoxRendererSystem::update(Entity* entity) {
 	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
 	BoundingBoxRendererComp* renderer = getComponentFromEntity<BoundingBoxRendererComp>(entity);
 	KeyInputComp* keyInput = getComponentFromEntity<KeyInputComp>(entity);
+
 
 	if (keyInput->keyPress[GLFW_KEY_T]) {
 		renderer->show = !renderer->show;
@@ -58,10 +59,19 @@ void BoundingBoxRendererSystem::update(Entity* entity) {
 	}
 }
 
+void CameraMoveSystem::start(Entity* entity) {
+	CameraComp* mainCamera = getComponentFromEntity<CameraComp>(entity);
+	Camera* cam = mainCamera->camera;
+	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
+
+	cam->setViewMatrix(transform->position);
+}
+
 void CameraMoveSystem::update(Entity* entity) {
     CameraComp* mainCamera = getComponentFromEntity<CameraComp>(entity);
     KeyInputComp* keyInput = getComponentFromEntity<KeyInputComp>(entity);
 	Camera* cam = mainCamera->camera;
+	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
 
 	glm::vec3 addPos(0, 0, 0);
 	bool camPosChanged = false;
@@ -84,17 +94,17 @@ void CameraMoveSystem::update(Entity* entity) {
 	}
 
 	if (keyInput->keyRepeat[GLFW_KEY_LEFT_SHIFT]) {
-		cam->cameraPos.y -= cam->actualWalkSpeed * static_cast<float>(glfwGetTime());
+		transform->position.y -= cam->actualWalkSpeed * static_cast<float>(glfwGetTime());
 		camPosChanged = true;
 	}
 	if (keyInput->keyRepeat[GLFW_KEY_SPACE]) {
-		cam->cameraPos.y += cam->actualWalkSpeed * static_cast<float>(glfwGetTime());
+		transform->position.y += cam->actualWalkSpeed * static_cast<float>(glfwGetTime());
 		camPosChanged = true;
 	}
 
 	if (camPosChanged) {
-		if (glm::length(addPos) > 0.001f) cam->cameraPos += glm::normalize(addPos) * static_cast<float>(cam->actualWalkSpeed) * static_cast<float>(glfwGetTime());
-		cam->setViewMatrix();
+		if (glm::length(addPos) > 0.001f) transform->position += glm::normalize(addPos) * static_cast<float>(cam->actualWalkSpeed) * static_cast<float>(glfwGetTime());
+		cam->setViewMatrix(transform->position);
 	}
 }
 
