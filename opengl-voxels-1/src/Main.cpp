@@ -17,29 +17,47 @@ const int HEIGHT = 600;
 const char* TITLE = "Voxels everywhere";
 
 Entity* addCameraEntity(Scene& scene, Camera* cam) {
-	Entity* cameraEntity = new Entity;
+	Entity* entity = new Entity;
 	//cameraEntity->insertComponent(new TransformComp({ 0, 0, 0 }));
-	cameraEntity->insertComponent(new TransformComp({ 0, 15, 20 }));
-	cameraEntity->insertComponent(new CameraComp(cam));
-	cameraEntity->insertComponent(new KeyInputComp);
-	cameraEntity->insertComponent(new MouseCursorInputComp);
-	scene.addEntity(cameraEntity);
-	return cameraEntity;
+	entity->insertComponent(new TransformComp({ 0, 15, 20 }));
+	entity->insertComponent(new CameraComp(cam));
+	entity->insertComponent(new KeyInputComp);
+	entity->insertComponent(new MouseCursorInputComp);
+	//scene.addEntity(cameraEntity);
+	addEntityEvent.notify(entity);
+	return entity;
 }
 
 void addModelEntity(Scene& scene, glm::vec3 pos, Model* model, Shader* terrainVoxelShader, Camera* cam) {
 	Entity* entity = new Entity;
 	entity->insertComponent(new TransformComp(pos));
 	entity->insertComponent(model->getVoxelRenderer(terrainVoxelShader, cam));
-	scene.addEntity(entity);
+	//scene.addEntity(entity);
+	addEntityEvent.notify(entity);
 }
 
-void addOctreeCompEntity(Scene& scene, Shader* terrainVoxelShader, Camera* cam, TransformComp* transform) {
-	Entity* entity = new Entity;
-	entity->insertComponent(new OctreeComp({ 0, 0, 0 }, 256, transform));
-	entity->insertComponent(new VoxelRendererComp(terrainVoxelShader, cam, 0, 0));
-	entity->insertComponent(new TransformComp());
-	scene.addEntity(entity);
+void addOctreeCompEntity(Scene& scene, Shader* terrainVoxelShader, Shader* boundingBoxShader, Camera* cam, TransformComp* transform) {
+	//Entity* entity = new Entity;
+	//entity->insertComponent(new OctreeComp({ 0, 0, 0 }, 256, transform));
+	//entity->insertComponent(new VoxelRendererComp(terrainVoxelShader, cam, 0, 0));
+	//entity->insertComponent(new BoundingBoxRendererComp(boundingBoxShader, cam, 0, 0, false));
+	//entity->insertComponent(new KeyInputComp());
+	//entity->insertComponent(new TransformComp());
+	////scene.addEntity(entity);
+	//addEntityEvent.notify(entity);
+	
+	Entity* entity2 = new Entity;
+	entity2->insertComponent(new OctreeComp({ 1, 0, 0 }, 256, transform));
+	entity2->insertComponent(new VoxelRendererComp(terrainVoxelShader, cam, 0, 0));
+	entity2->insertComponent(new BoundingBoxRendererComp(terrainVoxelShader, cam, 0, 0, false));
+	entity2->insertComponent(new KeyInputComp());
+	entity2->insertComponent(new TransformComp());
+	//scene.addEntity(entity);
+	addEntityEvent.notify(entity2);
+
+	/*Entity* entity = new Entity;
+	entity->insertComponent(new OctreeHandlerComp(transform));
+	addEntityEvent.notify(entity);*/
 }
 
 int main() {
@@ -61,14 +79,16 @@ int main() {
 		Entity* cameraEntity = addCameraEntity(scene, &cam);
 		//addModelEntity(scene, glm::vec3(30 * VOX_SIZE, 45*VOX_SIZE, 30 * VOX_SIZE), &monu, &voxelShader, &cam);
 		//addModelEntity(scene, glm::vec3(100 * VOX_SIZE, 45*VOX_SIZE, 0), &teapot, &voxelShader, &cam);
-		addOctreeCompEntity(scene, &terrainVoxelShader, &cam, static_cast<TransformComp*>(cameraEntity->getComponent(gcn(TransformComp()))));
+		addOctreeCompEntity(scene, &terrainVoxelShader, &boundingBoxShader, &cam, 
+			static_cast<TransformComp*>(cameraEntity->getComponent(gcn(TransformComp()))));
 
 		// TODO: Make better benchmark
 		// TODO: Make a deltaTime variable
-		double lastTime = glfwGetTime();
-		double lastTime2 = glfwGetTime();
 
 		scene.start();
+
+		double lastTime = glfwGetTime();
+		double lastTime2 = glfwGetTime();
 		while (!window.shouldClose()) {
 			// Measure speed
 			double currentTime = glfwGetTime();

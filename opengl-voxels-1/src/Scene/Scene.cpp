@@ -15,6 +15,10 @@ std::vector<SustainedSystem*> systems{
 KeyboardSystem keyboardSystem;
 CameraMouseCursorSystem cameraMouseCursorSystem;
 
+Scene::Scene() {
+	addEntityEvent += new SceneObserver(this);
+}
+
 void Scene::addEntity(Entity* entity) {
 	entities.push_back(entity);
 }

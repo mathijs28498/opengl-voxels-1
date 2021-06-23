@@ -124,7 +124,12 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 /// BEGIN OCTREE ///
 
 Octree::Octree(const std::vector<int> pos, uint32_t size) {
-	OctreeNode node = OctreeNode({ pos[0] - static_cast<int32_t>(size / 2), pos[1] - static_cast<int32_t>(size / 2), pos[2] - static_cast<int32_t>(size / 2) }, size);
+	OctreeNode node = OctreeNode({ 
+		pos[0] * (int32_t)size - static_cast<int32_t>(size / 2), 
+		pos[1] * (int32_t)size - static_cast<int32_t>(size / 2),
+		pos[2] * (int32_t)size - static_cast<int32_t>(size / 2) }, 
+		size);
+
 	root = node;
 	this->pos = pos;
 	this->size = size;
@@ -163,7 +168,10 @@ void Octree::calculateBoundingBoxVAO() {
 }
 
 void Octree::calculateVoxelVAO(uint32_t lod) {
+	/*int32_t tempPos[] = { 128, 0, 0 };
+	insert(new Voxel{ { 0, 0, 0, 1 }, { 0.149, 0.290, 0.890 } }, tempPos);
 
+	return;*/
 
 	using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
@@ -208,6 +216,8 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 
 void Octree::makeNoiseTerrain() {
 
+
+
 	using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
 	using std::chrono::duration;
@@ -215,12 +225,12 @@ void Octree::makeNoiseTerrain() {
 
 	auto t1 = high_resolution_clock::now();
 
-	int32_t chunkPos[] = { pos[0], pos[2] };
+	int32_t chunkPos[] = { root.pos[0], root.pos[2] };
 	fnl_state noise = fnlCreateState();
 	noise.noise_type = FNL_NOISE_PERLIN;
 
-	for (int32_t zi = -size / 2; zi < size / 2; zi++) {
-		for (int32_t xi = -size / 2; xi < size / 2; xi++) {
+	for (int32_t zi = 0; zi < size; zi++) {
+		for (int32_t xi = 0; xi < size; xi++) {
 			float x = static_cast<float>(xi + chunkPos[0]);
 			float z = static_cast<float>(zi + chunkPos[1]);
 			float data = (fnlGetNoise2D(&noise, x, z) + 1) * 50;
@@ -230,9 +240,8 @@ void Octree::makeNoiseTerrain() {
 			float y = std::round(data);
 
 			//// TODO ERROR: REMOVE THE "/ 2" IN FOR LOOP
-			//float y = 40;
-			std::vector<float> color;
 			int32_t curY = y / 2;
+			//int32_t curY = 0;
 			int32_t voxelPosInt[] = { x, 0, z };
 			for (int32_t i = curY; i < y && i < 35; i++, curY++) {
 				voxelPosInt[1] = i;
@@ -285,7 +294,12 @@ void Octree::fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod) {
 }
 
 BoundingBoxRendererComp* Octree::getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show) {
-	return new BoundingBoxRendererComp{ shader, camera, boundingBoxVAO, static_cast<uint32_t>(voxelAmounts[1]), show };
+	return new BoundingBoxRendererComp{ shader, camera, boundingBoxVAO, (uint32_t)amountOfBoundingboxes, show };
+}
+
+void Octree::fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer) {
+	renderer->VAO = boundingBoxVAO;
+	renderer->boundingBoxAmount = (uint32_t)amountOfBoundingboxes;
 }
 
 /// END OCTREE ///

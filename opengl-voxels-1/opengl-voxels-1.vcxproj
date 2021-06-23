@@ -155,6 +155,7 @@
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Global\GLHelperFunctions.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Observer Pattern\SceneObserver.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ECS\SustainedSystem.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="src\Headers\ECS\Component.h" />
     <ClInclude Include="src\Headers\ECS\EventSystem.h" />
     <ClInclude Include="src\Headers\ECS\OctreeECS.h" />
+    <ClInclude Include="src\Headers\Observer pattern\SceneObserver.h" />
     <ClInclude Include="src\Vendors\Noise\FastNoiseLite.h" />
     <ClInclude Include="src\Headers\Global\GeneralHelperFunctions.h" />
     <ClInclude Include="src\Headers\Global\GLHelperFunctions.h" />

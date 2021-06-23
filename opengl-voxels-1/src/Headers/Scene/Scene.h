@@ -2,6 +2,7 @@
 
 #include "../ECS/Component.h"
 #include "../Objects/Octree.h"
+#include "../Observer pattern/SceneObserver.h"
 
 #include <vector>
 
@@ -9,6 +10,7 @@
 
 class Scene {
 public:
+	Scene();
 	// TODO: Probably need to do garbage collection but this gives an error (entities are on heap)
 	/*~Scene() {
 	* delete mainCamera;
@@ -17,7 +19,6 @@ public:
 		}
 	};*/
 
-	void addEntity(Entity* entity);
 
 	void keyCallback(int key, int action);
 	void mouseCursorCallback(double xpos, double ypos);
@@ -28,4 +29,17 @@ public:
 
 private:
 	std::vector<Entity*> entities{};
+	void addEntity(Entity* entity);
+
+	class SceneObserver : public Observer {
+	public:
+		SceneObserver(Scene* scene) : scene(scene) {}
+
+		void update(Entity* entity) override {
+			scene->addEntity(entity);
+		}
+	private:
+		Scene* scene;
+	};
 };
+

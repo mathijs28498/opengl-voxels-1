@@ -21,6 +21,8 @@ struct BoundingBoxPoint {
 
 class OctreeNode {
 public:
+	std::vector<int> pos;
+
 	OctreeNode(std::vector<int> pos, int size, OctreeNode* parent = nullptr);
 	OctreeNode();
 	~OctreeNode();
@@ -37,7 +39,6 @@ public:
 private:
 	Voxel getAverageVoxelChildren();
 
-	std::vector<int> pos;
 	std::vector<Voxel*> voxels;
 	int size;
 	OctreeNode* parent;
@@ -60,7 +61,9 @@ public:
 
 	VoxelRendererComp* getVoxelRenderer(Shader* shader, Camera* camera, uint32_t lod);
 	void fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod);
-	BoundingBoxRendererComp* getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show); 
+	BoundingBoxRendererComp* getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show);
+	void fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer);
+
 private:
 	OctreeNode root;
 	// TODO: Make this a vector/hashmap with multiple LOD

@@ -13,7 +13,7 @@ out vec3 normal;
 
 uniform float voxSize;
 
-uniform mat4 model = mat4(1.0);
+//uniform mat4 model = mat4(1.0);
 uniform mat4 view;
 uniform mat4 proj;
 uniform vec3 viewPos;
@@ -40,7 +40,8 @@ void addQuad(mat4 mvp, vec4 center, vec4 v1, vec4 v2, vec4 v3, vec4 v4) {
 void main() {
     vec4 position = gl_in[0].gl_Position;
     vec4 center = vec4(position.xyz * voxSize, 1);
-    mat4 mvp = proj * view * model;
+    mat4 mvp = proj * view;
+//    mat4 mvp = proj * view * model;
     vec4 relativeCenter = mvp * center;
     if (relativeCenter.w <= 0) return;
     vec4 relativeCenterTop = relativeCenter + voxSize;

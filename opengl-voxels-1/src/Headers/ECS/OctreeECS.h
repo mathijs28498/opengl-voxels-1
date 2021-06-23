@@ -4,24 +4,35 @@
 #include "EventSystem.h"
 #include "../Objects/Octree.h"
 
+#include <list>
+
 struct OctreeComp : public Component {
 	OctreeComp() {};
-	OctreeComp(std::vector<int> pos, uint32_t size, TransformComp* cameraTransform) : 
+	OctreeComp(std::vector<int> pos, uint32_t size, TransformComp* cameraTransform) :
 		octree(Octree(pos, size)), cameraTransform(cameraTransform), currentLOD(0) {};
 	Octree octree;
 	TransformComp* cameraTransform;
 	uint32_t currentLOD;
 };
 
-class OctreeSystem : public SustainedSystem {
-public:
-	OctreeSystem() : SustainedSystem({ gcn(TransformComp()), gcn(OctreeComp()) , gcn(VoxelRendererComp()) }) {};
+struct OctreeHandlerComp : public Component {
+	OctreeHandlerComp() {};
+	OctreeHandlerComp(TransformComp* cameraComp) : cameraComp(cameraComp) {};
+	TransformComp* cameraComp;
+	std::list<OctreeComp*> chunks;
+};
 
-	void start(Entity* entity);
+class OctreeHandlerSystem : public SustainedSystem {
+public:
+	OctreeHandlerSystem() : SustainedSystem({ gcn(OctreeHandlerSystem()) }) {};
+
 	void update(Entity* entity);
 };
 
-class OctreeInsertSystem : public EventSystem {
+class OctreeSystem : public SustainedSystem {
 public:
-	OctreeInsertSystem() : EventSystem({ gcn(OctreeComp()) }) {};
+	OctreeSystem() : SustainedSystem({ gcn(TransformComp()), gcn(OctreeComp()) , gcn(VoxelRendererComp()), gcn(BoundingBoxRendererComp()) }) {};
+
+	void start(Entity* entity);
+	void update(Entity* entity);
 };

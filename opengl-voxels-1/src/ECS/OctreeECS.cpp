@@ -9,19 +9,17 @@ constexpr uint32_t LOD4 = 4;
 void OctreeSystem::start(Entity * entity) {
     OctreeComp* octree = getComponentFromEntity<OctreeComp>(entity);
     TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
-    VoxelRendererComp* renderer = getComponentFromEntity<VoxelRendererComp>(entity);
-    //octree->currentLOD = 1;
+    BoundingBoxRendererComp* renderer = getComponentFromEntity<BoundingBoxRendererComp>(entity);
 
     transform->position = {
-        octree->octree.pos[0] * octree->octree.size,
-        octree->octree.pos[1] * octree->octree.size,
-        octree->octree.pos[2] * octree->octree.size
+        octree->octree.pos[0] * octree->octree.size * VOX_SIZE,
+        octree->octree.pos[1] * octree->octree.size * VOX_SIZE,
+        octree->octree.pos[2] * octree->octree.size * VOX_SIZE
     };
 
     octree->octree.makeNoiseTerrain();
-
-
-    //octree->octree.fillVoxelRenderer(renderer, octree->currentLOD);
+    octree->octree.calculateBoundingBoxVAO();
+    octree->octree.fillBoundingBoxRenderer(renderer);
 }
 
 void OctreeSystem::update(Entity* entity) {
