@@ -50,6 +50,7 @@ void BoundingBoxRendererSystem::update(Entity* entity) {
 		renderer->shader->use();
 		renderer->camera->setUniforms(renderer->shader);
 
+		renderer->shader->setMat4("model", glm::translate(glm::mat4(1), transform->position));
 		renderer->shader->setFloat("voxSize", VOX_SIZE);
 		renderer->shader->setVec3("color", 1, 1, 0);
 

@@ -124,14 +124,14 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 /// BEGIN OCTREE ///
 
 Octree::Octree(const std::vector<int> pos, uint32_t size) {
-	OctreeNode node = OctreeNode({ 
+	/*OctreeNode node = OctreeNode({ 
 		pos[0] * (int32_t)size - static_cast<int32_t>(size / 2), 
 		pos[1] * (int32_t)size - static_cast<int32_t>(size / 2),
 		pos[2] * (int32_t)size - static_cast<int32_t>(size / 2) }, 
-		size);
+		size);*/
+	root = OctreeNode({ 0, 0, 0 }, size);
 
-	root = node;
-	this->pos = pos;
+	//this->pos = pos;
 	this->size = size;
 	//glGenVertexArrays(1, &voxelVAO);
 	glGenVertexArrays(1, &boundingBoxVAO);
@@ -168,11 +168,6 @@ void Octree::calculateBoundingBoxVAO() {
 }
 
 void Octree::calculateVoxelVAO(uint32_t lod) {
-	/*int32_t tempPos[] = { 128, 0, 0 };
-	insert(new Voxel{ { 0, 0, 0, 1 }, { 0.149, 0.290, 0.890 } }, tempPos);
-
-	return;*/
-
 	using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
 	using std::chrono::duration;
@@ -214,9 +209,7 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 
 }
 
-void Octree::makeNoiseTerrain() {
-
-
+void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 
 	using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
@@ -229,33 +222,40 @@ void Octree::makeNoiseTerrain() {
 	fnl_state noise = fnlCreateState();
 	noise.noise_type = FNL_NOISE_PERLIN;
 
+	int32_t xOffset = pos[0] * size;
+	int32_t zOffset = pos[2] * size;
 	for (int32_t zi = 0; zi < size; zi++) {
 		for (int32_t xi = 0; xi < size; xi++) {
-			float x = static_cast<float>(xi + chunkPos[0]);
-			float z = static_cast<float>(zi + chunkPos[1]);
-			float data = (fnlGetNoise2D(&noise, x, z) + 1) * 50;
-			data += fnlGetNoise2D(&noise, x * 10, z * 10) * 3;
-			data += fnlGetNoise2D(&noise, x * 100, z * 100) * 0.1f;
+			/*float x = static_cast<float>(xi + chunkPos[0]);
+			float z = static_cast<float>(zi + chunkPos[1]);*/
+			float x = xi;
+			float z = zi;
+			//float xn = x + pos.x;
+			float xn = x + xOffset;
+			float zn = z + zOffset;
+			float data = (fnlGetNoise2D(&noise, xn, zn) + 1) * 50;
+			data += fnlGetNoise2D(&noise, xn * 10, zn * 10) * 3;
+			data += fnlGetNoise2D(&noise, xn * 100, zn * 100) * 0.1f;
 
 			float y = std::round(data);
 
 			//// TODO ERROR: REMOVE THE "/ 2" IN FOR LOOP
-			int32_t curY = y / 2;
-			//int32_t curY = 0;
+			//int32_t curY = y / 2;
+			int32_t curY = 0;
 			int32_t voxelPosInt[] = { x, 0, z };
-			for (int32_t i = curY; i < y && i < 35; i++, curY++) {
+			for (int32_t i = curY; i < y && i < 25; i++, curY++) {
 				voxelPosInt[1] = i;
 				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.149, 0.290, 0.890 } }, voxelPosInt);
 			}
-			for (size_t i = curY; i < y && i < 40; i++, curY++) {
+			for (size_t i = curY; i < y && i < 30; i++, curY++) {
 				voxelPosInt[1] = i;
 				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.133, 0.835, 0.968 } }, voxelPosInt);
 			}
-			for (size_t i = curY; i < y && i < 45; i++, curY++) {
+			for (size_t i = curY; i < y && i < 35; i++, curY++) {
 				voxelPosInt[1] = i;
 				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.886, 0.890, 0.149 } }, voxelPosInt);
 			}
-			for (size_t i = curY; i < y && i < 50; i++, curY++) {
+			for (size_t i = curY; i < y && i < 45; i++, curY++) {
 				voxelPosInt[1] = i;
 				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.176, 0.501, 0.309 } }, voxelPosInt);
 			}

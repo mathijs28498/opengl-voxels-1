@@ -5,6 +5,7 @@
 #include "../Observer pattern/SceneObserver.h"
 
 #include <vector>
+#include <queue>
 
 
 
@@ -30,6 +31,8 @@ public:
 private:
 	std::vector<Entity*> entities{};
 	void addEntity(Entity* entity);
+	bool isStarted = false;
+	std::queue<Entity*> toAdd;
 
 	class SceneObserver : public Observer {
 	public:

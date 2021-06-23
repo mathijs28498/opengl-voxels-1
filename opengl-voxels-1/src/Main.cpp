@@ -18,8 +18,7 @@ const char* TITLE = "Voxels everywhere";
 
 Entity* addCameraEntity(Scene& scene, Camera* cam) {
 	Entity* entity = new Entity;
-	//cameraEntity->insertComponent(new TransformComp({ 0, 0, 0 }));
-	entity->insertComponent(new TransformComp({ 0, 15, 20 }));
+	entity->insertComponent(new TransformComp({ -10, -5, 0 }));
 	entity->insertComponent(new CameraComp(cam));
 	entity->insertComponent(new KeyInputComp);
 	entity->insertComponent(new MouseCursorInputComp);
@@ -45,19 +44,21 @@ void addOctreeCompEntity(Scene& scene, Shader* terrainVoxelShader, Shader* bound
 	//entity->insertComponent(new TransformComp());
 	////scene.addEntity(entity);
 	//addEntityEvent.notify(entity);
-	
-	Entity* entity2 = new Entity;
-	entity2->insertComponent(new OctreeComp({ 1, 0, 0 }, 256, transform));
-	entity2->insertComponent(new VoxelRendererComp(terrainVoxelShader, cam, 0, 0));
-	entity2->insertComponent(new BoundingBoxRendererComp(boundingBoxShader, cam, 0, 0, false));
-	entity2->insertComponent(new KeyInputComp());
-	entity2->insertComponent(new TransformComp());
-	//scene.addEntity(entity);
-	addEntityEvent.notify(entity2);
+	//
+	//Entity* entity2 = new Entity;
+	//entity2->insertComponent(new OctreeComp({ 1, 0, 0 }, 256, transform));
+	//entity2->insertComponent(new VoxelRendererComp(terrainVoxelShader, cam, 0, 0));
+	//entity2->insertComponent(new BoundingBoxRendererComp(boundingBoxShader, cam, 0, 0, false));
+	//entity2->insertComponent(new KeyInputComp());
+	//entity2->insertComponent(new TransformComp());
+	////scene.addEntity(entity);
+	//addEntityEvent.notify(entity2);
 
-	/*Entity* entity = new Entity;
-	entity->insertComponent(new OctreeHandlerComp(transform));
-	addEntityEvent.notify(entity);*/
+	Entity* entity = new Entity;
+	VoxelRendererComp* voxelRenderer = new VoxelRendererComp(terrainVoxelShader, cam, 0, 0);
+	BoundingBoxRendererComp* boundingBoxRenderer = new BoundingBoxRendererComp(boundingBoxShader, cam, 0, 0, false);
+	entity->insertComponent(new OctreeHandlerComp(voxelRenderer, boundingBoxRenderer, transform));
+	addEntityEvent.notify(entity);
 }
 
 int main() {
@@ -85,7 +86,7 @@ int main() {
 		// TODO: Make better benchmark
 		// TODO: Make a deltaTime variable
 
-		scene.start();
+		//scene.start();
 
 		double lastTime = glfwGetTime();
 		double lastTime2 = glfwGetTime();

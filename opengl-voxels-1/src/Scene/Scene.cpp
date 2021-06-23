@@ -7,6 +7,7 @@ std::vector<SustainedSystem*> systems{
 	new CameraMoveSystem(),
 	new VoxelRenderSystem(),
 	new BoundingBoxRendererSystem(),
+	new OctreeHandlerSystem(),
 	new OctreeSystem(),
 
 	new ResetKeyInputSystem(),
@@ -20,7 +21,14 @@ Scene::Scene() {
 }
 
 void Scene::addEntity(Entity* entity) {
-	entities.push_back(entity);
+	/*if (isStarted) {
+		for (SustainedSystem* system : systems) {
+			system->doStart(entity);
+		}
+		
+	}*/
+	toAdd.push(entity);
+	//entities.push_back(entity);
 }
 
 void Scene::keyCallback(int key, int action) {
@@ -40,14 +48,24 @@ void Scene::mouseCursorCallback(double xpos, double ypos) {
 };
 
 void Scene::start() {
+	/*isStarted = true;
 	for (SustainedSystem* system : systems) {
 		for (auto i = entities.rbegin(); i != entities.rend(); ++i) {
 			system->doStart(*i);
 		}
-	}
+	}*/
 };
 
 void Scene::update() {
+	while (!toAdd.empty()) {
+		Entity* entity = toAdd.front();
+		for (SustainedSystem* system : systems) {
+			system->doStart(entity);
+		}
+		entities.push_back(entity);
+		toAdd.pop();
+	}
+
 	for (SustainedSystem* system : systems) {
 		for (auto i = entities.rbegin(); i != entities.rend(); ++i) {
 			system->doUpdate(*i);

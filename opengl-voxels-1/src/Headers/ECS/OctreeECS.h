@@ -9,7 +9,9 @@
 struct OctreeComp : public Component {
 	OctreeComp() {};
 	OctreeComp(std::vector<int> pos, uint32_t size, TransformComp* cameraTransform) :
-		octree(Octree(pos, size)), cameraTransform(cameraTransform), currentLOD(0) {};
+		pos(pos), octree(Octree(pos, size)), cameraTransform(cameraTransform), currentLOD(0) {};
+	std::vector<int> pos;
+	glm::vec3 center;
 	Octree octree;
 	TransformComp* cameraTransform;
 	uint32_t currentLOD;
@@ -17,14 +19,17 @@ struct OctreeComp : public Component {
 
 struct OctreeHandlerComp : public Component {
 	OctreeHandlerComp() {};
-	OctreeHandlerComp(TransformComp* cameraComp) : cameraComp(cameraComp) {};
-	TransformComp* cameraComp;
-	std::list<OctreeComp*> chunks;
+	OctreeHandlerComp(VoxelRendererComp* VoxelRenderer, BoundingBoxRendererComp* boundingBoxRenderer, TransformComp* cameraTransform) :
+		voxelRenderer(VoxelRenderer), boundingBoxRenderer(boundingBoxRenderer), cameraTransform(cameraTransform) {};
+	VoxelRendererComp* voxelRenderer;
+	BoundingBoxRendererComp* boundingBoxRenderer;
+	TransformComp* cameraTransform;
+	std::vector<OctreeComp*> chunks;
 };
 
 class OctreeHandlerSystem : public SustainedSystem {
 public:
-	OctreeHandlerSystem() : SustainedSystem({ gcn(OctreeHandlerSystem()) }) {};
+	OctreeHandlerSystem() : SustainedSystem({ gcn(OctreeHandlerComp()) }) {}
 
 	void update(Entity* entity);
 };

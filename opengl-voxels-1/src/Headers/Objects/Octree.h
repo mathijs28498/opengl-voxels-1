@@ -42,13 +42,13 @@ private:
 	std::vector<Voxel*> voxels;
 	int size;
 	OctreeNode* parent;
-	bool hasChildren;
+	bool hasChildren = false;
 	OctreeNode* children[8];
 };
 
 class Octree {
 public:
-	std::vector<int32_t> pos;
+	//std::vector<int32_t> pos;
 	int32_t size;
 
 	Octree() {};
@@ -57,7 +57,7 @@ public:
 	void insert(Voxel* voxel, int32_t voxelPosInt[3]);
 	void calculateBoundingBoxVAO();
 	void calculateVoxelVAO(uint32_t lod);
-	void makeNoiseTerrain();
+	void makeNoiseTerrain(std::vector<int32_t> pos);
 
 	VoxelRendererComp* getVoxelRenderer(Shader* shader, Camera* camera, uint32_t lod);
 	void fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod);
