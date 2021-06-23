@@ -49,7 +49,7 @@ void addOctreeCompEntity(Scene& scene, Shader* terrainVoxelShader, Shader* bound
 	Entity* entity2 = new Entity;
 	entity2->insertComponent(new OctreeComp({ 1, 0, 0 }, 256, transform));
 	entity2->insertComponent(new VoxelRendererComp(terrainVoxelShader, cam, 0, 0));
-	entity2->insertComponent(new BoundingBoxRendererComp(terrainVoxelShader, cam, 0, 0, false));
+	entity2->insertComponent(new BoundingBoxRendererComp(boundingBoxShader, cam, 0, 0, false));
 	entity2->insertComponent(new KeyInputComp());
 	entity2->insertComponent(new TransformComp());
 	//scene.addEntity(entity);
