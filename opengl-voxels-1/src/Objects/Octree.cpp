@@ -46,9 +46,9 @@ void OctreeNode::insertIntoChildren(Voxel* voxel, int32_t voxelPosInt[3]) {
 
 	int32_t childSize = children[0]->size;
 
-	int32_t childIndex = 
-		(voxelPosInt[0] - pos[0]) / childSize * 4 + 
-		(voxelPosInt[1] - pos[1]) / childSize * 2 + 
+	int32_t childIndex =
+		(voxelPosInt[0] - pos[0]) / childSize * 4 +
+		(voxelPosInt[1] - pos[1]) / childSize * 2 +
 		(voxelPosInt[2] - pos[2]) / childSize;
 
 	children[childIndex]->insert(voxel, voxelPosInt);
@@ -124,16 +124,9 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 /// BEGIN OCTREE ///
 
 Octree::Octree(const std::vector<int> pos, uint32_t size) {
-	/*OctreeNode node = OctreeNode({ 
-		pos[0] * (int32_t)size - static_cast<int32_t>(size / 2), 
-		pos[1] * (int32_t)size - static_cast<int32_t>(size / 2),
-		pos[2] * (int32_t)size - static_cast<int32_t>(size / 2) }, 
-		size);*/
 	root = OctreeNode({ 0, 0, 0 }, size);
 
-	//this->pos = pos;
 	this->size = size;
-	//glGenVertexArrays(1, &voxelVAO);
 	glGenVertexArrays(1, &boundingBoxVAO);
 }
 
@@ -171,7 +164,6 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 	using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
 	using std::chrono::duration;
-	using std::chrono::milliseconds;
 
 	auto t1 = high_resolution_clock::now();
 
@@ -186,6 +178,7 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 	}
 
 	std::cout << voxelAmounts[lod] << " voxels in octree\n";
+	std::cout << sizeof(OctreeNode) << " size of single node\n";
 
 	uint32_t VBO;
 	glGenBuffers(1, &VBO);
@@ -206,7 +199,6 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 
 	duration<double, std::milli> ms = high_resolution_clock::now() - t1;
 	std::cout << ms.count() << "ms to build voxel chunk VAO\n";
-
 }
 
 void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
@@ -226,11 +218,8 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 	int32_t zOffset = pos[2] * size;
 	for (int32_t zi = 0; zi < size; zi++) {
 		for (int32_t xi = 0; xi < size; xi++) {
-			/*float x = static_cast<float>(xi + chunkPos[0]);
-			float z = static_cast<float>(zi + chunkPos[1]);*/
 			float x = xi;
 			float z = zi;
-			//float xn = x + pos.x;
 			float xn = x + xOffset;
 			float zn = z + zOffset;
 			float data = (fnlGetNoise2D(&noise, xn, zn) + 1) * 50;
@@ -279,23 +268,13 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 	std::cout << ms.count() << "ms to create voxel terrain chunk\n";
 }
 
-VoxelRendererComp* Octree::getVoxelRenderer(Shader* shader, Camera* camera, uint32_t lod) {
-	if (!voxelVAOs.count(lod))
-		calculateVoxelVAO(lod);
-	return new VoxelRendererComp{ shader, camera, voxelVAOs[lod], static_cast<uint32_t>(voxelAmounts[lod]) };
-}
-
 void Octree::fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod) {
 	if (!voxelVAOs.count(lod))
 		calculateVoxelVAO(lod);
 
 	renderer->VAO = voxelVAOs[lod];
 	renderer->voxelAmount = static_cast<uint32_t>(voxelAmounts[lod]);
-}
-
-BoundingBoxRendererComp* Octree::getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show) {
-	return new BoundingBoxRendererComp{ shader, camera, boundingBoxVAO, (uint32_t)amountOfBoundingboxes, show };
-}
+} 
 
 void Octree::fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer) {
 	renderer->VAO = boundingBoxVAO;

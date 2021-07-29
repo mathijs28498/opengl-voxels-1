@@ -24,7 +24,6 @@ public:
 	void keyCallback(int key, int action);
 	void mouseCursorCallback(double xpos, double ypos);
 
-	void start();
 	void update();
 	void fixedUpdate();
 

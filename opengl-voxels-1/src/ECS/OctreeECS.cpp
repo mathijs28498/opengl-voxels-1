@@ -2,11 +2,23 @@
 #include "../Headers/Observer pattern/SceneObserver.h"
 
 #include <glm/gtx/norm.hpp>
+#include <mutex>
+#include <chrono>
 
-constexpr uint32_t LOD1 = 2;
-constexpr uint32_t LOD2 = 3;
-constexpr uint32_t LOD3 = 4;
+constexpr uint32_t LOD1 = 1;
+constexpr uint32_t LOD2 = 2;
+constexpr uint32_t LOD3 = 3;
 //constexpr uint32_t LOD4 = 5;
+
+std::mutex mtx;
+
+void createVoxelTerrain(OctreeComp* octree, BoundingBoxRendererComp* renderer) {
+	octree->octree.makeNoiseTerrain(octree->pos);
+	octree->octree.calculateBoundingBoxVAO();
+	octree->octree.fillBoundingBoxRenderer(renderer);
+	//octree->terrainCreationPromise.set_value(true);
+	octree->threadBusy = true;
+}
 
 void OctreeSystem::start(Entity* entity) {
 	OctreeComp* octree = getComponentFromEntity<OctreeComp>(entity);
@@ -25,16 +37,17 @@ void OctreeSystem::start(Entity* entity) {
 		(octree->pos[2] * octree->octree.size - octree->octree.size / 2) * VOX_SIZE,
 	};
 
-	octree->octree.makeNoiseTerrain(octree->pos);
-	octree->octree.calculateBoundingBoxVAO();
-	octree->octree.fillBoundingBoxRenderer(renderer);
+	octree->terrainCreationThread = std::thread(createVoxelTerrain, octree, renderer);
+	std::future<bool> future = octree->terrainCreationPromise.get_future();
 }
 
 void OctreeSystem::update(Entity* entity) {
 	OctreeComp* octree = getComponentFromEntity<OctreeComp>(entity);
+	if (!octree->threadBusy)
+		return;
+
 	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
 	VoxelRendererComp* renderer = getComponentFromEntity<VoxelRendererComp>(entity);
-
 
 	float distThreshold0 = octree->octree.size * VOX_SIZE;
 	float distThreshold1 = distThreshold0 * 3;
@@ -76,13 +89,9 @@ void OctreeHandlerSystem::update(Entity* entity) {
 
 	static bool tempBool = false;
 	std::vector<int32_t> curGridPos = {
-		//(int32_t)(camPos.x / (256 * VOX_SIZE)), 0, (int32_t)(camPos.z / (256 * VOX_SIZE)) 
-		(int32_t)floor((camPos.x + (256 / 2 * VOX_SIZE)) / (256 * VOX_SIZE)),
-		0,
-		(int32_t)floor((camPos.z + (256 / 2 * VOX_SIZE)) / (256 * VOX_SIZE)),
+		(int32_t)floor((camPos.x + (256 / 2 * VOX_SIZE)) / (256 * VOX_SIZE)), 0, (int32_t)floor((camPos.z + (256 / 2 * VOX_SIZE)) / (256 * VOX_SIZE)),
 	};
 	if (!isChunkActive(curGridPos, octreeHandler)) {
-		//if (!tempBool && glm::distance2(glm::vec3(0, 0, 0), tempCamPos) < 10 * 10) {
 		tempBool = true;
 		Entity* entity = new Entity;
 		OctreeComp* octreeComp = new OctreeComp(curGridPos, 256, octreeHandler->cameraTransform);
@@ -93,6 +102,5 @@ void OctreeHandlerSystem::update(Entity* entity) {
 		entity->insertComponent(new TransformComp());
 		octreeHandler->chunks.push_back(octreeComp);
 		addEntityEvent.notify(entity);
-		std::cout << octreeHandler->chunks.size() << " chunks\n";
 	}
 }

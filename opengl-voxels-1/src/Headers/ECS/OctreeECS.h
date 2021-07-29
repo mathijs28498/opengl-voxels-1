@@ -5,6 +5,8 @@
 #include "../Objects/Octree.h"
 
 #include <list>
+#include <thread>
+#include <future>
 
 struct OctreeComp : public Component {
 	OctreeComp() {};
@@ -15,6 +17,11 @@ struct OctreeComp : public Component {
 	Octree octree;
 	TransformComp* cameraTransform;
 	uint32_t currentLOD;
+
+	bool threadBusy = false;
+	std::thread terrainCreationThread; 
+	std::promise<bool> terrainCreationPromise;
+	std::future<bool> terrainCreationFuture;
 };
 
 struct OctreeHandlerComp : public Component {

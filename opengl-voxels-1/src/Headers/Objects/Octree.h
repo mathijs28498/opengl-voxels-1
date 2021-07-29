@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 
 #include <vector>
+#include <thread>
 
 int* getColorFromInt(int colorInt);
 int getIntFromColor(const int* colorArray);
@@ -48,7 +49,6 @@ private:
 
 class Octree {
 public:
-	//std::vector<int32_t> pos;
 	int32_t size;
 
 	Octree() {};
@@ -59,15 +59,11 @@ public:
 	void calculateVoxelVAO(uint32_t lod);
 	void makeNoiseTerrain(std::vector<int32_t> pos);
 
-	VoxelRendererComp* getVoxelRenderer(Shader* shader, Camera* camera, uint32_t lod);
 	void fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod);
-	BoundingBoxRendererComp* getBoundingBoxRenderer(Shader* shader, Camera* camera, bool show);
 	void fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer);
 
 private:
 	OctreeNode root;
-	// TODO: Make this a vector/hashmap with multiple LOD
-	//uint32_t voxelVAO;
 	std::map<uint32_t, uint32_t> voxelVAOs;
 	std::map<uint32_t, uint32_t> voxelAmounts;
 	uint32_t boundingBoxVAO;

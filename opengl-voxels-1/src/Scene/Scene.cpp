@@ -47,15 +47,6 @@ void Scene::mouseCursorCallback(double xpos, double ypos) {
 	}
 };
 
-void Scene::start() {
-	/*isStarted = true;
-	for (SustainedSystem* system : systems) {
-		for (auto i = entities.rbegin(); i != entities.rend(); ++i) {
-			system->doStart(*i);
-		}
-	}*/
-};
-
 void Scene::update() {
 	while (!toAdd.empty()) {
 		Entity* entity = toAdd.front();
