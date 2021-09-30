@@ -22,6 +22,7 @@ struct Light {
 struct Voxel {
 	float position[4];
 	float color[3];
+	unsigned int sideBitMask;
 
 	static Voxel getVoxelCopy(Voxel originalVoxel) {
 		Voxel voxel;
@@ -29,6 +30,7 @@ struct Voxel {
 			voxel.position[i] = originalVoxel.position[i];
 		for (size_t i = 0; i < 3; i++) 
 			voxel.color[i] = originalVoxel.color[i];
+		voxel.sideBitMask = originalVoxel.sideBitMask;
 
 		return voxel;
 	}

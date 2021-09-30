@@ -4,6 +4,7 @@ layout(triangle_strip, max_vertices = 24) out;
 
 in vec3 gColor[];
 in float gSizeMult[];
+in unsigned int gEnabledFaces[];
 
 
 out vec3 fColor;
@@ -69,29 +70,41 @@ void main() {
 //    vec4 dz = mvp[2] * center / 2.0 * voxSize;
 
     // FRONT
-    normal = vec3(0, 0, 1);
+    if ((gEnabledFaces[0] & 0x01u) != 0u) {
+        normal = vec3(0, 0, 1);
         addQuad(mvp, center, ruf, rdf, luf, ldf);
+    }
 
     // BACK
-    normal = vec3(0, 0, -1);
+    if ((gEnabledFaces[0] & 0x02u) != 0u) {
+        normal = vec3(0, 0, -1);
         addQuad(mvp, center, lub, ldb, rub, rdb);
+    }
     
     // LEFT
-    normal = vec3(1, 0, 0 );
-//    testDot = dot(-viewDir, normal);
+    if ((gEnabledFaces[0] & 0x04u) != 0u) {
+        normal = vec3(1, 0, 0 );
+    //    testDot = dot(-viewDir, normal);
         addQuad(mvp, center, luf, ldf, lub, ldb);
+    }
 
     // RIGHT
-    normal = vec3(-1, 0, 0);
+    if ((gEnabledFaces[0] & 0x08u) != 0u) {
+        normal = vec3(-1, 0, 0);
         addQuad(mvp, center, rub, rdb, ruf, rdf);
+    }
     
     // TOP
-    normal = vec3(0, 1, 0);
-//    testDot = dot(-viewDir, normal);
+    if ((gEnabledFaces[0] & 0x10u) != 0u) {
+        normal = vec3(0, 1, 0);
+    //    testDot = dot(-viewDir, normal);
         addQuad(mvp, center, rub, ruf, lub, luf);
+    }
 
     // BOT
-    normal = vec3(0, -1, 0);
-//    if ((test & 0x20) != 0) 
+    if ((gEnabledFaces[0] & 0x20u) != 0u) {
+        normal = vec3(0, -1, 0);
+    //    if ((test & 0x20) != 0) 
         addQuad(mvp, center, ldb, ldf, rdb, rdf);
+    }
 }

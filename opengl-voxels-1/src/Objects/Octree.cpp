@@ -184,6 +184,8 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 	glGenBuffers(1, &VBO);
 	glBindVertexArray(voxelVAOs[lod]);
 
+	// TODO: Change to size of Voxel
+
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, voxelCloud.size() * sizeof(Voxel), voxelCloud.data(), GL_DYNAMIC_DRAW);
 
@@ -192,6 +194,10 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)offsetof(Voxel, color));
 	glEnableVertexAttribArray(1);
+
+	//glVertexAttribPointer(2, 1, GL_INT, GL_FALSE, sizeof(Voxel), (void*)offsetof(Voxel, sideBitMask));
+	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, sideBitMask));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -232,33 +238,33 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 			//int32_t curY = y / 2;
 			int32_t curY = 0;
 			int32_t voxelPosInt[] = { x, 0, z };
+			uint32_t sideBitMask = 0xff;
 			for (int32_t i = curY; i < y && i < 25; i++, curY++) {
 				voxelPosInt[1] = i;
-				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.149, 0.290, 0.890 } }, voxelPosInt);
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.149, 0.290, 0.890 }, sideBitMask }, voxelPosInt);
 			}
 			for (size_t i = curY; i < y && i < 30; i++, curY++) {
 				voxelPosInt[1] = i;
-				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.133, 0.835, 0.968 } }, voxelPosInt);
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.133, 0.835, 0.968 }, sideBitMask }, voxelPosInt);
 			}
 			for (size_t i = curY; i < y && i < 35; i++, curY++) {
 				voxelPosInt[1] = i;
-				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.886, 0.890, 0.149 } }, voxelPosInt);
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.886, 0.890, 0.149 }, sideBitMask }, voxelPosInt);
 			}
 			for (size_t i = curY; i < y && i < 45; i++, curY++) {
 				voxelPosInt[1] = i;
-				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.176, 0.501, 0.309 } }, voxelPosInt);
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.176, 0.501, 0.309 }, sideBitMask }, voxelPosInt);
 			}
 			for (size_t i = curY; i < y && i < 55; i++, curY++) {
 				voxelPosInt[1] = i;
-				insert(new Voxel{ { x, static_cast<float>(i), z, 1 },{ 0.760, 0.760, 0.760 } }, voxelPosInt);
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 },{ 0.760, 0.760, 0.760 }, sideBitMask }, voxelPosInt);
 			}
 			for (size_t i = curY; i < y && i < 65; i++, curY++) {
 				voxelPosInt[1] = i;
-				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.462, 0.494, 0.498 } }, voxelPosInt);
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 0.462, 0.494, 0.498 }, sideBitMask }, voxelPosInt);
 			}
 			for (size_t i = curY; i < y; i++, curY++) {
-				voxelPosInt[1] = i;
-				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 1, 1, 1 } }, voxelPosInt);
+				insert(new Voxel{ { x, static_cast<float>(i), z, 1 }, { 1, 1, 1 }, sideBitMask }, voxelPosInt);
 			}
 		}
 	}
