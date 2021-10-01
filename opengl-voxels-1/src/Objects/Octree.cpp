@@ -95,9 +95,13 @@ void OctreeNode::drawVoxels(Shader* shader) const {
 
 // TODO: Make different lod
 void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod) {
+	static uint32_t sum = 0;
 	if (!hasChildren) {
 		if (lod == 1) {
 			for (size_t i = 0; i < voxels.size(); i++) {
+				/*if (++sum % 1000 == 0)
+					std::cout << sum << '\n';*/
+
 				if (voxels[i]->enabledFaces == 0x00)
 					continue;
 				voxelCloud->push_back(*voxels[i]);
@@ -210,20 +214,14 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, voxelCloud.size() * sizeof(Voxel), voxelCloud.data(), GL_DYNAMIC_DRAW);
 
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)0);
+	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*) 0);
 	glEnableVertexAttribArray(0);
-
-	/*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Voxel), (void*)offsetof(Voxel, color));
-	glEnableVertexAttribArray(1);*/
 
 	glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, colorInt));
 	glEnableVertexAttribArray(1);
 
 	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, enabledFaces));
 	glEnableVertexAttribArray(2);
-
-	glVertexAttribIPointer(3, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, positionInt));
-	glEnableVertexAttribArray(3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -260,6 +258,8 @@ uint8_t createEnabledFacesBitMask(uint32_t i, float y, float yf, float yb, float
 
 
 void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
+	std::cout << sizeof(Voxel) << '\n';
+	std::cout << sizeof(OctreeNode) << '\n';
 
 	using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
@@ -336,7 +336,7 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 		}
 	}
 
-
+	
 	duration<double, std::milli> ms = high_resolution_clock::now() - t1;
 	std::cout << ms.count() << "ms to create voxel terrain chunk\n";
 }

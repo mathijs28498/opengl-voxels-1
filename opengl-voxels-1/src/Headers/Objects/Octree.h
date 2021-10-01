@@ -41,7 +41,7 @@ private:
 	Voxel getAverageVoxelChildren();
 
 	std::vector<Voxel*> voxels;
-	int size;
+	uint16_t size;
 	OctreeNode* parent;
 	bool hasChildren = false;
 	OctreeNode* children[8];
@@ -49,7 +49,7 @@ private:
 
 class Octree {
 public:
-	int32_t size;
+	uint16_t size;
 
 	Octree() {};
 	Octree(const std::vector<int> pos, uint32_t size);

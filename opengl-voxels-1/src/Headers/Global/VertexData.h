@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <iostream>
 
 // TODO: Decrease this to 0.125f
 const float VOX_SIZE = 0.25f;
@@ -19,16 +20,15 @@ struct Light {
 	glm::vec3 specular;
 };
 
+
 struct Voxel {
 	uint32_t positionInt;
+	// TODO: Put enabled faces in colorInt extra byte (or perhaps make 2 uint16_t)
 	uint32_t colorInt;
-	uint8_t enabledFaces;
+	uint8_t enabledFaces; 
 
 	static Voxel getVoxelCopy(Voxel originalVoxel) {
-		Voxel voxel;
-		voxel.positionInt = originalVoxel.positionInt;
-		voxel.colorInt = originalVoxel.colorInt;
-		voxel.enabledFaces = originalVoxel.enabledFaces;
+		Voxel voxel{ originalVoxel.colorInt, originalVoxel.enabledFaces, originalVoxel.positionInt };
 
 		return voxel;
 	}
