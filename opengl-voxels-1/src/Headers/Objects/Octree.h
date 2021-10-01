@@ -28,9 +28,9 @@ public:
 	OctreeNode();
 	~OctreeNode();
 
-	void insert(Voxel* voxel, int32_t voxelPosInt[3]);
+	void insert(Voxel* voxel, uint8_t voxelPosInt[3]);
 	void subdivide();
-	void insertIntoChildren(Voxel* voxel, int32_t voxelPosInt[3]);
+	void insertIntoChildren(Voxel* voxel, uint8_t voxelPosInt[3]);
 	bool containsPoint(Voxel* voxel) const;
 
 	void calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod);
@@ -54,7 +54,7 @@ public:
 	Octree() {};
 	Octree(const std::vector<int> pos, uint32_t size);
 
-	void insert(Voxel* voxel, int32_t voxelPosInt[3]);
+	void insert(Voxel* voxel, uint8_t voxelPosInt[3]);
 	void calculateBoundingBoxVAO();
 	void calculateVoxelVAO(uint32_t lod);
 	void makeNoiseTerrain(std::vector<int32_t> pos);

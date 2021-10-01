@@ -1,21 +1,34 @@
 #version 330 core
 //precision highp int;
 
-layout (location = 0) in vec4 vVertPos;
-layout (location = 1) in vec3 vColor;
+layout (location = 0) in unsigned int positionInt;
+layout (location = 1) in unsigned int colorInt;
 layout (location = 2) in unsigned int vEnabledFaces;
 
 out vec3 gColor;
 out float gSizeMult;
 out unsigned int gEnabledFaces;
 
+vec3 intToVec3(unsigned int intArg) {
+	float i0 = int( intArg		  & 255u);
+	float i1 = int((intArg >> 8u)  & 255u);
+	float i2 = int((intArg >> 16u) & 255u);
+	return vec3(i0, i1, i2);  
+}
+
+vec4 intToVec4(unsigned int intArg) {
+	float i0 = int( intArg		  & 255u);
+	float i1 = int((intArg >> 8u)  & 255u);
+	float i2 = int((intArg >> 16u) & 255u);
+	float i3 = int((intArg >> 24u) & 255u);
+	return vec4(i0, i1, i2, i3);  
+}
+
 void main() {
-	gl_Position =  vec4(vVertPos.xyz, 1.0);
-//	float r = vColorInt / 255;
-//	float g = (255 - vColorInt) / 255;
-	
-//	gColor = vec3(r, g, 0);
-	gColor = vColor;
-	gSizeMult = vVertPos.w;
+	vec4 position = intToVec4(positionInt);
+
+	gl_Position = vec4(position.xyz, 1.0);
+	gColor = intToVec3(colorInt) / 255.0;
+	gSizeMult = position.w;
 	gEnabledFaces = vEnabledFaces;
 }

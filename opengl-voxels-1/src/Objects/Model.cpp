@@ -51,7 +51,7 @@ void Model::draw(Shader* shader, Camera* cam) {
 }
 
 void Model::calculateVAO(std::vector<Voxel>* voxels) {
-    uint32_t VBO;
+    /*uint32_t VBO;
     glGenBuffers(1, &VBO);
 
     glBindVertexArray(VAO);
@@ -67,63 +67,63 @@ void Model::calculateVAO(std::vector<Voxel>* voxels) {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glBindVertexArray(0);
+    glBindVertexArray(0);*/
 }
 
 // TODO: Fix for multiple chunks
 void Model::loadModel(const char* filePath) {
-    std::ifstream input(filePath, std::ios::binary);
+    //std::ifstream input(filePath, std::ios::binary);
 
-    std::vector<char> bytes((std::istreambuf_iterator<char>(input)), (std::istreambuf_iterator<char>()));
+    //std::vector<char> bytes((std::istreambuf_iterator<char>(input)), (std::istreambuf_iterator<char>()));
 
-    input.close();
+    //input.close();
 
-    size_t bytePointer = 4;
-    uint32_t versionNumber = bytesToUint32(&bytes, &bytePointer);
-    
-    if (!findWordInBytes(&bytes, &bytePointer, "SIZE", 4)) {
-        throw std::runtime_error("Couldn't find 'SIZE' in vox file");
-    }
-    bytePointer += 4 * 2;
-    uint32_t xChunkSize = bytesToUint32(&bytes, &bytePointer);
-    uint32_t yChunkSize = bytesToUint32(&bytes, &bytePointer);
-    uint32_t zChunkSize = bytesToUint32(&bytes, &bytePointer);
+    //size_t bytePointer = 4;
+    //uint32_t versionNumber = bytesToUint32(&bytes, &bytePointer);
+    //
+    //if (!findWordInBytes(&bytes, &bytePointer, "SIZE", 4)) {
+    //    throw std::runtime_error("Couldn't find 'SIZE' in vox file");
+    //}
+    //bytePointer += 4 * 2;
+    //uint32_t xChunkSize = bytesToUint32(&bytes, &bytePointer);
+    //uint32_t yChunkSize = bytesToUint32(&bytes, &bytePointer);
+    //uint32_t zChunkSize = bytesToUint32(&bytes, &bytePointer);
 
-    if (!findWordInBytes(&bytes, &bytePointer, "XYZI", 4)) {
-        throw std::runtime_error("couldn't find 'XYZI' in vox file");
-    }
+    //if (!findWordInBytes(&bytes, &bytePointer, "XYZI", 4)) {
+    //    throw std::runtime_error("couldn't find 'XYZI' in vox file");
+    //}
 
-    bytePointer += 4 * 2;
-    const uint32_t voxAmount = bytesToUint32(&bytes, &bytePointer);
-    amountOfVoxels = voxAmount;
-    std::vector<QuadUint8Struct> voxXYZIs(voxAmount);
-    for (int i = 0; i < voxAmount; i++) {
-        voxXYZIs[i] = QuadUint8Struct::getQuadUint8Struct(&bytes, &bytePointer);
-    }
+    //bytePointer += 4 * 2;
+    //const uint32_t voxAmount = bytesToUint32(&bytes, &bytePointer);
+    //amountOfVoxels = voxAmount;
+    //std::vector<QuadUint8Struct> voxXYZIs(voxAmount);
+    //for (int i = 0; i < voxAmount; i++) {
+    //    voxXYZIs[i] = QuadUint8Struct::getQuadUint8Struct(&bytes, &bytePointer);
+    //}
 
-    if (!findWordInBytes(&bytes, &bytePointer, "RGBA", 4)) {
-        // TODO: Add default palette if RGBA not found (also make bytePointer not go to end)
-        throw std::runtime_error("Couldn't find 'RGBA' in vox file");
-    }
+    //if (!findWordInBytes(&bytes, &bytePointer, "RGBA", 4)) {
+    //    // TODO: Add default palette if RGBA not found (also make bytePointer not go to end)
+    //    throw std::runtime_error("Couldn't find 'RGBA' in vox file");
+    //}
 
-    bytePointer += 4 * 2;
-    constexpr size_t rgbaAmount = 255;
-    std::vector<QuadUint8Struct> voxRGBAs(rgbaAmount);
-    for (int i = 0; i < rgbaAmount; i++) {
-        voxRGBAs[i] = QuadUint8Struct::getQuadUint8Struct(&bytes, &bytePointer);
-    }
+    //bytePointer += 4 * 2;
+    //constexpr size_t rgbaAmount = 255;
+    //std::vector<QuadUint8Struct> voxRGBAs(rgbaAmount);
+    //for (int i = 0; i < rgbaAmount; i++) {
+    //    voxRGBAs[i] = QuadUint8Struct::getQuadUint8Struct(&bytes, &bytePointer);
+    //}
 
-    std::vector<Voxel> voxels(voxAmount);
-    for (size_t i = 0; i < voxAmount; i++) {
-        QuadUint8Struct voxXYZI = voxXYZIs[i];
-        QuadUint8Struct voxRGBA = voxRGBAs[voxXYZIs[i].d - 1];
+    //std::vector<Voxel> voxels(voxAmount);
+    //for (size_t i = 0; i < voxAmount; i++) {
+    //    QuadUint8Struct voxXYZI = voxXYZIs[i];
+    //    QuadUint8Struct voxRGBA = voxRGBAs[voxXYZIs[i].d - 1];
 
-        voxels[i] = {
-            (float)voxXYZI.a, (float)voxXYZI.c, (float)voxXYZI.b,
-            (float)voxRGBA.a / 255.0f, (float)voxRGBA.b / 255.0f, (float)voxRGBA.c / 255.0f,
-        };
-    }
+    //    voxels[i] = {
+    //        (float)voxXYZI.a, (float)voxXYZI.c, (float)voxXYZI.b,
+    //        (float)voxRGBA.a / 255.0f, (float)voxRGBA.b / 255.0f, (float)voxRGBA.c / 255.0f,
+    //    };
+    //}
 
-    std::cout << "amount of voxels in model: " << amountOfVoxels << '\n';
-    calculateVAO(&voxels);
+    //std::cout << "amount of voxels in model: " << amountOfVoxels << '\n';
+    //calculateVAO(&voxels);
 }

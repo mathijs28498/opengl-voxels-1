@@ -39,6 +39,9 @@ void addQuad(mat4 mvp, vec4 center, vec4 v1, vec4 v2, vec4 v3, vec4 v4) {
 
 // TODO: Only draw visible faces with normal towards you (max_vertices could be 12)
 void main() {
+    if (gEnabledFaces[0] == 0x00u) {
+        return;
+    }
     vec4 position = gl_in[0].gl_Position;
     vec4 center = vec4(position.xyz * voxSize, 1);
 //    mat4 mvp = proj * view;

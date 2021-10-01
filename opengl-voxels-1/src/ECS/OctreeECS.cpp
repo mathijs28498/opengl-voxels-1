@@ -46,6 +46,8 @@ void OctreeSystem::update(Entity* entity) {
 	if (!octree->threadBusy)
 		return;
 
+	bool useLOD = false;
+
 	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
 	VoxelRendererComp* renderer = getComponentFromEntity<VoxelRendererComp>(entity);
 
@@ -53,7 +55,7 @@ void OctreeSystem::update(Entity* entity) {
 	float distThreshold1 = distThreshold0 * 3;
 	float distSq = glm::distance2(octree->center, octree->cameraTransform->position);
 
-	if (distSq < distThreshold0 * distThreshold0) {
+	if (distSq < distThreshold0 * distThreshold0 || !useLOD) {
 		if (octree->currentLOD != LOD1) {
 			octree->currentLOD = LOD1;
 			octree->octree.fillVoxelRenderer(renderer, octree->currentLOD);
