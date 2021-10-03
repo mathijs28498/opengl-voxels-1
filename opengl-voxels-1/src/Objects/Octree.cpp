@@ -6,11 +6,22 @@
 #include <stdexcept>
 #include <chrono>
 #include <glm/gtx/rotate_vector.hpp>
+#include <array>
 
 constexpr uint32_t LEAF_SIZE = 16;
 
 uint32_t bytesToInt(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3) {
 	return b0 + (b1 << 8) + (b2 << 16) + (b3 << 24);
+}
+
+uint8_t* positionFromInt(uint32_t position) {
+	uint8_t res[] = {
+		position & 0xff,
+		(position >> 8) & 0xff,
+		(position >> 16) & 0xff,
+	};
+
+	return res;
 }
 
 std::vector<uint8_t> intToBytes(uint32_t intArg) {
@@ -43,28 +54,29 @@ OctreeNode::~OctreeNode() {
 	}*/
 }
 
-void OctreeNode::insert(Voxel* voxel, uint8_t voxelPosInt[3]) {
+void OctreeNode::insert(Voxel* voxel) {
 	if (size <= LEAF_SIZE) {
 		voxels.push_back(voxel);
 		return;
 	}
-	insertIntoChildren(voxel, voxelPosInt);
+	insertIntoChildren(voxel);
 
 }
 
-void OctreeNode::insertIntoChildren(Voxel* voxel, uint8_t voxelPosInt[3]) {
+void OctreeNode::insertIntoChildren(Voxel* voxel) {
 	if (!hasChildren) {
 		subdivide();
 	}
 
 	int32_t childSize = children[0]->size;
+	uint8_t* voxelPos = positionFromInt(voxel->positionInt);
 
 	int32_t childIndex =
-		(voxelPosInt[0] - pos[0]) / childSize * 4 +
-		(voxelPosInt[1] - pos[1]) / childSize * 2 +
-		(voxelPosInt[2] - pos[2]) / childSize;
+		(voxelPos[0] - pos[0]) / childSize * 4 +
+		(voxelPos[1] - pos[1]) / childSize * 2 +
+		(voxelPos[2] - pos[2]) / childSize;
 
-	children[childIndex]->insert(voxel, voxelPosInt);
+	children[childIndex]->insert(voxel);
 }
 
 bool OctreeNode::containsPoint(Voxel* voxel) const {
@@ -155,8 +167,8 @@ Octree::Octree(const std::vector<int> pos, uint32_t size) {
 	glGenVertexArrays(1, &boundingBoxVAO);
 }
 
-void Octree::insert(Voxel* voxel, uint8_t voxelPosInt[3]) {
-	root.insert(voxel, voxelPosInt);
+void Octree::insert(Voxel* voxel) {
+	root.insert(voxel);
 }
 
 void Octree::calculateBoundingBoxVAO() {
@@ -238,7 +250,7 @@ float getNoiseHeight(fnl_state* noise, float xn, float zn) {
 	return std::round(data);
 }
 
-uint8_t createEnabledFacesBitMask(uint32_t i, float y, float yf, float yb, float yl, float yr) {
+uint8_t Octree::createEnabledFacesBitMask(uint32_t i, float y, float yf, float yb, float yl, float yr) {
 	uint8_t enabledFaces = 0x00;
 	if (i == 0)
 		enabledFaces += 0x20;
@@ -255,6 +267,11 @@ uint8_t createEnabledFacesBitMask(uint32_t i, float y, float yf, float yb, float
 	return enabledFaces;
 }
 
+Voxel* Octree::createVoxel(uint8_t x, uint32_t i, uint8_t z, std::array<uint8_t, 3> color, float y, float yf, float yb, float yl, float yr) {
+	uint8_t enabledFaces = createEnabledFacesBitMask(i, y, yf, yb, yl, yr);
+	uint32_t voxelPosInt = bytesToInt(x, i, z, 1);
+	return new Voxel{ voxelPosInt, bytesToInt(color[0], color[1], color[2], enabledFaces) };
+}
 
 
 void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
@@ -272,66 +289,46 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 	fnl_state noise = fnlCreateState();
 	noise.noise_type = FNL_NOISE_PERLIN;
 
-	int32_t xOffset = pos[0] * size;
-	int32_t zOffset = pos[2] * size;
-	for (int32_t zi = 0; zi < size; zi++) {
-		for (int32_t xi = 0; xi < size; xi++) {
-			float x = xi;
-			float z = zi;
+	float xOffset = pos[0] * size;
+	float zOffset = pos[2] * size;
+	for (uint32_t z = 0; z < size; z++) {
+		for (uint32_t x = 0; x < size; x++) {
 			float xn = x + xOffset;
 			float zn = z + zOffset;
 
 			float y = getNoiseHeight(&noise, xn, zn);
+
 			float yf = getNoiseHeight(&noise, xn, zn + 1);
 			float yb = getNoiseHeight(&noise, xn, zn - 1);
 			float yl = getNoiseHeight(&noise, xn - 1, zn);
 			float yr = getNoiseHeight(&noise, xn + 1, zn);
 
+			// TODO: REMOVE THIS!!!!
+			y = size;
+			std::cout << y;
+
 			int32_t curY = 0;
 			uint8_t voxelPosBytes[] = { x, 0, z };
 			for (int32_t i = curY; i < y && i < 25; i++, curY++) {
-				voxelPosBytes[1] = i;
-				uint8_t enabledFaces = createEnabledFacesBitMask(i, y, yf, yb, yl, yr);
-				uint32_t voxelPosInt = bytesToInt(x, i, z, 1);
-				insert(new Voxel{ voxelPosInt, bytesToInt(52, 58, 235, enabledFaces) }, voxelPosBytes);
+				insert(createVoxel(x, i, z, { 52, 58, 235 }, y, yf, yb, yl, yr));
 			}
 			for (size_t i = curY; i < y && i < 30; i++, curY++) {
-				voxelPosBytes[1] = i;
-				uint8_t enabledFaces = createEnabledFacesBitMask(i, y, yf, yb, yl, yr);
-				uint32_t voxelPosInt = bytesToInt(x, i, z, 1);
-				uint32_t temp = voxelPosInt;
-
-				insert(new Voxel{ voxelPosInt, bytesToInt(52, 143, 235, enabledFaces) }, voxelPosBytes);
+				insert(createVoxel(x, i, z, { 52, 143, 235 }, y, yf, yb, yl, yr));
 			}
 			for (size_t i = curY; i < y && i < 35; i++, curY++) {
-				voxelPosBytes[1] = i;
-				uint8_t enabledFaces = createEnabledFacesBitMask(i, y, yf, yb, yl, yr);
-				uint32_t voxelPosInt = bytesToInt(x, i, z, 1);
-				insert(new Voxel{ voxelPosInt, bytesToInt(207, 191, 70, enabledFaces) }, voxelPosBytes);
+				insert(createVoxel(x, i, z, { 207, 191, 70 }, y, yf, yb, yl, yr));
 			}
 			for (size_t i = curY; i < y && i < 45; i++, curY++) {
-				voxelPosBytes[1] = i;
-				uint8_t enabledFaces = createEnabledFacesBitMask(i, y, yf, yb, yl, yr);
-				uint32_t voxelPosInt = bytesToInt(x, i, z, 1);
-				insert(new Voxel{ voxelPosInt, bytesToInt(75, 207, 70, enabledFaces) }, voxelPosBytes);
+				insert(createVoxel(x, i, z, { 75, 207, 70 }, y, yf, yb, yl, yr));
 			}
 			for (size_t i = curY; i < y && i < 55; i++, curY++) {
-				voxelPosBytes[1] = i;
-				uint8_t enabledFaces = createEnabledFacesBitMask(i, y, yf, yb, yl, yr);
-				uint32_t voxelPosInt = bytesToInt(x, i, z, 1);
-				insert(new Voxel{ voxelPosInt, bytesToInt(113, 122, 119, enabledFaces) }, voxelPosBytes);
+				insert(createVoxel(x, i, z, { 113, 122, 119 }, y, yf, yb, yl, yr));
 			}
 			for (size_t i = curY; i < y && i < 65; i++, curY++) {
-				voxelPosBytes[1] = i;
-				uint8_t enabledFaces = createEnabledFacesBitMask(i, y, yf, yb, yl, yr);
-				uint32_t voxelPosInt = bytesToInt(x, i, z, 1);
-				insert(new Voxel{ voxelPosInt, bytesToInt(59, 66, 64, enabledFaces) }, voxelPosBytes);
+				insert(createVoxel(x, i, z, { 59, 66, 64 }, y, yf, yb, yl, yr));
 			}
 			for (size_t i = curY; i < y; i++, curY++) {
-				voxelPosBytes[1] = i;
-				uint8_t enabledFaces = createEnabledFacesBitMask(i, y, yf, yb, yl, yr);
-				uint32_t voxelPosInt = bytesToInt(x, i, z, 1);
-				insert(new Voxel{ voxelPosInt, bytesToInt(255, 255, 255, enabledFaces) }, voxelPosBytes);
+				insert(createVoxel(x, i, z, { 230, 230, 230 }, y, yf, yb, yl, yr));
 			}
 		}
 	}

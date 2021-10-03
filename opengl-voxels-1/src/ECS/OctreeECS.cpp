@@ -83,6 +83,8 @@ bool isChunkActive(std::vector<int32_t> curGridPos, OctreeHandlerComp* octreeHan
 	return false;
 }
 
+uint16_t OCTREE_SIZE = 256;
+
 void OctreeHandlerSystem::update(Entity* entity) {
 	OctreeHandlerComp* octreeHandler = getComponentFromEntity<OctreeHandlerComp>(entity);
 	glm::vec3 camPos = octreeHandler->cameraTransform->position;
@@ -91,12 +93,12 @@ void OctreeHandlerSystem::update(Entity* entity) {
 
 	static bool tempBool = false;
 	std::vector<int32_t> curGridPos = {
-		(int32_t)floor((camPos.x + (256 / 2 * VOX_SIZE)) / (256 * VOX_SIZE)), 0, (int32_t)floor((camPos.z + (256 / 2 * VOX_SIZE)) / (256 * VOX_SIZE)),
+		(int32_t)floor((camPos.x + (OCTREE_SIZE / 2 * VOX_SIZE)) / (OCTREE_SIZE * VOX_SIZE)), 0, (int32_t)floor((camPos.z + (OCTREE_SIZE / 2 * VOX_SIZE)) / (OCTREE_SIZE * VOX_SIZE)),
 	};
 	if (!isChunkActive(curGridPos, octreeHandler)) {
 		tempBool = true;
 		Entity* entity = new Entity;
-		OctreeComp* octreeComp = new OctreeComp(curGridPos, 256, octreeHandler->cameraTransform);
+		OctreeComp* octreeComp = new OctreeComp(curGridPos, OCTREE_SIZE, octreeHandler->cameraTransform);
 		entity->insertComponent(octreeComp);
 		entity->insertComponent(new VoxelRendererComp(octreeHandler->voxelRenderer->shader, octreeHandler->voxelRenderer->camera, 0, 0));
 		entity->insertComponent(new BoundingBoxRendererComp(octreeHandler->boundingBoxRenderer->shader, octreeHandler->voxelRenderer->camera, 0, 0, false));

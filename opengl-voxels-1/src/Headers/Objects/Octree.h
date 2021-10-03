@@ -28,9 +28,9 @@ public:
 	OctreeNode();
 	~OctreeNode();
 
-	void insert(Voxel* voxel, uint8_t voxelPosInt[3]);
+	void insert(Voxel* voxel);
 	void subdivide();
-	void insertIntoChildren(Voxel* voxel, uint8_t voxelPosInt[3]);
+	void insertIntoChildren(Voxel* voxel);
 	bool containsPoint(Voxel* voxel) const;
 
 	void calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod);
@@ -54,10 +54,13 @@ public:
 	Octree() {};
 	Octree(const std::vector<int> pos, uint32_t size);
 
-	void insert(Voxel* voxel, uint8_t voxelPosInt[3]);
+	void insert(Voxel* voxel);
 	void calculateBoundingBoxVAO();
 	void calculateVoxelVAO(uint32_t lod);
-	void makeNoiseTerrain(std::vector<int32_t> pos);
+	void makeNoiseTerrain(std::vector<int32_t> pos); 
+
+	static Voxel* createVoxel(uint8_t x, uint32_t i, uint8_t z, std::array<uint8_t, 3> color, float y, float yf, float yb, float yl, float yr);
+	static uint8_t createEnabledFacesBitMask(uint32_t i, float y, float yf, float yb, float yl, float yr);
 
 	void fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod);
 	void fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer);
