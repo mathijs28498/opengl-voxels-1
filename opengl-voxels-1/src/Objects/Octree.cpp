@@ -214,7 +214,7 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 		voxelAmounts.insert({ lod, voxelCloud.size() });
 	}
 
-	std::cout << voxelAmounts[lod] << " voxels in octree\n";
+	std::cout << voxelAmounts[lod] << " voxels in drawn\n";
 	std::cout << sizeof(OctreeNode) << " size of single node\n";
 
 	uint32_t VBO;
@@ -231,9 +231,6 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 
 	glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, colorAndEnabledInt));
 	glEnableVertexAttribArray(1);
-
-	//glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, enabledFaces));
-	//glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -275,8 +272,6 @@ Voxel* Octree::createVoxel(uint8_t x, uint32_t i, uint8_t z, std::array<uint8_t,
 
 
 void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
-	std::cout << sizeof(Voxel) << '\n';
-	std::cout << sizeof(OctreeNode) << '\n';
 
 	using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
@@ -304,8 +299,6 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 			float yr = getNoiseHeight(&noise, xn + 1, zn);
 
 			// TODO: REMOVE THIS!!!!
-			y = size;
-			std::cout << y;
 
 			int32_t curY = 0;
 			uint8_t voxelPosBytes[] = { x, 0, z };

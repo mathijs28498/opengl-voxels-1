@@ -4,7 +4,7 @@ layout(triangle_strip, max_vertices = 24) out;
 
 in vec3 gColor[];
 in float gSizeMult[];
-in unsigned int gEnabledFaces[];
+in uint gEnabledFaces[];
 
 
 out vec3 fColor;

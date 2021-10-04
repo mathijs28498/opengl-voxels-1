@@ -23,7 +23,6 @@ struct Light {
 
 struct Voxel {
 	uint32_t positionInt;
-	// TODO: Put enabled faces in colorInt extra byte (or perhaps make 2 uint16_t)
 	uint32_t colorAndEnabledInt;
 
 	static Voxel getVoxelCopy(Voxel originalVoxel) {

@@ -1,22 +1,22 @@
 #version 330 core
 //precision highp int;
 
-layout (location = 0) in unsigned int positionInt;
-layout (location = 1) in unsigned int colorAndEnabledInt;
-layout (location = 2) in unsigned int vEnabledFaces;
+layout (location = 0) in uint positionInt;
+layout (location = 1) in uint colorAndEnabledInt;
+layout (location = 2) in uint vEnabledFaces;
 
 out vec3 gColor;
 out float gSizeMult;
-out unsigned int gEnabledFaces;
+out uint gEnabledFaces;
 
-vec3 intToVec3(unsigned int intArg) {
+vec3 intToVec3(uint intArg) {
 	float i0 = int( intArg		  & 0xFFu);
 	float i1 = int((intArg >> 8u)  & 0xFFu);
 	float i2 = int((intArg >> 16u) & 0xFFu);
 	return vec3(i0, i1, i2);  
 }
 
-vec4 intToVec4(unsigned int intArg) {
+vec4 intToVec4(uint intArg) {
 	float i0 = int( intArg		  & 0xFFu);
 	float i1 = int((intArg >> 8u)  & 0xFFu);
 	float i2 = int((intArg >> 16u) & 0xFFu);
