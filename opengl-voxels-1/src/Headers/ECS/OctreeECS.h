@@ -8,6 +8,8 @@
 #include <thread>
 #include <future>
 
+#include <iostream>
+
 struct OctreeComp : public Component {
 	OctreeComp() {};
 	OctreeComp(std::vector<int> pos, uint32_t size, TransformComp* cameraTransform) :
@@ -24,6 +26,7 @@ struct OctreeComp : public Component {
 	std::future<bool> terrainCreationFuture;
 };
 
+// TODO: Make the renderer comps as seperate components, not in this one
 struct OctreeHandlerComp : public Component {
 	OctreeHandlerComp() {};
 	OctreeHandlerComp(VoxelRendererComp* VoxelRenderer, BoundingBoxRendererComp* boundingBoxRenderer, TransformComp* cameraTransform) :
@@ -32,6 +35,13 @@ struct OctreeHandlerComp : public Component {
 	BoundingBoxRendererComp* boundingBoxRenderer;
 	TransformComp* cameraTransform;
 	std::vector<OctreeComp*> chunks;
+};
+
+struct RayCastComp : public Component {
+	RayCastComp() {};
+	RayCastComp(Camera* cam) : cam(cam) {};
+	
+	Camera* cam;
 };
 
 class OctreeHandlerSystem : public SustainedSystem {
@@ -47,4 +57,11 @@ public:
 
 	void start(Entity* entity);
 	void update(Entity* entity);
+};
+
+class RayCastSystem : public SustainedSystem {
+public:
+	RayCastSystem() : SustainedSystem({ gcn(RayCastComp()), gcn(KeyInputComp()) }) {};
+
+	void fixedUpdate(Entity* entity);
 };

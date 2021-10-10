@@ -33,13 +33,32 @@ private:
 	bool isStarted = false;
 	std::queue<Entity*> toAdd;
 
-	class SceneObserver : public Observer {
+	class SceneObserver : public Observer<Entity*> {
 	public:
 		SceneObserver(Scene* scene) : scene(scene) {}
 
 		void update(Entity* entity) override {
-			scene->addEntity(entity);
+			scene->addEntity((Entity*)entity);
 		}
+	private:
+		Scene* scene;
+	};
+
+	class GetEntitiesObserver : public Observer2<std::vector<Entity*>*, std::string> {
+	public:
+		GetEntitiesObserver(Scene* scene) : scene(scene) {};
+
+		void update(std::vector<Entity*>* entities, std::string compName) override {
+			// TODO: 
+			//		 - Look through entities to find with compName
+			//		 - Put in std::vector
+			for (Entity* entity : scene->entities) {
+				if (entity->hasRequirement(compName)) {
+					entities->push_back(entity);
+				}
+			}
+		}
+
 	private:
 		Scene* scene;
 	};

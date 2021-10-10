@@ -103,6 +103,6 @@ public:
 };
 
 template <typename T>
-T* getComponentFromEntity(Entity* entity) {
+T* getComponentOfEntity(Entity* entity) {
 	return dynamic_cast<T*>(entity->getComponent(typeid(T).name()));
 }

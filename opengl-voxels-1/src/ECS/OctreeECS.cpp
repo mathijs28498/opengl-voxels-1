@@ -4,6 +4,7 @@
 #include <glm/gtx/norm.hpp>
 #include <mutex>
 #include <chrono>
+#include <array>
 
 constexpr uint32_t LOD1 = 1;
 constexpr uint32_t LOD2 = 2;
@@ -21,9 +22,9 @@ void createVoxelTerrain(OctreeComp* octree, BoundingBoxRendererComp* renderer) {
 }
 
 void OctreeSystem::start(Entity* entity) {
-	OctreeComp* octree = getComponentFromEntity<OctreeComp>(entity);
-	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
-	BoundingBoxRendererComp* renderer = getComponentFromEntity<BoundingBoxRendererComp>(entity);
+	OctreeComp* octree = getComponentOfEntity<OctreeComp>(entity);
+	TransformComp* transform = getComponentOfEntity<TransformComp>(entity);
+	BoundingBoxRendererComp* renderer = getComponentOfEntity<BoundingBoxRendererComp>(entity);
 
 	octree->center = {
 		octree->pos[0] * octree->octree.size * VOX_SIZE,
@@ -42,14 +43,14 @@ void OctreeSystem::start(Entity* entity) {
 }
 
 void OctreeSystem::update(Entity* entity) {
-	OctreeComp* octree = getComponentFromEntity<OctreeComp>(entity);
+	OctreeComp* octree = getComponentOfEntity<OctreeComp>(entity);
 	if (!octree->threadBusy)
 		return;
 
 	bool useLOD = false;
 
-	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
-	VoxelRendererComp* renderer = getComponentFromEntity<VoxelRendererComp>(entity);
+	TransformComp* transform = getComponentOfEntity<TransformComp>(entity);
+	VoxelRendererComp* renderer = getComponentOfEntity<VoxelRendererComp>(entity);
 
 	float distThreshold0 = octree->octree.size * VOX_SIZE;
 	float distThreshold1 = distThreshold0 * 3;
@@ -86,7 +87,7 @@ bool isChunkActive(std::vector<int32_t> curGridPos, OctreeHandlerComp* octreeHan
 uint16_t OCTREE_SIZE = 256;
 
 void OctreeHandlerSystem::update(Entity* entity) {
-	OctreeHandlerComp* octreeHandler = getComponentFromEntity<OctreeHandlerComp>(entity);
+	OctreeHandlerComp* octreeHandler = getComponentOfEntity<OctreeHandlerComp>(entity);
 	glm::vec3 camPos = octreeHandler->cameraTransform->position;
 	glm::vec3 tempCamPos = { camPos.x, 0, camPos.z };
 
@@ -107,4 +108,34 @@ void OctreeHandlerSystem::update(Entity* entity) {
 		octreeHandler->chunks.push_back(octreeComp);
 		addEntityEvent.notify(entity);
 	}
+}
+
+
+void RayCastSystem::fixedUpdate(Entity* entity) {
+	RayCastComp* rayCast = getComponentOfEntity<RayCastComp>(entity);
+	KeyInputComp* keyInput = getComponentOfEntity<KeyInputComp>(entity);
+
+	if (keyInput->keyRepeat[GLFW_KEY_Q]) {
+		std::string octreeCompName = gcn(OctreeComp());
+
+		Ray ray = rayCast->cam->getCameraRay(100);
+
+		std::vector<Entity*> entities;
+		getEntitiesWithComponentEvent.notify(&entities, octreeCompName);
+
+		std::vector<Octree*> octrees(entities.size());
+
+		RayCollision collision;
+		for (size_t i = 0; i < entities.size(); i++) {
+			//octrees[i] = 
+
+			OctreeComp* octreeComp = (OctreeComp*)entities[i]->getComponent(octreeCompName);
+			glm::vec3 octreePos = { octreeComp->pos[0], octreeComp->pos[1], octreeComp->pos[2] };
+			if (octreeComp->octree.rayCastCollision(ray, octreePos, &collision)) {
+				std::cout << "collided\n";
+			}
+		}
+
+	}
+
 }

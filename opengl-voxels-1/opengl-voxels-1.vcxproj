@@ -155,7 +155,6 @@
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Global\GLHelperFunctions.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Observer Pattern\SceneObserver.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ECS\SustainedSystem.cpp" />

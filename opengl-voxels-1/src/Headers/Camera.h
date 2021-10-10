@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Shader.h"
+#include "Global/VertexData.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -37,6 +38,10 @@ public:
 		return glm::cross(glm::vec3(0, 1, 0), getForwardVec3());
 	}
 
+	Ray getCameraRay(float length) {
+		return { cameraPos, cameraDir, length };
+	}
+
 	float normalWalkSpeed;
 	float speedMultiplier;
 	float actualWalkSpeed;
@@ -45,6 +50,7 @@ public:
 	float yaw = 0.0f;
 	float pitch = 0.0f;
 	glm::vec3 cameraDir = glm::vec3(1.0f, 0.0f, 0.0f);
+
 
 private:
 	glm::vec3 cameraPos;

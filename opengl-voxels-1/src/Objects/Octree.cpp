@@ -1,4 +1,5 @@
 #include "../Headers/Objects/Octree.h"
+#include "../Headers/Global/GeneralHelperFunctions.h"
 
 #define FNL_IMPL
 #include "../Vendors/Noise/FastNoiseLite.h"
@@ -9,29 +10,6 @@
 #include <array>
 
 constexpr uint32_t LEAF_SIZE = 16;
-
-uint32_t bytesToInt(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3) {
-	return b0 + (b1 << 8) + (b2 << 16) + (b3 << 24);
-}
-
-uint8_t* positionFromInt(uint32_t position) {
-	uint8_t res[] = {
-		position & 0xff,
-		(position >> 8) & 0xff,
-		(position >> 16) & 0xff,
-	};
-
-	return res;
-}
-
-std::vector<uint8_t> intToBytes(uint32_t intArg) {
-	uint8_t b0 = intArg & 0xFF;
-	uint8_t b1 = (intArg >> 8) & 0xFF;
-	uint8_t b2 = (intArg >> 16) & 0xFF;
-	uint8_t b3 = (intArg >> 24) & 0xFF;
-
-	return { b0, b1, b2, b3 };
-}
 
 /// BEGIN OCTREE_NODE ///
 
@@ -101,10 +79,6 @@ void OctreeNode::subdivide() {
 	hasChildren = true;
 }
 
-void OctreeNode::drawVoxels(Shader* shader) const {
-
-}
-
 // TODO: Make different lod
 void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod) {
 	static uint32_t sum = 0;
@@ -153,6 +127,39 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 		for (OctreeNode* child : children) {
 			child->calculateBoundingBoxVAO(pointCloud, depth + 1);
 		}
+	}
+}
+
+bool OctreeNode::rayCastCollision(Ray& ray, glm::vec3& octreePos, RayCollision* collision) {
+	if (voxels.size() > 0) {
+		// TODO: Do collision and find smallest distance
+		bool isCollided = false;
+		for (Voxel* voxel : voxels) {
+			RayCollision col;
+			if (voxel->rayCastCollision(ray, octreePos, &col)) {
+				isCollided = true;
+				if (collision->distance < 0 || col.distance < collision->distance) {
+					collision->point = col.point;
+					collision->distance = col.distance;
+				}
+			}
+		}
+		return isCollided;
+	} else if (!hasChildren) {
+		return false;
+	} else {
+		bool isCollided = false;
+		for (OctreeNode* child : children) {
+			RayCollision col;
+			if (child->rayCastCollision(ray, octreePos, &col)) {
+				isCollided = true;
+				if (collision->distance < 0 || col.distance < collision->distance) {
+					collision->point = col.point;
+					collision->distance = col.distance;
+				}
+			}
+		}
+		return isCollided;
 	}
 }
 
@@ -342,6 +349,10 @@ void Octree::fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod) {
 void Octree::fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer) {
 	renderer->VAO = boundingBoxVAO;
 	renderer->boundingBoxAmount = (uint32_t)amountOfBoundingboxes;
+}
+
+bool Octree::rayCastCollision(Ray& ray, glm::vec3& octreePos, RayCollision* collision) {
+	return root.rayCastCollision(ray, octreePos, collision);
 }
 
 /// END OCTREE ///

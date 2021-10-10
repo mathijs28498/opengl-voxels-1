@@ -20,7 +20,7 @@ public:
 
 	void doFixedUpdate(Entity* entity) {
 		if (hasComponents(entity))
-			update(entity);
+			fixedUpdate(entity);
 	};
 
 protected:

@@ -4,8 +4,8 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 void VoxelRenderSystem::update(Entity* entity) {
-    TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
-    VoxelRendererComp* renderer = getComponentFromEntity<VoxelRendererComp>(entity);
+    TransformComp* transform = getComponentOfEntity<TransformComp>(entity);
+    VoxelRendererComp* renderer = getComponentOfEntity<VoxelRendererComp>(entity);
 
     renderer->shader->use();
     renderer->camera->setUniforms(renderer->shader);
@@ -37,9 +37,9 @@ void VoxelRenderSystem::update(Entity* entity) {
 }
 
 void BoundingBoxRendererSystem::update(Entity* entity) {
-	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
-	BoundingBoxRendererComp* renderer = getComponentFromEntity<BoundingBoxRendererComp>(entity);
-	KeyInputComp* keyInput = getComponentFromEntity<KeyInputComp>(entity);
+	TransformComp* transform = getComponentOfEntity<TransformComp>(entity);
+	BoundingBoxRendererComp* renderer = getComponentOfEntity<BoundingBoxRendererComp>(entity);
+	KeyInputComp* keyInput = getComponentOfEntity<KeyInputComp>(entity);
 
 
 	if (keyInput->keyPress[GLFW_KEY_T]) {
@@ -61,18 +61,18 @@ void BoundingBoxRendererSystem::update(Entity* entity) {
 }
 
 void CameraMoveSystem::start(Entity* entity) {
-	CameraComp* mainCamera = getComponentFromEntity<CameraComp>(entity);
+	CameraComp* mainCamera = getComponentOfEntity<CameraComp>(entity);
 	Camera* cam = mainCamera->camera;
-	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
+	TransformComp* transform = getComponentOfEntity<TransformComp>(entity);
 
 	cam->setViewMatrix(transform->position);
 }
 
 void CameraMoveSystem::update(Entity* entity) {
-    CameraComp* mainCamera = getComponentFromEntity<CameraComp>(entity);
-    KeyInputComp* keyInput = getComponentFromEntity<KeyInputComp>(entity);
+    CameraComp* mainCamera = getComponentOfEntity<CameraComp>(entity);
+    KeyInputComp* keyInput = getComponentOfEntity<KeyInputComp>(entity);
 	Camera* cam = mainCamera->camera;
-	TransformComp* transform = getComponentFromEntity<TransformComp>(entity);
+	TransformComp* transform = getComponentOfEntity<TransformComp>(entity);
 
 	glm::vec3 addPos(0, 0, 0);
 	bool camPosChanged = false;
@@ -110,7 +110,7 @@ void CameraMoveSystem::update(Entity* entity) {
 }
 
 void ResetKeyInputSystem::update(Entity* entity) {
-    KeyInputComp* keyInput = getComponentFromEntity<KeyInputComp>(entity);
+    KeyInputComp* keyInput = getComponentOfEntity<KeyInputComp>(entity);
 
     std::fill_n(keyInput->keyPress, GLFW_KEY_LAST, false);
     std::fill_n(keyInput->keyRelease, GLFW_KEY_LAST, false);

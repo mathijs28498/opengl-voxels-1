@@ -36,7 +36,8 @@ public:
 	void calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod);
 	void calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointCloud, uint8_t depth);
 
-	void drawVoxels(Shader* shader) const;
+	bool rayCastCollision(Ray& ray, glm::vec3& octreePos, RayCollision* collision);
+
 private:
 	Voxel getAverageVoxelChildren();
 
@@ -64,6 +65,8 @@ public:
 
 	void fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod);
 	void fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer);
+
+	bool rayCastCollision(Ray& ray, glm::vec3& pos, RayCollision* collision);
 
 private:
 	OctreeNode root;

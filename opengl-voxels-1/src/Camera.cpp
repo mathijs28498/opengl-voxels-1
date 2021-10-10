@@ -35,3 +35,4 @@ void Camera::setUniforms(const Shader* shader) {
 	shader->setVec3("viewPos", cameraPos);
 	shader->setVec3("viewDir", cameraDir);
 }
+

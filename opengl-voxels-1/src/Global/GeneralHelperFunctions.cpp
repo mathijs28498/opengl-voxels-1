@@ -39,3 +39,26 @@ bool findWordInBytes(std::vector<char>* bytes, size_t* bytePointer, const char* 
 	}
 	return false;
 }
+
+uint32_t bytesToInt(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3) {
+	return b0 + (b1 << 8) + (b2 << 16) + (b3 << 24);
+}
+
+uint8_t* positionFromInt(uint32_t position) {
+	uint8_t res[] = {
+		position & 0xff,
+		(position >> 8) & 0xff,
+		(position >> 16) & 0xff,
+	};
+
+	return res;
+}
+
+std::vector<uint8_t> intToBytes(uint32_t intArg) {
+	uint8_t b0 = intArg & 0xFF;
+	uint8_t b1 = (intArg >> 8) & 0xFF;
+	uint8_t b2 = (intArg >> 16) & 0xFF;
+	uint8_t b3 = (intArg >> 24) & 0xFF;
+
+	return { b0, b1, b2, b3 };
+}

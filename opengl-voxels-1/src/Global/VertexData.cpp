@@ -1,5 +1,9 @@
 #include "../Headers/Global/VertexData.h"
 
+
+Event<Entity*> addEntityEvent;
+Event2<std::vector<Entity*>*, std::string> getEntitiesWithComponentEvent;
+
 float cubeVertices[]{
 	0.0f, 0.0f, 0.0f
 };

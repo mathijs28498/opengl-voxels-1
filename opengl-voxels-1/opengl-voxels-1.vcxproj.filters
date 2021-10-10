@@ -96,9 +96,6 @@
     <ClCompile Include="src\ECS\OctreeECS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Observer Pattern\SceneObserver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Headers\Camera.h">

@@ -36,29 +36,16 @@ void addModelEntity(Scene& scene, glm::vec3 pos, Model* model, Shader* terrainVo
 }
 
 void addOctreeCompEntity(Scene& scene, Shader* terrainVoxelShader, Shader* boundingBoxShader, Camera* cam, TransformComp* transform) {
-	//Entity* entity = new Entity;
-	//entity->insertComponent(new OctreeComp({ 0, 0, 0 }, 256, transform));
-	//entity->insertComponent(new VoxelRendererComp(terrainVoxelShader, cam, 0, 0));
-	//entity->insertComponent(new BoundingBoxRendererComp(boundingBoxShader, cam, 0, 0, false));
-	//entity->insertComponent(new KeyInputComp());
-	//entity->insertComponent(new TransformComp());
-	////scene.addEntity(entity);
-	//addEntityEvent.notify(entity);
-	//
-	//Entity* entity2 = new Entity;
-	//entity2->insertComponent(new OctreeComp({ 1, 0, 0 }, 256, transform));
-	//entity2->insertComponent(new VoxelRendererComp(terrainVoxelShader, cam, 0, 0));
-	//entity2->insertComponent(new BoundingBoxRendererComp(boundingBoxShader, cam, 0, 0, false));
-	//entity2->insertComponent(new KeyInputComp());
-	//entity2->insertComponent(new TransformComp());
-	////scene.addEntity(entity);
-	//addEntityEvent.notify(entity2);
-
 	Entity* entity = new Entity;
 	VoxelRendererComp* voxelRenderer = new VoxelRendererComp(terrainVoxelShader, cam, 0, 0);
 	BoundingBoxRendererComp* boundingBoxRenderer = new BoundingBoxRendererComp(boundingBoxShader, cam, 0, 0, false);
 	entity->insertComponent(new OctreeHandlerComp(voxelRenderer, boundingBoxRenderer, transform));
 	addEntityEvent.notify(entity);
+
+	Entity* entity2 = new Entity;
+	entity2->insertComponent(new RayCastComp(cam));
+	entity2->insertComponent(new KeyInputComp());
+	addEntityEvent.notify(entity2);
 }
 
 int main() {
@@ -67,21 +54,12 @@ int main() {
 		Window window(WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		Camera cam(window.window, 0.01f, 5, 0.1f, WIDTH, HEIGHT);
 
-
 		Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
-		//Shader terrainVoxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
-		//Shader voxelShader("shaders/voxelInstancing.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
-		//Shader terrainVoxelShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
 		Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
-
-		/*Model monu("models/monu10.vox");
-		Model teapot("models/teapot.vox");*/
 
 		Scene scene;
 		window.setScenePointer(&scene);
 		Entity* cameraEntity = addCameraEntity(scene, &cam);
-		//addModelEntity(scene, glm::vec3(30 * VOX_SIZE, 45*VOX_SIZE, 30 * VOX_SIZE), &monu, &voxelShader, &cam);
-		//addModelEntity(scene, glm::vec3(100 * VOX_SIZE, 45*VOX_SIZE, 0), &teapot, &voxelShader, &cam);
 		addOctreeCompEntity(scene, &terrainVoxelShader, &boundingBoxShader, &cam, 
 			static_cast<TransformComp*>(cameraEntity->getComponent(gcn(TransformComp()))));
 
@@ -105,6 +83,8 @@ int main() {
 			window.beginLoop();
 
 			scene.update();
+			// TODO: Make fixed update work
+			scene.fixedUpdate();
 
 			window.endLoop();
 
