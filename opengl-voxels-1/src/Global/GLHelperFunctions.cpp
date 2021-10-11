@@ -2,6 +2,46 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+uint32_t createVoxelVAO(Voxel* voxelPointer, size_t voxelSize) {
+	uint32_t VBO, VAO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, voxelSize * sizeof(Voxel), voxelPointer, GL_DYNAMIC_DRAW);
+
+	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, colorAndEnabledInt));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindVertexArray(0);
+
+	return VAO;
+}
+
+void editVoxelVAO(Voxel* voxelPointer, size_t voxelSize, uint32_t VAO) {
+	uint32_t VBO;
+	glGenBuffers(1, &VBO);
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, voxelSize * sizeof(Voxel), voxelPointer, GL_DYNAMIC_DRAW);
+
+	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, colorAndEnabledInt));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindVertexArray(0);
+}
 
 uint32_t getVAO() {
 	uint32_t VAO;

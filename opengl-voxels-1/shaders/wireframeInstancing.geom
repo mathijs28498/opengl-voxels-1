@@ -1,6 +1,6 @@
 #version 330 core
 layout(points) in;
-layout(triangle_strip, max_vertices = 24) out;
+layout(line_strip, max_vertices = 16) out;
 
 in vec3 gColor[];
 in float gSizeMult[];
@@ -59,57 +59,58 @@ void main() {
 //    }
 
     fColor = gColor[0];
-    float voxSizeReal = voxSizeMult;
+    float voxSizeReal = voxSizeMult + 0.005;
+    float voxMin = -0.005;
 
-    vec4 luf = vec4(0, voxSizeReal, voxSizeReal, 0);
+    vec4 luf = vec4(voxMin, voxSizeReal, voxSizeReal, 0);
     vec4 ruf = vec4(voxSizeReal, voxSizeReal, voxSizeReal, 0);
-    vec4 ldf = vec4(0, 0, voxSizeReal, 0);
-    vec4 rdf = vec4(voxSizeReal, 0, voxSizeReal, 0);
-    vec4 lub = vec4(0, voxSizeReal, 0, 0);
-    vec4 rub = vec4(voxSizeReal, voxSizeReal, 0, 0);
-    vec4 ldb = vec4(0, 0, 0, 0);
-    vec4 rdb = vec4(voxSizeReal, 0, 0, 0);
+    vec4 ldf = vec4(voxMin, voxMin, voxSizeReal, 0);
+    vec4 rdf = vec4(voxSizeReal, voxMin, voxSizeReal, 0);
+    vec4 lub = vec4(voxMin, voxSizeReal, voxMin, 0);
+    vec4 rub = vec4(voxSizeReal, voxSizeReal, voxMin, 0);
+    vec4 ldb = vec4(voxMin, voxMin, voxMin, 0);
+    vec4 rdb = vec4(voxSizeReal, voxMin, voxMin, 0);
     
-//    vec4 dx = mvp[0] * center / 2.0 * voxSize;
-//    vec4 dy = mvp[1] * center / 2.0 * voxSize;
-//    vec4 dz = mvp[2] * center / 2.0 * voxSize;
+    gl_Position = mvp * (center + lub);
+    EmitVertex();
+    gl_Position = mvp * (center + luf);
+    EmitVertex();
+    gl_Position = mvp * (center + ruf);
+    EmitVertex();
+    gl_Position = mvp * (center + rdf);
+    EmitVertex();
+    gl_Position = mvp * (center + ldf);
+    EmitVertex();
+    gl_Position = mvp * (center + luf);
+    EmitVertex();
+    EndPrimitive();
 
-    // FRONT
-    if ((gEnabledFaces[0] & 0x01u) != 0u) {
-        normal = vec3(0, 0, 1);
-        addQuad(mvp, center, ruf, rdf, luf, ldf);
-    }
-
-    // BACK
-    if ((gEnabledFaces[0] & 0x02u) != 0u) {
-        normal = vec3(0, 0, -1);
-        addQuad(mvp, center, lub, ldb, rub, rdb);
-    }
     
-    // LEFT
-    if ((gEnabledFaces[0] & 0x04u) != 0u) {
-        normal = vec3(1, 0, 0 );
-    //    testDot = dot(-viewDir, normal);
-        addQuad(mvp, center, luf, ldf, lub, ldb);
-    }
+    gl_Position = mvp * (center + ruf);
+    EmitVertex();
+    gl_Position = mvp * (center + rub);
+    EmitVertex();
+    gl_Position = mvp * (center + rdb);
+    EmitVertex();
+    gl_Position = mvp * (center + ldb);
+    EmitVertex();
+    gl_Position = mvp * (center + lub);
+    EmitVertex();
+    gl_Position = mvp * (center + rub);
+    EmitVertex();
+    EndPrimitive();
 
-    // RIGHT
-    if ((gEnabledFaces[0] & 0x08u) != 0u) {
-        normal = vec3(-1, 0, 0);
-        addQuad(mvp, center, rub, rdb, ruf, rdf);
-    }
+    gl_Position = mvp * (center + rdb);
+    EmitVertex();
+    gl_Position = mvp * (center + rdf);
+    EmitVertex();
+    EndPrimitive();
+
+    gl_Position = mvp * (center + ldb);
+    EmitVertex();
+    gl_Position = mvp * (center + ldf);
+    EmitVertex();
+    EndPrimitive();
+
     
-    // TOP
-    if ((gEnabledFaces[0] & 0x10u) != 0u) {
-        normal = vec3(0, 1, 0);
-    //    testDot = dot(-viewDir, normal);
-        addQuad(mvp, center, rub, ruf, lub, luf);
-    }
-
-    // BOT
-    if ((gEnabledFaces[0] & 0x20u) != 0u) {
-        normal = vec3(0, -1, 0);
-    //    if ((test & 0x20) != 0) 
-        addQuad(mvp, center, ldb, ldf, rdb, rdf);
-    }
 }

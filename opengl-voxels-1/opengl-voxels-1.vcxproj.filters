@@ -181,5 +181,7 @@
     <None Include="shaders\voxelInstancing.vert">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="shaders\wireframeInstancing.geom" />
+    <None Include="shaders\wireframeInstancing.frag" />
   </ItemGroup>
 </Project>

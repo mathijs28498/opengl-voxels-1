@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+uint32_t createVoxelVAO(Voxel* voxelPointer, size_t voxelSize);
+void editVoxelVAO(Voxel* voxelPointer, size_t voxelSize, uint32_t VAO);
 
 uint32_t getVAO();
 

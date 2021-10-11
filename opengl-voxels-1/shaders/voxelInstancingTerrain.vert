@@ -3,7 +3,6 @@
 
 layout (location = 0) in uint positionInt;
 layout (location = 1) in uint colorAndEnabledInt;
-layout (location = 2) in uint vEnabledFaces;
 
 out vec3 gColor;
 out float gSizeMult;

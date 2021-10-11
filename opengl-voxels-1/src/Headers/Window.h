@@ -13,6 +13,7 @@ class Window {
 public:
 	GLFWwindow* window;
 
+	Window() {};
 	Window(int width, int height, const char* title, glm::vec4 backgroundColor);
 	~Window();
 	bool shouldClose();
