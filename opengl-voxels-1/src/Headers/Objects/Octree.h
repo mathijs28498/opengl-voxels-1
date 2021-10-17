@@ -12,7 +12,8 @@
 #include <thread>
 
 int* getColorFromInt(int colorInt);
-int getIntFromColor(const int* colorArray);
+int getIntFromColor(const int* colorArray); 
+glm::vec3 getRealOctreePos(glm::vec3& octreePos);
 
 struct BoundingBoxPoint {
 	float position[3];
@@ -36,15 +37,15 @@ public:
 	void calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod);
 	void calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointCloud, uint8_t depth);
 
-	bool rayCastCollision(Ray& ray, glm::vec3& octreePos, RayCollision* collision);
+	bool rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision& collisionOut);
 
 private:
-	Voxel getAverageVoxelChildren();
+	VoxelAABB getVoxelAABB(glm::vec3& octreePos);
 
 	std::vector<Voxel*> voxels;
 	uint16_t size;
-	OctreeNode* parent;
 	bool hasChildren = false;
+	OctreeNode* parent;
 	OctreeNode* children[8];
 };
 
@@ -66,7 +67,7 @@ public:
 	void fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod);
 	void fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer);
 
-	bool rayCastCollision(Ray& ray, glm::vec3& pos, RayCollision* collision);
+	bool rayCastCollision(Ray& ray, glm::vec3& pos, VoxelCollision& collisionOut);
 
 private:
 	OctreeNode root;

@@ -39,9 +39,10 @@ struct OctreeHandlerComp : public Component {
 
 struct RayCastComp : public Component {
 	RayCastComp() {};
-	RayCastComp(Camera* cam) : cam(cam) {};
+	RayCastComp(Camera* cam, TransformComp* markerCubeTransform) : cam(cam), markerCubeTransform(markerCubeTransform) {};
 	
 	Camera* cam;
+	TransformComp* markerCubeTransform;
 };
 
 class OctreeHandlerSystem : public SustainedSystem {

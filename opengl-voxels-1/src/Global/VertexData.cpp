@@ -128,3 +128,96 @@ glm::vec3 pointLightColors[] = {
 	glm::vec3(1, 1, 1),
 	glm::vec3(1, 1, 1),
 };*/
+
+
+glm::vec3 Voxel::getPosition(glm::vec3& posOctree) {
+	uint8_t* posBytes = positionFromInt(positionInt);
+	glm::vec3 pos = (glm::vec3(posBytes[0], posBytes[1], posBytes[2]) + posOctree) * VOX_SIZE;
+
+	pos += posOctree;
+	pos *= VOX_SIZE;
+	return pos;
+}
+
+glm::vec3 Voxel::getModelPosition(const glm::vec3& modelPosition) const {
+	glm::vec3 position = {
+		positionInt & 0xFF,
+		(positionInt >> 8) & 0xFF,
+		(positionInt >> 16) & 0xFF,
+	};
+
+	//PRINT_VEC3(modelPosition);
+
+	return position * VOX_SIZE + modelPosition;
+}
+
+bool Voxel::rayCastCollision(Ray& ray, glm::vec3& posOctree, RayCollision* rayCollision) {
+	glm::vec3 pos = getPosition(posOctree);
+	glm::vec3 min = pos - VOX_SIZE / 2;
+	glm::vec3 max = pos + VOX_SIZE / 2;
+
+	float tMinX = (min.x - ray.origin.x) / ray.direction.x;
+	float tMinY = (min.y - ray.origin.y) / ray.direction.y;
+	float tMinZ = (min.z - ray.origin.z) / ray.direction.z;
+
+	float tMaxX = (max.x - ray.origin.x) / ray.direction.x;
+	float tMaxY = (max.y - ray.origin.y) / ray.direction.y;
+	float tMaxZ = (max.z - ray.origin.z) / ray.direction.z;
+
+	float tMin = std::max(std::max(std::min(tMinX, tMaxX), std::min(tMinY, tMaxY)), std::min(tMinZ, tMaxZ));
+	float tMax = std::min(std::min(std::max(tMinX, tMaxX), std::max(tMinY, tMaxY)), std::max(tMinZ, tMaxZ));
+
+	if (tMax < 0 || tMin > tMax) {
+		return false;
+	}
+
+	rayCollision->distance = tMin > 0 ? tMin : tMax;
+	rayCollision->point = ray.origin + ray.direction * rayCollision->distance;
+
+	return true;
+}
+
+Voxel Voxel::getVoxelCopy(Voxel originalVoxel) {
+	Voxel voxel{ originalVoxel.positionInt, originalVoxel.colorAndEnabledInt };
+	return voxel;
+}
+
+VoxelAABB::VoxelAABB(const Voxel& voxel, const glm::vec3& modelPosition) {
+	glm::vec3 pos = voxel.getModelPosition(modelPosition);
+	float sizeMult = std::pow(2, (voxel.positionInt >> 24) - 1);
+
+	min = pos - HALF_VOX_SIZE;
+	max = pos + VOX_SIZE * sizeMult - HALF_VOX_SIZE;
+}
+
+VoxelAABB::VoxelAABB(const glm::vec3& pos, float size) {
+	min = pos - HALF_VOX_SIZE;
+	max = pos + size - HALF_VOX_SIZE;
+}
+
+float VoxelAABB::rayCollision(const Ray& r) {
+	float ignored;
+	return rayCollision(r, ignored);
+}
+
+float VoxelAABB::rayCollision(const Ray& r, float& tmin) {
+	float t0 = (min.x - r.origin.x) / r.direction.x;
+	float t1 = (max.x - r.origin.x) / r.direction.x;
+
+	float t2 = (min.y - r.origin.y) / r.direction.y;
+	float t3 = (max.y - r.origin.y) / r.direction.y;
+
+	float t4 = (min.z - r.origin.z) / r.direction.z;
+	float t5 = (max.z - r.origin.z) / r.direction.z;
+
+	tmin = std::max(std::max(std::min(t0, t1), std::min(t2, t3)), std::min(t4, t5));
+	float tmax = std::min(std::min(std::max(t0, t1), std::max(t2, t3)), std::max(t4, t5));
+
+	if (tmax < 0 || tmin > tmax)
+		return -1;
+
+	if (tmin < 0)
+		return tmax;
+
+	return tmin;
+}

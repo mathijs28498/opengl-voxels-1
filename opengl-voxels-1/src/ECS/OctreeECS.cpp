@@ -1,5 +1,6 @@
 #include "../Headers/ECS/OctreeECS.h"
 #include "../Headers/Observer pattern/SceneObserver.h"
+#include "../Headers/Global/GLHelperFunctions.h"
 
 #include <glm/gtx/norm.hpp>
 #include <mutex>
@@ -84,8 +85,6 @@ bool isChunkActive(std::vector<int32_t> curGridPos, OctreeHandlerComp* octreeHan
 	return false;
 }
 
-uint16_t OCTREE_SIZE = 256;
-
 void OctreeHandlerSystem::update(Entity* entity) {
 	OctreeHandlerComp* octreeHandler = getComponentOfEntity<OctreeHandlerComp>(entity);
 	glm::vec3 camPos = octreeHandler->cameraTransform->position;
@@ -115,25 +114,35 @@ void RayCastSystem::fixedUpdate(Entity* entity) {
 	RayCastComp* rayCast = getComponentOfEntity<RayCastComp>(entity);
 	KeyInputComp* keyInput = getComponentOfEntity<KeyInputComp>(entity);
 
-	if (keyInput->keyRepeat[GLFW_KEY_Q]) {
+	if (keyInput->keyRepeat[GLFW_KEY_Q] || true) {
 		std::string octreeCompName = gcn(OctreeComp());
 
-		Ray ray = rayCast->cam->getCameraRay(100);
+		Ray ray = rayCast->cam->getCameraRay(10);
 
 		std::vector<Entity*> entities;
 		getEntitiesWithComponentEvent.notify(&entities, octreeCompName);
 
 		std::vector<Octree*> octrees(entities.size());
 
-		RayCollision collision;
+		VoxelCollision collision;
+		bool isCollision = false;
+		glm::vec3 collisionOctreePos;
 		for (size_t i = 0; i < entities.size(); i++) {
-			//octrees[i] = 
-
 			OctreeComp* octreeComp = (OctreeComp*)entities[i]->getComponent(octreeCompName);
 			glm::vec3 octreePos = { octreeComp->pos[0], octreeComp->pos[1], octreeComp->pos[2] };
-			if (octreeComp->octree.rayCastCollision(ray, octreePos, &collision)) {
-				std::cout << "collided\n";
+			if (octreeComp->octree.rayCastCollision(ray, octreePos, collision)) {
+				if (!isCollision) isCollision = true;
+				collisionOctreePos = octreePos;
 			}
+		}
+
+		if (isCollision) {
+			Voxel newMarkerCube{ collision.voxel->positionInt & 0xFF000000, 0xFF0000FF };
+			//editVoxelVAO(&newMarkerCube, 1, markerCube->VAO);
+			rayCast->markerCubeTransform->position = collision.voxel->getModelPosition(getRealOctreePos(collisionOctreePos));
+		} else {
+			// TODO: Remove marker cube when not collided
+			//collision->position = collision.intersecPoint;
 		}
 
 	}

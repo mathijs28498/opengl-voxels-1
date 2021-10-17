@@ -110,9 +110,9 @@ void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod) {
 			}
 		}
 	} else {
-		for (OctreeNode* child : children) {
-			child->calculateVAO(voxelCloud, lod);
-		}
+	for (OctreeNode* child : children) {
+		child->calculateVAO(voxelCloud, lod);
+	}
 	}
 }
 
@@ -130,36 +130,63 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 	}
 }
 
-bool OctreeNode::rayCastCollision(Ray& ray, glm::vec3& octreePos, RayCollision* collision) {
+glm::vec3 getRealOctreePos(glm::vec3& octreePos) {
+	return octreePos * REAL_OCTREE_SIZE - REAL_HALF_OCTREE_SIZE;
+}
+
+VoxelAABB OctreeNode::getVoxelAABB(glm::vec3& octreePos) {
+	glm::vec3 realLocalPos{
+		pos[0] * VOX_SIZE,
+		pos[1] * VOX_SIZE,
+		pos[2] * VOX_SIZE,
+	};
+	glm::vec3 realGlobalPos = realLocalPos + octreePos * REAL_OCTREE_SIZE - REAL_HALF_OCTREE_SIZE;
+	return { realGlobalPos, size * VOX_SIZE };
+}
+
+bool OctreeNode::rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision& collisionOut) {
 	if (voxels.size() > 0) {
-		// TODO: Do collision and find smallest distance
-		bool isCollided = false;
-		for (Voxel* voxel : voxels) {
-			RayCollision col;
-			if (voxel->rayCastCollision(ray, octreePos, &col)) {
-				isCollided = true;
-				if (collision->distance < 0 || col.distance < collision->distance) {
-					collision->point = col.point;
-					collision->distance = col.distance;
-				}
+		float intersecDist = -1;
+		Voxel* voxelIntersected = nullptr;
+		glm::vec3 realOctreePos = getRealOctreePos(octreePos);
+		for (size_t i = 0; i < voxels.size(); i++) {
+			VoxelAABB aabb(*voxels[i], realOctreePos);
+			float d = aabb.rayCollision(ray);
+			if (d > 0 && (intersecDist < 0 || d < intersecDist)) {
+				voxelIntersected = voxels[i];
+				intersecDist = d;
 			}
 		}
-		return isCollided;
+		if (intersecDist < 0)
+			return false;
+
+		collisionOut.voxel = voxelIntersected;
+		collisionOut.dist = intersecDist;
+		return true;
 	} else if (!hasChildren) {
 		return false;
 	} else {
-		bool isCollided = false;
+		VoxelAABB aabb = getVoxelAABB(octreePos);
+		float tmin;
+		float collisionDist = aabb.rayCollision(ray, tmin);
+
+		// No hit if:
+		// - there is no collision
+		// - the distance is further than the ray length
+		// - there is a closer collision found
+		if (collisionDist < 0 || tmin > ray.length || (collisionOut.dist > 0 && collisionOut.dist < collisionDist)) 
+			return false;
+
+		VoxelCollision collisionChild;
+		float collisionChildDist = -1;
 		for (OctreeNode* child : children) {
-			RayCollision col;
-			if (child->rayCastCollision(ray, octreePos, &col)) {
-				isCollided = true;
-				if (collision->distance < 0 || col.distance < collision->distance) {
-					collision->point = col.point;
-					collision->distance = col.distance;
-				}
+			if (child->rayCastCollision(ray, octreePos, collisionChild) && (collisionChildDist < 0 || collisionChild.dist < collisionChildDist)) {
+				collisionChildDist = collisionChild.dist;
+				collisionOut = collisionChild;
 			}
 		}
-		return isCollided;
+		
+		return collisionChildDist > 0;
 	}
 }
 
@@ -332,7 +359,6 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 			}
 		}
 	}
-
 	
 	duration<double, std::milli> ms = high_resolution_clock::now() - t1;
 	std::cout << ms.count() << "ms to create voxel terrain chunk\n";
@@ -351,8 +377,12 @@ void Octree::fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer) {
 	renderer->boundingBoxAmount = (uint32_t)amountOfBoundingboxes;
 }
 
-bool Octree::rayCastCollision(Ray& ray, glm::vec3& octreePos, RayCollision* collision) {
-	return root.rayCastCollision(ray, octreePos, collision);
+bool Octree::rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision& collisionOut) {
+	bool isCollided = root.rayCastCollision(ray, octreePos, collisionOut);
+	if (!isCollided) return false;
+
+	collisionOut.intersecPoint = ray.origin + ray.direction * collisionOut.dist;
+	return true;
 }
 
 /// END OCTREE ///

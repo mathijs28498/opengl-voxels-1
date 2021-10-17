@@ -24,6 +24,7 @@ uint32_t createVoxelVAO(Voxel* voxelPointer, size_t voxelSize) {
 	return VAO;
 }
 
+// TODO: Change voxelPointer to a reference
 void editVoxelVAO(Voxel* voxelPointer, size_t voxelSize, uint32_t VAO) {
 	uint32_t VBO;
 	glGenBuffers(1, &VBO);
