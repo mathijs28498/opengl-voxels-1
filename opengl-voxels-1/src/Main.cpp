@@ -141,9 +141,6 @@ bool doRayCast(std::vector<Voxel>* voxels, TransformComp* voxelTransform, Ray& r
 	if (voxels->size() < 1)
 		return false;
 
-	std::vector<VoxelAABB> voxelAABBs;
-	voxelAABBs.resize(voxels->size());
-
 	float intersecDist = -1;
 	size_t indexIntersected = -1;
 
@@ -158,8 +155,6 @@ bool doRayCast(std::vector<Voxel>* voxels, TransformComp* voxelTransform, Ray& r
 	}
 
 	bool isIntersected = intersecDist > 0;
-
-	//VoxelAABB box = getVoxelAABB((*voxels)[3], voxelTransform->position);
 
 	intersecPointOut = {
 		indexIntersected,
