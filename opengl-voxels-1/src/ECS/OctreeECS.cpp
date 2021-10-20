@@ -11,7 +11,7 @@ constexpr uint32_t LOD1 = 1;
 constexpr uint32_t LOD2 = 2;
 constexpr uint32_t LOD3 = 3;
 
-int chunkRange = 0;
+int chunkRange = 1;
 //constexpr uint32_t LOD4 = 5;
 
 std::mutex mtx;

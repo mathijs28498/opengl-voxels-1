@@ -19,11 +19,17 @@ extern Event2<std::vector<Entity*>*, std::string> getEntitiesWithComponentEvent;
 #define VOX_SIZE 0.25f
 #define HALF_VOX_SIZE (VOX_SIZE / 2)
 
+//#define OCTREE_SIZE 256
 #define OCTREE_SIZE 256
 #define REAL_OCTREE_SIZE (VOX_SIZE * OCTREE_SIZE)
 #define REAL_HALF_OCTREE_SIZE (REAL_OCTREE_SIZE / 2)
 
-#define LEAF_SIZE 4
+//#define LEAF_SIZE 16
+#define LEAF_SIZE 16
+#define LEAF_MAX_INDEX (LEAF_SIZE - 1)
+#define Q_LEAF_SIZE (LEAF_SIZE * LEAF_SIZE)
+#define Q3_LEAF_SIZE (LEAF_SIZE * LEAF_SIZE * LEAF_SIZE)
+#define Q3_LEAF_SIZE_OVERFLOW (Q_LEAF_SIZE + 2)
 
 struct Ray {
 	glm::vec3 origin;

@@ -46,6 +46,7 @@ private:
 	Voxel* findSiblingVoxel(int16_t x, int16_t y, int16_t z) const;
 	bool hasSiblingVoxel(int16_t x, int16_t y, int16_t z) const;
 	VoxelAABB getVoxelAABB(glm::vec3& octreePos);
+	int getVoxelIndex(uint8_t x, uint8_t y, uint8_t z) const;
 
 	std::vector<Voxel*> voxels;
 	uint16_t size;

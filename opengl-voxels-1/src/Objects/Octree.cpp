@@ -8,6 +8,7 @@
 #include <chrono>
 #include <glm/gtx/rotate_vector.hpp>
 #include <array>
+#include <algorithm>
 
 
 /// BEGIN OCTREE_NODE ///
@@ -31,9 +32,19 @@ OctreeNode::~OctreeNode() {
 	}*/
 }
 
+int OctreeNode::getVoxelIndex(uint8_t x, uint8_t y, uint8_t z) const {
+	return (z - pos[2]) * Q_LEAF_SIZE + (y - pos[1]) * LEAF_SIZE + (x - pos[0]);
+}
+
 void OctreeNode::insert(Voxel* voxel) {
 	if (size <= LEAF_SIZE) {
-		voxels.push_back(voxel);
+		std::vector<uint8_t> voxPos = intToBytes(voxel->positionInt);
+		int index = getVoxelIndex(voxPos[0], voxPos[1], voxPos[2]);
+		if (voxels.size() < index + 1) {
+			voxels.resize(std::min(Q3_LEAF_SIZE, index + 100));
+			//PRINT(voxels.size());
+		}
+		voxels[index] = voxel;
 		return;
 	}
 	insertIntoChildren(voxel);
@@ -61,15 +72,15 @@ bool OctreeNode::containsPoint(Voxel* voxel) const {
 }
 
 bool OctreeNode::containsPoint(const std::vector<uint8_t>& position) const {
-	return position[0] >= pos[0] && position[0] <= pos[0] + size &&
-		position[1] >= pos[1] && position[1] <= pos[1] + size &&
-		position[2] >= pos[2] && position[2] <= pos[2] + size;
+	return position[0] >= pos[0] && position[0] < pos[0] + size &&
+		position[1] >= pos[1] && position[1] < pos[1] + size &&
+		position[2] >= pos[2] && position[2] < pos[2] + size;
 }
 
 bool OctreeNode::containsPoint(int16_t x, int16_t y, int16_t z) const {
-	return x >= pos[0] && x <= pos[0] + size &&
-		y >= pos[1] && y <= pos[1] + size &&
-		z >= pos[2] && z <= pos[2] + size;
+	return x >= pos[0] && x < pos[0] + size &&
+		y >= pos[1] && y < pos[1] + size &&
+		z >= pos[2] && z < pos[2] + size;
 }
 
 void OctreeNode::subdivide() {
@@ -93,6 +104,8 @@ void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod) {
 	if (!hasChildren) {
 		if (lod == 1) {
 			for (size_t i = 0; i < voxels.size(); i++) {
+				if (voxels[i] == nullptr)
+					continue;
 				if ((voxels[i]->colorAndEnabledInt & 0xFF000000) == 0x00)
 					continue;
 				voxelCloud->push_back(*voxels[i]);
@@ -151,14 +164,20 @@ bool OctreeNode::hasSiblingVoxel(int16_t x, int16_t y, int16_t z) const {
 	return false;*/
 	if (containsPoint(x, y, z)) {
 		if (voxels.size() > 0) {
-			for (Voxel* voxel : voxels) {
+			/*for (Voxel* voxel : voxels) {
 				std::vector<uint8_t> position = intToBytes(voxel->positionInt);
 				if (position[0] == x && position[1] == y && position[2] == z) {
 					return true;
 				}
+			}*/
+			/*PRINT(x << " - " << y << " - " << z);*/
+			int index = getVoxelIndex(x, y, z);
+			if (voxels.size() < index + 1) {
+				return false;
 			}
-
-			return false;
+			//std::vector<uint8_t> position = intToBytes(voxels[index]->positionInt);
+			//PRINT(+position[0] << " - " << +position[1] << " - " << +position[2]);
+			return voxels[index] != nullptr;
 		}
 
 		if (!hasChildren) {
@@ -193,11 +212,16 @@ VoxelAABB OctreeNode::getVoxelAABB(glm::vec3& octreePos) {
 }
 
 bool OctreeNode::rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision& collisionOut) {
+	//return false;
+
+	//TODO: FIX THIS
 	if (voxels.size() > 0) {
 		float intersecDist = -1;
 		Voxel* voxelIntersected = nullptr;
 		glm::vec3 realOctreePos = getRealOctreePos(octreePos);
 		for (size_t i = 0; i < voxels.size(); i++) {
+			if (voxels[i] == nullptr)
+				continue;
 			VoxelAABB aabb(*voxels[i], realOctreePos);
 			float d = aabb.rayCollision(ray);
 			if (d > 0 && (intersecDist < 0 || d < intersecDist)) {
@@ -245,25 +269,27 @@ void OctreeNode::calculateEnabledFaces() {
 		}
 	} else if (voxels.size() > 0) {
 		for (Voxel* voxel : voxels) {
+			if (voxel == nullptr)
+				continue;
 			//uint8_t* voxelPos = voxel->getPositionBytes();
 			std::vector<uint8_t> voxelPos = intToBytes(voxel->positionInt);
 			auto caeV = intToBytes(voxel->colorAndEnabledInt);
 			uint8_t* cae = caeV.data();
 			uint8_t en = 0x00;
-			/*if (!hasSiblingVoxel((int16_t)voxelPos[0] + 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2]))
+			if (!hasSiblingVoxel((int16_t)voxelPos[0] + 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2]))
 				en |= 0x08;
 			if (!hasSiblingVoxel((int16_t)voxelPos[0] - 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2]))
 				en |= 0x04;
 
 			if (!hasSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] - 1, (int16_t)voxelPos[2]))
-					en |= 0x20;*/
+					en |= 0x20;
 			//PRINT(static_cast<int16_t>(voxelPos[0]) << " - " << static_cast<int16_t>(voxelPos[1]) + 1 << " - " << static_cast<int16_t>(voxelPos[2]));
 			if (!hasSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] + 1, (int16_t)voxelPos[2]))
 				en |= 0x10;
-			/*if (!hasSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - 1))
+			if (!hasSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - 1))
 				en |= 0x02;
 			if (!hasSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + 1))
-				en |= 0x01;*/
+				en |= 0x01;
 
 			voxel->colorAndEnabledInt = bytesToInt(cae[0], cae[1], cae[2], en);
 
