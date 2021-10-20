@@ -85,27 +85,31 @@ bool isChunkActive(std::vector<int32_t> curGridPos, OctreeHandlerComp* octreeHan
 	return false;
 }
 
-#define CHUNK_RANGE 1
+int chunkRange = 1;
 
 void OctreeHandlerSystem::update(Entity* entity) {
 	OctreeHandlerComp* octreeHandler = getComponentOfEntity<OctreeHandlerComp>(entity);
 	glm::vec3 camPos = octreeHandler->cameraTransform->position;
 	glm::vec3 tempCamPos = { camPos.x, 0, camPos.z };
-
-
 	std::vector<int32_t> curGridPos = {
-		(int32_t)floor((camPos.x + (OCTREE_SIZE / 2 * VOX_SIZE)) / (OCTREE_SIZE * VOX_SIZE)), 0, (int32_t)floor((camPos.z + (OCTREE_SIZE / 2 * VOX_SIZE)) / (OCTREE_SIZE * VOX_SIZE)),
+				(int32_t)floor((camPos.x + (OCTREE_SIZE / 2 * VOX_SIZE)) / (OCTREE_SIZE * VOX_SIZE)), 0, (int32_t)floor((camPos.z + (OCTREE_SIZE / 2 * VOX_SIZE)) / (OCTREE_SIZE * VOX_SIZE)),
 	};
-	if (!isChunkActive(curGridPos, octreeHandler)) {
-		Entity* entity = new Entity;
-		OctreeComp* octreeComp = new OctreeComp(curGridPos, OCTREE_SIZE, octreeHandler->cameraTransform);
-		entity->insertComponent(octreeComp);
-		entity->insertComponent(new VoxelRendererComp(octreeHandler->voxelRenderer->shader, octreeHandler->voxelRenderer->camera, 0, 0));
-		entity->insertComponent(new BoundingBoxRendererComp(octreeHandler->boundingBoxRenderer->shader, octreeHandler->voxelRenderer->camera, 0, 0, false));
-		entity->insertComponent(new KeyInputComp());
-		entity->insertComponent(new TransformComp());
-		octreeHandler->chunks.push_back(octreeComp);
-		addEntityEvent.notify(entity);
+	for (int x = -chunkRange; x <= chunkRange; x++) {
+		for (int z = -chunkRange; z <= chunkRange; z++) {
+			std::vector<int32_t> curGridPosOffset = { curGridPos[0] + x, curGridPos[1], curGridPos[2] + z };
+
+			if (!isChunkActive(curGridPosOffset, octreeHandler)) {
+				Entity* entity = new Entity;
+				OctreeComp* octreeComp = new OctreeComp(curGridPosOffset, OCTREE_SIZE, octreeHandler->cameraTransform);
+				entity->insertComponent(octreeComp);
+				entity->insertComponent(new VoxelRendererComp(octreeHandler->voxelRenderer->shader, octreeHandler->voxelRenderer->camera, 0, 0));
+				entity->insertComponent(new BoundingBoxRendererComp(octreeHandler->boundingBoxRenderer->shader, octreeHandler->voxelRenderer->camera, 0, 0, false));
+				entity->insertComponent(new KeyInputComp());
+				entity->insertComponent(new TransformComp());
+				octreeHandler->chunks.push_back(octreeComp);
+				addEntityEvent.notify(entity);
+			}
+		}
 	}
 	
 }
