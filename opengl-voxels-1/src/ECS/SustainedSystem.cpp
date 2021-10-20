@@ -1,5 +1,5 @@
 #include "../Headers/ECS/SustainedSystem.h"
-#include "../Headers/Global/VertexData.h"
+#include "../Headers/Global/VoxelStructs.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 
@@ -37,7 +37,7 @@ void VoxelRenderSystem::update(Entity* entity) {
     glBindVertexArray(0);
 }
 
-void BoundingBoxRendererSystem::update(Entity* entity) {
+void BoundingBoxRendererSystem::fixedUpdate(Entity* entity) {
 	TransformComp* transform = getComponentOfEntity<TransformComp>(entity);
 	BoundingBoxRendererComp* renderer = getComponentOfEntity<BoundingBoxRendererComp>(entity);
 	KeyInputComp* keyInput = getComponentOfEntity<KeyInputComp>(entity);

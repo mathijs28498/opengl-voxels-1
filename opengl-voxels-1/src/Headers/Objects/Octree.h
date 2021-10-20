@@ -3,7 +3,7 @@
 
 #include "../Shader.h"
 #include "../Camera.h"
-#include "../Global/VertexData.h"
+#include "../Global/VoxelStructs.h"
 #include "../ECS/Component.h"
 
 #include <glm/glm.hpp>

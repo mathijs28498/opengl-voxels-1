@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Shader.h"
-#include "Global/VertexData.h"
+#include "Global/VoxelStructs.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

@@ -49,8 +49,8 @@ public:
 
 protected:
 	void start(Entity* entity) {}
-	void update(Entity* entity);
-	void fixedUpdate(Entity* entity) {}
+	void update(Entity* entity) {}
+	void fixedUpdate(Entity* entity);
 };
 
 class CameraMoveSystem : public SustainedSystem {

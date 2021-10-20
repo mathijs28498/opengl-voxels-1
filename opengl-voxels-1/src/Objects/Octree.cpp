@@ -249,7 +249,6 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 	}
 
 	std::cout << voxelAmounts[lod] << " voxels in drawn\n";
-	std::cout << sizeof(OctreeNode) << " size of single node\n";
 
 	uint32_t VBO;
 	glGenBuffers(1, &VBO);

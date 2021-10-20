@@ -85,18 +85,18 @@ bool isChunkActive(std::vector<int32_t> curGridPos, OctreeHandlerComp* octreeHan
 	return false;
 }
 
+#define CHUNK_RANGE 1
+
 void OctreeHandlerSystem::update(Entity* entity) {
 	OctreeHandlerComp* octreeHandler = getComponentOfEntity<OctreeHandlerComp>(entity);
 	glm::vec3 camPos = octreeHandler->cameraTransform->position;
 	glm::vec3 tempCamPos = { camPos.x, 0, camPos.z };
 
 
-	static bool tempBool = false;
 	std::vector<int32_t> curGridPos = {
 		(int32_t)floor((camPos.x + (OCTREE_SIZE / 2 * VOX_SIZE)) / (OCTREE_SIZE * VOX_SIZE)), 0, (int32_t)floor((camPos.z + (OCTREE_SIZE / 2 * VOX_SIZE)) / (OCTREE_SIZE * VOX_SIZE)),
 	};
 	if (!isChunkActive(curGridPos, octreeHandler)) {
-		tempBool = true;
 		Entity* entity = new Entity;
 		OctreeComp* octreeComp = new OctreeComp(curGridPos, OCTREE_SIZE, octreeHandler->cameraTransform);
 		entity->insertComponent(octreeComp);
@@ -107,17 +107,18 @@ void OctreeHandlerSystem::update(Entity* entity) {
 		octreeHandler->chunks.push_back(octreeComp);
 		addEntityEvent.notify(entity);
 	}
+	
 }
 
 
 void RayCastSystem::fixedUpdate(Entity* entity) {
 	RayCastComp* rayCast = getComponentOfEntity<RayCastComp>(entity);
 	KeyInputComp* keyInput = getComponentOfEntity<KeyInputComp>(entity);
-
+	   
 	if (keyInput->keyRepeat[GLFW_KEY_Q] || true) {
 		std::string octreeCompName = gcn(OctreeComp());
 
-		Ray ray = rayCast->cam->getCameraRay(10);
+		Ray ray = rayCast->cam->getCameraRay(1000);
 
 		std::vector<Entity*> entities;
 		getEntitiesWithComponentEvent.notify(&entities, octreeCompName);
@@ -138,11 +139,9 @@ void RayCastSystem::fixedUpdate(Entity* entity) {
 
 		if (isCollision) {
 			Voxel newMarkerCube{ collision.voxel->positionInt & 0xFF000000, 0xFF0000FF };
-			//editVoxelVAO(&newMarkerCube, 1, markerCube->VAO);
 			rayCast->markerCubeTransform->position = collision.voxel->getModelPosition(getRealOctreePos(collisionOctreePos));
 		} else {
 			// TODO: Remove marker cube when not collided
-			//collision->position = collision.intersecPoint;
 		}
 
 	}

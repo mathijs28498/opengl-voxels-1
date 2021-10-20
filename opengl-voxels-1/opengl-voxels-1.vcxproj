@@ -158,7 +158,7 @@
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ECS\SustainedSystem.cpp" />
-    <ClCompile Include="src\Global\VertexData.cpp" />
+    <ClCompile Include="src\Global\VoxelStructs.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -176,7 +176,7 @@
     <ClInclude Include="src\Headers\Shader.h" />
     <ClInclude Include="src\Headers\ECS\SustainedSystem.h" />
     <ClInclude Include="src\Headers\ECS\System.h" />
-    <ClInclude Include="src\Headers\Global\VertexData.h" />
+    <ClInclude Include="src\Headers\Global\VoxelStructs.h" />
     <ClInclude Include="src\Headers\Window.h" />
   </ItemGroup>
   <ItemGroup>

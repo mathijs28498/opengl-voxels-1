@@ -75,7 +75,7 @@
     <ClCompile Include="src\Global\GLHelperFunctions.cpp">
       <Filter>Source Files\Global</Filter>
     </ClCompile>
-    <ClCompile Include="src\Global\VertexData.cpp">
+    <ClCompile Include="src\Global\VoxelStructs.cpp">
       <Filter>Source Files\Global</Filter>
     </ClCompile>
     <ClCompile Include="src\Global\GeneralHelperFunctions.cpp">
@@ -119,7 +119,7 @@
     <ClInclude Include="src\Headers\Global\GLHelperFunctions.h">
       <Filter>Header Files\Global</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\Global\VertexData.h">
+    <ClInclude Include="src\Headers\Global\VoxelStructs.h">
       <Filter>Header Files\Global</Filter>
     </ClInclude>
     <ClInclude Include="src\Headers\Global\GeneralHelperFunctions.h">

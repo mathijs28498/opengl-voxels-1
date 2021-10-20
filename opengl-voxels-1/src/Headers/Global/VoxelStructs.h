@@ -23,41 +23,38 @@ extern Event2<std::vector<Entity*>*, std::string> getEntitiesWithComponentEvent;
 #define REAL_OCTREE_SIZE (VOX_SIZE * OCTREE_SIZE)
 #define REAL_HALF_OCTREE_SIZE (REAL_OCTREE_SIZE / 2)
 
-struct Material {
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
-	float shininess;
-};
-
-struct Light {
-	glm::vec3 position;
-
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
-};
-
 struct Ray {
 	glm::vec3 origin;
 	glm::vec3 direction;
 	float length;
 };
 
-struct RayCollision {
-	glm::vec3 point;
-	float distance = -10;
-}; 
 
+
+//struct Voxel {
+//	union {
+//		uint8_t positionArray[4];
+//		uint32_t positionInt;
+//	};
+//	//uint32_t positionInt;
+//	union {
+//		uint8_t colorAndEnabledArray[4];
+//		uint32_t colorAndEnabledInt;
+//	};
+//
+//	glm::vec3 getModelPosition(const glm::vec3& modelPosition) const;
+//	static Voxel getVoxelCopy(Voxel originalVoxel);
+//};
 struct Voxel {
 	uint32_t positionInt;
+	//uint32_t positionInt;
 	uint32_t colorAndEnabledInt;
 
-	glm::vec3 getPosition(glm::vec3& posOctree);
 	glm::vec3 getModelPosition(const glm::vec3& modelPosition) const;
-	bool rayCastCollision(Ray& ray, glm::vec3& posOctree, RayCollision* rayCollision);
 	static Voxel getVoxelCopy(Voxel originalVoxel);
 };
+
+
 
 struct VoxelCollision {
 	Voxel* voxel;
@@ -73,16 +70,3 @@ struct VoxelAABB {
 	float rayCollision(const Ray& r, float& tmin);
 	float rayCollision(const Ray& r);
 };
-
-
-extern float cubeVertices[];
-
-extern float vertices[];
-
-extern glm::vec3 cubePositions[];
-
-extern Material materials[];
-
-extern glm::vec3 pointLightPositions[];
-
-extern glm::vec3 pointLightColors[];
