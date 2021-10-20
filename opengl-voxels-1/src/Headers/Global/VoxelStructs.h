@@ -23,6 +23,8 @@ extern Event2<std::vector<Entity*>*, std::string> getEntitiesWithComponentEvent;
 #define REAL_OCTREE_SIZE (VOX_SIZE * OCTREE_SIZE)
 #define REAL_HALF_OCTREE_SIZE (REAL_OCTREE_SIZE / 2)
 
+#define LEAF_SIZE 4
+
 struct Ray {
 	glm::vec3 origin;
 	glm::vec3 direction;
@@ -47,7 +49,6 @@ struct Ray {
 //};
 struct Voxel {
 	uint32_t positionInt;
-	//uint32_t positionInt;
 	uint32_t colorAndEnabledInt;
 
 	glm::vec3 getModelPosition(const glm::vec3& modelPosition) const;

@@ -9,7 +9,6 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <array>
 
-constexpr uint32_t LEAF_SIZE = 16;
 
 /// BEGIN OCTREE_NODE ///
 
@@ -58,10 +57,19 @@ void OctreeNode::insertIntoChildren(Voxel* voxel) {
 }
 
 bool OctreeNode::containsPoint(Voxel* voxel) const {
-	std::vector<uint8_t> position = intToBytes(voxel->positionInt);
+	return containsPoint(intToBytes(voxel->positionInt));
+}
+
+bool OctreeNode::containsPoint(const std::vector<uint8_t>& position) const {
 	return position[0] >= pos[0] && position[0] <= pos[0] + size &&
 		position[1] >= pos[1] && position[1] <= pos[1] + size &&
 		position[2] >= pos[2] && position[2] <= pos[2] + size;
+}
+
+bool OctreeNode::containsPoint(int16_t x, int16_t y, int16_t z) const {
+	return x >= pos[0] && x <= pos[0] + size &&
+		y >= pos[1] && y <= pos[1] + size &&
+		z >= pos[2] && z <= pos[2] + size;
 }
 
 void OctreeNode::subdivide() {
@@ -85,9 +93,6 @@ void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod) {
 	if (!hasChildren) {
 		if (lod == 1) {
 			for (size_t i = 0; i < voxels.size(); i++) {
-				/*if (++sum % 1000 == 0)
-					std::cout << sum << '\n';*/
-
 				if ((voxels[i]->colorAndEnabledInt & 0xFF000000) == 0x00)
 					continue;
 				voxelCloud->push_back(*voxels[i]);
@@ -110,13 +115,12 @@ void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod) {
 			}
 		}
 	} else {
-	for (OctreeNode* child : children) {
-		child->calculateVAO(voxelCloud, lod);
-	}
+		for (OctreeNode* child : children) {
+			child->calculateVAO(voxelCloud, lod);
+		}
 	}
 }
 
-// TODO: Make different colour for each layer
 void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointCloud, uint8_t depth) {
 	if (!hasChildren) {
 		pointCloud->push_back({
@@ -132,6 +136,50 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 
 glm::vec3 getRealOctreePos(glm::vec3& octreePos) {
 	return octreePos * REAL_OCTREE_SIZE - REAL_HALF_OCTREE_SIZE;
+}
+
+Voxel* OctreeNode::findSiblingVoxel(int16_t x, int16_t y, int16_t z) const {
+	return nullptr;
+}
+
+bool OctreeNode::hasSiblingVoxel(int16_t x, int16_t y, int16_t z) const {
+	/*PRINT(x << " - " << y << " - " << z);
+	if (containsPoint(x, y, z)) {
+		return true;
+	}
+
+	return false;*/
+	if (containsPoint(x, y, z)) {
+		if (voxels.size() > 0) {
+			for (Voxel* voxel : voxels) {
+				std::vector<uint8_t> position = intToBytes(voxel->positionInt);
+				if (position[0] == x && position[1] == y && position[2] == z) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		if (!hasChildren) {
+			return false;
+		}
+
+		for (OctreeNode* child : children) {
+			if (child->containsPoint(x, y, z)) {
+				return child->hasSiblingVoxel(x, y, z);
+			}
+		}
+
+		return false;
+	}
+
+	if (parent == nullptr) {
+		return false;
+	}
+
+	return parent->hasSiblingVoxel(x, y, z);
+
 }
 
 VoxelAABB OctreeNode::getVoxelAABB(glm::vec3& octreePos) {
@@ -174,7 +222,7 @@ bool OctreeNode::rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision
 		// - there is no collision
 		// - the distance is further than the ray length
 		// - there is a closer collision found
-		if (collisionDist < 0 || tmin > ray.length || (collisionOut.dist > 0 && collisionOut.dist < collisionDist)) 
+		if (collisionDist < 0 || tmin > ray.length || (collisionOut.dist > 0 && collisionOut.dist < collisionDist))
 			return false;
 
 		VoxelCollision collisionChild;
@@ -185,8 +233,57 @@ bool OctreeNode::rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision
 				collisionOut = collisionChild;
 			}
 		}
-		
+
 		return collisionChildDist > 0;
+	}
+}
+
+void OctreeNode::calculateEnabledFaces() {
+	if (hasChildren) {
+		for (OctreeNode* child : children) {
+			child->calculateEnabledFaces();
+		}
+	} else if (voxels.size() > 0) {
+		for (Voxel* voxel : voxels) {
+			//uint8_t* voxelPos = voxel->getPositionBytes();
+			std::vector<uint8_t> voxelPos = intToBytes(voxel->positionInt);
+			auto caeV = intToBytes(voxel->colorAndEnabledInt);
+			uint8_t* cae = caeV.data();
+			uint8_t en = 0x00;
+			/*if (!hasSiblingVoxel((int16_t)voxelPos[0] + 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2]))
+				en |= 0x08;
+			if (!hasSiblingVoxel((int16_t)voxelPos[0] - 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2]))
+				en |= 0x04;
+
+			if (!hasSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] - 1, (int16_t)voxelPos[2]))
+					en |= 0x20;*/
+			//PRINT(static_cast<int16_t>(voxelPos[0]) << " - " << static_cast<int16_t>(voxelPos[1]) + 1 << " - " << static_cast<int16_t>(voxelPos[2]));
+			if (!hasSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] + 1, (int16_t)voxelPos[2]))
+				en |= 0x10;
+			/*if (!hasSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - 1))
+				en |= 0x02;
+			if (!hasSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + 1))
+				en |= 0x01;*/
+
+			voxel->colorAndEnabledInt = bytesToInt(cae[0], cae[1], cae[2], en);
+
+			//uint8_t Octree::createEnabledFacesBitMask(uint32_t i, float y, float yf, float yb, float yl, float yr) {
+			//	uint8_t enabledFaces = 0x00;
+			//	if (i == 0)
+			//		enabledFaces += 0x20;
+			//	if (i == y - 1)
+			//		enabledFaces += 0x10;
+			//	if (i >= yf)
+			//		enabledFaces += 0x01;
+			//	if (i >= yb)
+			//		enabledFaces += 0x02;
+			//	if (i >= yl)
+			//		enabledFaces += 0x04;
+			//	if (i >= yr)
+			//		enabledFaces += 0x08;
+			//	return enabledFaces;
+			//}
+		}
 	}
 }
 
@@ -259,7 +356,7 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, voxelCloud.size() * sizeof(Voxel), voxelCloud.data(), GL_DYNAMIC_DRAW);
 
-	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*) 0);
+	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, colorAndEnabledInt));
@@ -298,7 +395,7 @@ uint8_t Octree::createEnabledFacesBitMask(uint32_t i, float y, float yf, float y
 }
 
 Voxel* Octree::createVoxel(uint8_t x, uint32_t i, uint8_t z, std::array<uint8_t, 3> color, float y, float yf, float yb, float yl, float yr) {
-	uint8_t enabledFaces = createEnabledFacesBitMask(i, y, yf, yb, yl, yr);
+	uint8_t enabledFaces = 0x00;
 	uint32_t voxelPosInt = bytesToInt(x, i, z, 1);
 	return new Voxel{ voxelPosInt, bytesToInt(color[0], color[1], color[2], enabledFaces) };
 }
@@ -311,7 +408,7 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 	using std::chrono::duration;
 	using std::chrono::milliseconds;
 
-	auto t1 = high_resolution_clock::now();
+	//auto t1 = high_resolution_clock::now();
 
 	int32_t chunkPos[] = { root.pos[0], root.pos[2] };
 	fnl_state noise = fnlCreateState();
@@ -331,7 +428,8 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 			float yl = getNoiseHeight(&noise, xn - 1, zn);
 			float yr = getNoiseHeight(&noise, xn + 1, zn);
 
-			// TODO: REMOVE THIS!!!!
+			// TODO: improve this!!!!
+			y = std::min((float)OCTREE_SIZE, y);
 
 			int32_t curY = 0;
 			uint8_t voxelPosBytes[] = { x, 0, z };
@@ -358,9 +456,17 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 			}
 		}
 	}
-	
+
+
+	auto t1 = high_resolution_clock::now();
+	calculateEnabledFaces();
+
 	duration<double, std::milli> ms = high_resolution_clock::now() - t1;
-	std::cout << ms.count() << "ms to create voxel terrain chunk\n";
+	std::cout << ms.count() << "ms to calculate enabled faces\n";
+}
+
+void Octree::calculateEnabledFaces() {
+	root.calculateEnabledFaces();
 }
 
 void Octree::fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod) {

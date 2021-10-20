@@ -10,6 +10,8 @@
 constexpr uint32_t LOD1 = 1;
 constexpr uint32_t LOD2 = 2;
 constexpr uint32_t LOD3 = 3;
+
+int chunkRange = 0;
 //constexpr uint32_t LOD4 = 5;
 
 std::mutex mtx;
@@ -84,8 +86,6 @@ bool isChunkActive(std::vector<int32_t> curGridPos, OctreeHandlerComp* octreeHan
 	}
 	return false;
 }
-
-int chunkRange = 1;
 
 void OctreeHandlerSystem::update(Entity* entity) {
 	OctreeHandlerComp* octreeHandler = getComponentOfEntity<OctreeHandlerComp>(entity);

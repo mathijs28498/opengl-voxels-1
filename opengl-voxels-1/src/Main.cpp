@@ -93,7 +93,7 @@ std::vector<Voxel> voxels = {
 int main() {
 	try {
 		Window window = { WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) };
-		Camera cam = { window.window, 0.1f, 5, 0.1f, WIDTH, HEIGHT };
+		Camera cam = { window.window, 0.001f, 5, 0.1f, WIDTH, HEIGHT };
 
 		camP = &cam;
 
