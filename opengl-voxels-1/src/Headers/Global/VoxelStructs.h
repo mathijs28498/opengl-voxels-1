@@ -58,6 +58,7 @@ struct Voxel {
 	uint32_t colorAndEnabledInt;
 
 	glm::vec3 getModelPosition(const glm::vec3& modelPosition) const;
+	bool hasSamePosition(const std::vector<uint8_t>& otherPos) const;
 	static Voxel getVoxelCopy(Voxel originalVoxel);
 };
 

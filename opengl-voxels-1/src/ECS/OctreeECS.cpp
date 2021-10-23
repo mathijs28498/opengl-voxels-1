@@ -156,9 +156,9 @@ void RayCastSystem::fixedUpdate(Entity* entity) {
 		// TODO: Remove marker cube when not collided
 	}
 
-	if (keyInput->keyRepeat[GLFW_KEY_Q] && collisionOctreeComp != nullptr) {
-		float power = 5;
-		collisionOctreeComp->octree.removeVoxel(intToBytes(collision.voxel->positionInt), power);
+	if ((keyInput->keyRepeat[GLFW_KEY_E] || keyInput->keyPress[GLFW_KEY_Q]) && collisionOctreeComp != nullptr) {
+		float power = 3;
+		collisionOctreeComp->octree.removeVoxels(intToBytes(collision.voxel->positionInt), power);
 		collisionOctreeComp->octree.fillVoxelRenderer(collisionVoxelRendererComp, 1, true);
 	}
 }
