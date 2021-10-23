@@ -61,12 +61,12 @@ struct Voxel {
 	static Voxel getVoxelCopy(Voxel originalVoxel);
 };
 
-
-
 struct VoxelCollision {
+	//uint32_t voxelIndex;
 	Voxel* voxel;
 	glm::vec3 intersecPoint;
 	float dist;
+	//uint32_t voxelIndex;
 };
 
 struct VoxelAABB {

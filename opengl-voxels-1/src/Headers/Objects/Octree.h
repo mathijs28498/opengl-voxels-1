@@ -41,12 +41,16 @@ public:
 	void calculateEnabledFaces();
 
 	bool rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision& collisionOut);
+	void removeVoxel(const std::vector<uint8_t>& position, uint8_t power);
 
 private:
 	Voxel* findSiblingVoxel(int16_t x, int16_t y, int16_t z) const;
-	bool hasSiblingVoxel(int16_t x, int16_t y, int16_t z) const;
 	VoxelAABB getVoxelAABB(glm::vec3& octreePos);
 	int getVoxelIndex(uint8_t x, uint8_t y, uint8_t z) const;
+
+	uint8_t calculateEnabledFace(const std::vector<uint8_t>& voxelPos);
+	void calculateSurroundedFaces(const std::vector<uint8_t>& voxelPos);
+	void removeSurroundedVoxels(const std::vector<uint8_t>& voxelPos, uint8_t power);
 
 	std::vector<Voxel*> voxels;
 	uint16_t size;
@@ -67,18 +71,20 @@ public:
 	void calculateVoxelVAO(uint32_t lod);
 	void makeNoiseTerrain(std::vector<int32_t> pos); 
 
-	static Voxel* createVoxel(uint8_t x, uint32_t i, uint8_t z, std::array<uint8_t, 3> color, float y, float yf, float yb, float yl, float yr);
+	static Voxel* createVoxel(uint8_t x, uint32_t i, uint8_t z, std::array<uint8_t, 3> color);
 	static uint8_t createEnabledFacesBitMask(uint32_t i, float y, float yf, float yb, float yl, float yr);
 	void calculateEnabledFaces();
 
-	void fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod);
+	void fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod, bool reFill = false);
 	void fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer);
 
 	bool rayCastCollision(Ray& ray, glm::vec3& pos, VoxelCollision& collisionOut);
+	void removeVoxel(const std::vector<uint8_t>& position, uint8_t power);
 
 private:
 	OctreeNode root;
 	std::map<uint32_t, uint32_t> voxelVAOs;
+	std::map<uint32_t, uint32_t> voxelVBOs;
 	std::map<uint32_t, uint32_t> voxelAmounts;
 	uint32_t boundingBoxVAO;
 	size_t amountOfBoundingboxes;

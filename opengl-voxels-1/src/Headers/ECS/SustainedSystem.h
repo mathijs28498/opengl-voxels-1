@@ -68,6 +68,6 @@ public:
 	ResetKeyInputSystem() : SustainedSystem({ gcn(KeyInputComp()) }) {};
 
 protected:
-	void update(Entity* entity);
+	void fixedUpdate(Entity* entity);
 };
 

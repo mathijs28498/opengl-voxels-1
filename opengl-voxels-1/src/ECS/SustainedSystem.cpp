@@ -77,7 +77,6 @@ void CameraMoveSystem::update(Entity* entity) {
 
 	glm::vec3 addPos(0, 0, 0);
 	bool camPosChanged = false;
-	keyInput->keyPress[GLFW_KEY_W];
 	if (keyInput->keyRepeat[GLFW_KEY_W]) {
 		addPos += cam->getForwardVec3();
 		camPosChanged = true;
@@ -110,7 +109,7 @@ void CameraMoveSystem::update(Entity* entity) {
 	}
 }
 
-void ResetKeyInputSystem::update(Entity* entity) {
+void ResetKeyInputSystem::fixedUpdate(Entity* entity) {
     KeyInputComp* keyInput = getComponentOfEntity<KeyInputComp>(entity);
 
     std::fill_n(keyInput->keyPress, GLFW_KEY_LAST, false);

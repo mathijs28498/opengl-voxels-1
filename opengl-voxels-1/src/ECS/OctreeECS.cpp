@@ -7,12 +7,11 @@
 #include <chrono>
 #include <array>
 
-constexpr uint32_t LOD1 = 1;
-constexpr uint32_t LOD2 = 2;
-constexpr uint32_t LOD3 = 3;
+#define LOD1 1
+#define LOD2 2
+#define LOD3 3
 
-int chunkRange = 1;
-//constexpr uint32_t LOD4 = 5;
+int chunkRange = 0;
 
 std::mutex mtx;
 
@@ -118,36 +117,48 @@ void OctreeHandlerSystem::update(Entity* entity) {
 void RayCastSystem::fixedUpdate(Entity* entity) {
 	RayCastComp* rayCast = getComponentOfEntity<RayCastComp>(entity);
 	KeyInputComp* keyInput = getComponentOfEntity<KeyInputComp>(entity);
-	   
-	if (keyInput->keyRepeat[GLFW_KEY_Q] || true) {
-		std::string octreeCompName = gcn(OctreeComp());
+	
+	std::string octreeCompName = gcn(OctreeComp());
+	std::string voxelRendererCompName = gcn(VoxelRendererComp());
 
-		Ray ray = rayCast->cam->getCameraRay(1000);
+	Ray ray = rayCast->cam->getCameraRay(1000);
 
-		std::vector<Entity*> entities;
-		getEntitiesWithComponentEvent.notify(&entities, octreeCompName);
+	std::vector<Entity*> entities;
+	getEntitiesWithComponentEvent.notify(&entities, octreeCompName);
 
-		std::vector<Octree*> octrees(entities.size());
+	std::vector<Octree*> octrees(entities.size());
 
-		VoxelCollision collision;
-		bool isCollision = false;
-		glm::vec3 collisionOctreePos;
-		for (size_t i = 0; i < entities.size(); i++) {
-			OctreeComp* octreeComp = (OctreeComp*)entities[i]->getComponent(octreeCompName);
-			glm::vec3 octreePos = { octreeComp->pos[0], octreeComp->pos[1], octreeComp->pos[2] };
-			if (octreeComp->octree.rayCastCollision(ray, octreePos, collision)) {
-				if (!isCollision) isCollision = true;
-				collisionOctreePos = octreePos;
-			}
+	VoxelCollision collision;
+	bool isCollision = false;
+	glm::vec3 collisionOctreePos;
+	OctreeComp* collisionOctreeComp = nullptr;
+	VoxelRendererComp* collisionVoxelRendererComp = nullptr;
+	for (size_t i = 0; i < entities.size(); i++) {
+		VoxelRendererComp* voxelRendererComp = (VoxelRendererComp*)entities[i]->getComponent(voxelRendererCompName);
+		if (voxelRendererComp->voxelAmount == 0)
+			continue;
+
+		OctreeComp* octreeComp = (OctreeComp*)entities[i]->getComponent(octreeCompName);
+
+		glm::vec3 octreePos = { octreeComp->pos[0], octreeComp->pos[1], octreeComp->pos[2] };
+		if (octreeComp->octree.rayCastCollision(ray, octreePos, collision)) {
+			if (!isCollision) isCollision = true;
+			collisionOctreePos = octreePos;
+			collisionOctreeComp = (OctreeComp*)entities[i]->getComponent(octreeCompName);
+			collisionVoxelRendererComp = voxelRendererComp;
 		}
-
-		if (isCollision) {
-			Voxel newMarkerCube{ collision.voxel->positionInt & 0xFF000000, 0xFF0000FF };
-			rayCast->markerCubeTransform->position = collision.voxel->getModelPosition(getRealOctreePos(collisionOctreePos));
-		} else {
-			// TODO: Remove marker cube when not collided
-		}
-
 	}
 
+	if (isCollision) {
+		Voxel newMarkerCube{ collision.voxel->positionInt & 0xFF000000, 0xFF0000FF };
+		rayCast->markerCubeTransform->position = collision.voxel->getModelPosition(getRealOctreePos(collisionOctreePos));
+	} else {
+		// TODO: Remove marker cube when not collided
+	}
+
+	if (keyInput->keyRepeat[GLFW_KEY_Q] && collisionOctreeComp != nullptr) {
+		float power = 5;
+		collisionOctreeComp->octree.removeVoxel(intToBytes(collision.voxel->positionInt), power);
+		collisionOctreeComp->octree.fillVoxelRenderer(collisionVoxelRendererComp, 1, true);
+	}
 }

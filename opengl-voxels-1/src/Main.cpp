@@ -93,7 +93,7 @@ std::vector<Voxel> voxels = {
 int main() {
 	try {
 		Window window = { WIDTH, HEIGHT, TITLE, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) };
-		Camera cam = { window.window, 0.1f, 5, 0.1f, WIDTH, HEIGHT };
+		Camera cam = { window.window, 0.01f, 5, 0.1f, WIDTH, HEIGHT };
 
 		camP = &cam;
 
@@ -134,17 +134,6 @@ int main() {
 			window.beginLoop();
 
 			scene.update();
-			//Ray ray = cam.getCameraRay(100);
-			//doRayCast(&voxels, markerCubeTransform, ray);
-			/*Ray ray = camP->getCameraRay(100);
-			VoxelIntersect voxelIntersect;
-			if (doRayCast(&voxels, raycastTestTransform, ray, voxelIntersect)) {
-				Voxel newMarkerCube{ voxelIntersect.voxel->positionInt & 0xFF000000, 0xFF0000FF };
-				editVoxelVAO(&newMarkerCube, 1, markerCube->VAO);
-				markerCubeTransform->position = voxelIntersect.voxel->getModelPosition({ 0, 0, 0 });
-			} else {
-				markerCubeTransform->position = voxelIntersect.intersecPoint;
-			}*/
 
 			//// TODO: Make fixed update work
 			scene.fixedUpdate();
