@@ -263,6 +263,13 @@ void OctreeNode::calculateVoxelsToRemove(const std::vector<uint8_t>& position, u
 	if (power <= 0) 
 		return;
 
+	if (!containsPoint(position)) {
+		if (parent == nullptr)
+			return;
+
+		parent->calculateVoxelsToRemove(position, power, toRemoveOut);
+	}
+
 	if (voxels.size() > 0) {
 		int index = getVoxelIndex(position[0], position[1], position[2]);
 		if (index < 0 || index > voxels.size() - 1)
@@ -286,6 +293,8 @@ void OctreeNode::calculateVoxelsToRemove(const std::vector<uint8_t>& position, u
 
 void OctreeNode::addSurroundingVoxelToRemove(const std::vector<int16_t>& voxelPos, uint8_t power, std::vector<std::vector<uint8_t>>& toRemoveOut) {
 	Voxel* voxel;
+	static int amount = 0;
+
 	if ((voxel = findSiblingVoxel(voxelPos[0], voxelPos[1], voxelPos[2])) != nullptr) {
 		bool alreadyRemoved = false;
 		for (std::vector<uint8_t> voxPos : toRemoveOut) {
@@ -294,6 +303,7 @@ void OctreeNode::addSurroundingVoxelToRemove(const std::vector<int16_t>& voxelPo
 				break;
 			}
 		}
+
 		if (!alreadyRemoved)
 			calculateVoxelsToRemove({ (uint8_t) voxelPos[0], (uint8_t)voxelPos[1], (uint8_t) voxelPos[2] }, power - 1, toRemoveOut);
 	}
@@ -301,29 +311,29 @@ void OctreeNode::addSurroundingVoxelToRemove(const std::vector<int16_t>& voxelPo
 
 void OctreeNode::addSurroundingVoxelsToRemove(const std::vector<uint8_t>& voxelPos, uint8_t power, std::vector<std::vector<uint8_t>>& toRemoveOut) {
 	Voxel* voxel;
-	addSurroundingVoxelToRemove({ (int16_t)(voxelPos[0] - 1), (int16_t)voxelPos[1], (int16_t)voxelPos[2] }, power, toRemoveOut);
-	addSurroundingVoxelToRemove({ (int16_t)(voxelPos[0] + 1), (int16_t)voxelPos[1], (int16_t)voxelPos[2] }, power, toRemoveOut);
-	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)(voxelPos[1] - 1), (int16_t)voxelPos[2] }, power, toRemoveOut);
-	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)(voxelPos[1] + 1), (int16_t)voxelPos[2] }, power, toRemoveOut);
-	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)(voxelPos[2] - 1) }, power, toRemoveOut);
-	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)(voxelPos[2] + 1) }, power, toRemoveOut);
+	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0] - (int16_t)1, (int16_t)voxelPos[1], (int16_t)voxelPos[2] }, power, toRemoveOut);
+	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0] + (int16_t)1, (int16_t)voxelPos[1], (int16_t)voxelPos[2] }, power, toRemoveOut);
+	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)voxelPos[1] - (int16_t)1, (int16_t)voxelPos[2] }, power, toRemoveOut);
+	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)voxelPos[1] + (int16_t)1, (int16_t)voxelPos[2] }, power, toRemoveOut);
+	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - (int16_t)1 }, power, toRemoveOut);
+	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + (int16_t)1 }, power, toRemoveOut);
 }
 
 void OctreeNode::calculateSurroundedFaces(const std::vector<uint8_t>& voxelPos) {
 	Voxel* voxel;
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0] + 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2])) != nullptr) 
+	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0] + (int16_t)1, (int16_t)voxelPos[1], (int16_t)voxelPos[2])) != nullptr)
 		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x04 << 24;
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0] - 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2])) != nullptr) 
+	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0] - (int16_t)1, (int16_t)voxelPos[1], (int16_t)voxelPos[2])) != nullptr)
 		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x08 << 24;
 
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] - 1, (int16_t)voxelPos[2])) != nullptr)
+	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] - (int16_t)1, (int16_t)voxelPos[2])) != nullptr)
 		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x10 << 24;
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] + 1, (int16_t)voxelPos[2])) != nullptr)
+	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] + (int16_t)1, (int16_t)voxelPos[2])) != nullptr)
 		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x20 << 24;
 
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - 1)) != nullptr)
+	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - (int16_t)1)) != nullptr)
 		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x01 << 24;
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + 1)) != nullptr)
+	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + (int16_t)1)) != nullptr)
 		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x02 << 24;
 }
 
@@ -406,19 +416,24 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 
 	auto t1 = high_resolution_clock::now();
 
+	bool first_time_lod = false;
+
 	std::vector<Voxel> voxelCloud;
 	root.calculateVAO(&voxelCloud, lod);
 	if (!voxelVAOs.count(lod)) {
+		first_time_lod = true;
 		uint32_t VAO;
 		glGenVertexArrays(1, &VAO);
-		voxelVAOs.insert({ lod, VAO }); 
+		voxelVAOs.insert({ lod, VAO });
 		uint32_t VBO;
 		glGenBuffers(1, &VBO);
 		voxelVBOs.insert({ lod, VBO });
+		voxelAmounts.insert({ lod, voxelCloud.size() });
+		std::cout << voxelAmounts[lod] << " voxels drawn\n";
+	} else {
+		voxelAmounts[lod] = voxelCloud.size();
 	}
-	voxelAmounts.insert({ lod, voxelCloud.size() });
 
-	std::cout << voxelAmounts[lod] << " voxels drawn\n";
 
 	
 	glBindVertexArray(voxelVAOs[lod]);
@@ -436,8 +451,10 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 
 	glBindVertexArray(0);
 
-	duration<double, std::milli> ms = high_resolution_clock::now() - t1;
-	std::cout << ms.count() << "ms to build voxel chunk VAO\n";
+	if (first_time_lod) {
+		duration<double, std::milli> ms = high_resolution_clock::now() - t1;
+		std::cout << ms.count() << "ms to build voxel chunk VAO\n";
+	}
 }
 
 float getNoiseHeight(fnl_state* noise, float xn, float zn) {
@@ -540,6 +557,7 @@ bool Octree::rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision& co
 void Octree::removeVoxels(const std::vector<uint8_t>& position, uint16_t power) {
 	std::vector<std::vector<uint8_t>> toRemove;
 	root.calculateVoxelsToRemove(position, power, toRemove);
+
 	for (std::vector<uint8_t> voxelPos : toRemove) {
 		root.removeVoxel(voxelPos);
 	}

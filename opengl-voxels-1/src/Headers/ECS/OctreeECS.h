@@ -34,7 +34,7 @@ struct OctreeHandlerComp : public Component {
 	VoxelRendererComp* voxelRenderer;
 	BoundingBoxRendererComp* boundingBoxRenderer;
 	TransformComp* cameraTransform;
-	std::vector<OctreeComp*> chunks;
+	std::vector<Entity*> chunkEntities;
 };
 
 struct RayCastComp : public Component {
