@@ -73,7 +73,7 @@ public:
 	void calculateVoxelVAO(uint32_t lod);
 	void makeNoiseTerrain(std::vector<int32_t> pos); 
 
-	static Voxel* createVoxel(uint8_t x, uint32_t i, uint8_t z, std::array<uint8_t, 3> color);
+	static Voxel* createVoxel(uint8_t x, uint32_t i, uint8_t z, uint8_t matID);
 	static uint8_t createEnabledFacesBitMask(uint32_t i, float y, float yf, float yb, float yl, float yr);
 	void calculateEnabledFaces();
 

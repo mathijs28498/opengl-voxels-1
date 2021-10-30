@@ -464,10 +464,10 @@ float getNoiseHeight(fnl_state* noise, float xn, float zn) {
 	return std::round(data);
 }
 
-Voxel* Octree::createVoxel(uint8_t x, uint32_t i, uint8_t z, std::array<uint8_t, 3> color) {
+Voxel* Octree::createVoxel(uint8_t x, uint32_t i, uint8_t z, uint8_t matID) {
 	uint8_t enabledFaces = 0x00;
 	uint32_t voxelPosInt = bytesToInt(x, i, z, 1);
-	return new Voxel{ voxelPosInt, bytesToInt(color[0], color[1], color[2], enabledFaces) };
+	return new Voxel{ voxelPosInt, bytesToInt(matID, 0x00, 0x00, enabledFaces) };
 }
 
 
@@ -498,25 +498,25 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 			y = std::min((float)OCTREE_SIZE, y);
 			int32_t curY = 0;
 			for (int32_t i = curY; i < y && i < 25; i++, curY++) {
-				insert(createVoxel(x, i, z, { 52, 58, 235 }));
+				insert(createVoxel(x, i, z, 0));
 			}
 			for (size_t i = curY; i < y && i < 30; i++, curY++) {
-				insert(createVoxel(x, i, z, { 52, 143, 235 }));
+				insert(createVoxel(x, i, z, 1));
 			}
 			for (size_t i = curY; i < y && i < 35; i++, curY++) {
-				insert(createVoxel(x, i, z, { 207, 191, 70 }));
+				insert(createVoxel(x, i, z, 2));
 			}
 			for (size_t i = curY; i < y && i < 45; i++, curY++) {
-				insert(createVoxel(x, i, z, { 75, 207, 70 }));
+				insert(createVoxel(x, i, z, 3));
 			}
 			for (size_t i = curY; i < y && i < 55; i++, curY++) {
-				insert(createVoxel(x, i, z, { 113, 122, 119 }));
+				insert(createVoxel(x, i, z, 4));
 			}
 			for (size_t i = curY; i < y && i < 65; i++, curY++) {
-				insert(createVoxel(x, i, z, { 59, 66, 64 }));
+				insert(createVoxel(x, i, z, 5));
 			}
 			for (size_t i = curY; i < y; i++, curY++) {
-				insert(createVoxel(x, i, z, { 230, 230, 230 }));
+				insert(createVoxel(x, i, z, 6));
 			}
 		}
 	}

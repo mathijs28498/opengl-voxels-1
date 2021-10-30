@@ -100,7 +100,7 @@ int main() {
 		//glfwSetMouseButtonCallback(window.window, mouseButtonCallback);
 
 		Shader terrainVoxelShader("shaders/voxelInstancingTerrain.vert", "shaders/voxelInstancing.geom", "shaders/voxelInstancing.frag");
-		Shader wireframeShader("shaders/voxelInstancingTerrain.vert", "shaders/wireframeInstancing.geom", "shaders/wireframeInstancing.frag");
+		Shader wireframeShader("shaders/wireframeInstancing.vert", "shaders/wireframeInstancing.geom", "shaders/wireframeInstancing.frag");
 		Shader boundingBoxShader("shaders/octreeBoundingBox.vert", "shaders/octreeBoundingBox.geom", "shaders/octreeBoundingBox.frag");
 
 		Scene scene;

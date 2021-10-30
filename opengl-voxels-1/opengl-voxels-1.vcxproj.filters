@@ -183,5 +183,6 @@
     </None>
     <None Include="shaders\wireframeInstancing.geom" />
     <None Include="shaders\wireframeInstancing.frag" />
+    <None Include="shaders\wireframeInstancing.vert" />
   </ItemGroup>
 </Project>
