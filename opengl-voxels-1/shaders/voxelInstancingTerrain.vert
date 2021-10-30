@@ -4,7 +4,7 @@ struct Material {
 };
 
 layout (location = 0) in uint positionInt;
-layout (location = 1) in uint colorAndEnabledInt;
+layout (location = 1) in uint materialAndEnabledInt;
 
 out vec3 gColor;
 out float gSizeMult;
@@ -43,9 +43,8 @@ void main() {
 	vec4 position = intToVec4(positionInt);
 
 	gl_Position = vec4(position.xyz, 1.0);
-	uint matID = int32ToInt16(colorAndEnabledInt);
-//	gColor = intToVec3(colorAndEnabledInt) / 255.0;
+	uint matID = int32ToInt16(materialAndEnabledInt);
 	gColor = materials[matID].color;
 	gSizeMult = position.w;
-	gEnabledFaces = (colorAndEnabledInt >> 24u) & 0xFFu;
+	gEnabledFaces = (materialAndEnabledInt >> 24u) & 0xFFu;
 }

@@ -55,7 +55,7 @@ struct Ray {
 //};
 struct Voxel {
 	uint32_t positionInt;
-	uint32_t colorAndEnabledInt;
+	uint32_t materialAndEnabledInt;
 
 	glm::vec3 getModelPosition(const glm::vec3& modelPosition) const;
 	bool hasSamePosition(const std::vector<uint8_t>& otherPos) const;

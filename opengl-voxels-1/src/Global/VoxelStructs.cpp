@@ -20,7 +20,7 @@ bool Voxel::hasSamePosition(const std::vector<uint8_t>& otherPos) const {
 }
 
 Voxel Voxel::getVoxelCopy(Voxel originalVoxel) {
-	Voxel voxel{ originalVoxel.positionInt, originalVoxel.colorAndEnabledInt };
+	Voxel voxel{ originalVoxel.positionInt, originalVoxel.materialAndEnabledInt };
 	return voxel;
 }
 

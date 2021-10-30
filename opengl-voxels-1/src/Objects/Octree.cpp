@@ -106,7 +106,7 @@ void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod) {
 			for (size_t i = 0; i < voxels.size(); i++) {
 				if (voxels[i] == nullptr)
 					continue;
-				if ((voxels[i]->colorAndEnabledInt & 0xFF000000) == 0x00)
+				if ((voxels[i]->materialAndEnabledInt & 0xFF000000) == 0x00)
 					continue;
 				voxelCloud->push_back(*voxels[i]);
 			}
@@ -117,7 +117,7 @@ void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod) {
 			uint32_t newSize = pow(2, lod - 1);
 			for (size_t i = 0; i < voxels.size(); i++) {
 				Voxel voxel = Voxel::getVoxelCopy(*voxels[i]);
-				voxel.colorAndEnabledInt = voxel.colorAndEnabledInt & 0xFFFFFF + 0xFF000000;
+				voxel.materialAndEnabledInt = voxel.materialAndEnabledInt & 0xFFFFFF + 0xFF000000;
 				std::vector<uint8_t> position = intToBytes(voxel.positionInt);
 				if ((static_cast<uint32_t>(position[0]) % newSize) == 0 &&
 					(static_cast<uint32_t>(position[1]) % newSize) == 0 &&
@@ -322,19 +322,19 @@ void OctreeNode::addSurroundingVoxelsToRemove(const std::vector<uint8_t>& voxelP
 void OctreeNode::calculateSurroundedFaces(const std::vector<uint8_t>& voxelPos) {
 	Voxel* voxel;
 	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0] + (int16_t)1, (int16_t)voxelPos[1], (int16_t)voxelPos[2])) != nullptr)
-		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x04 << 24;
+		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x04 << 24;
 	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0] - (int16_t)1, (int16_t)voxelPos[1], (int16_t)voxelPos[2])) != nullptr)
-		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x08 << 24;
+		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x08 << 24;
 
 	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] - (int16_t)1, (int16_t)voxelPos[2])) != nullptr)
-		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x10 << 24;
+		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x10 << 24;
 	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] + (int16_t)1, (int16_t)voxelPos[2])) != nullptr)
-		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x20 << 24;
+		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x20 << 24;
 
 	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - (int16_t)1)) != nullptr)
-		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x01 << 24;
+		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x01 << 24;
 	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + (int16_t)1)) != nullptr)
-		voxel->colorAndEnabledInt = voxel->colorAndEnabledInt | 0x02 << 24;
+		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x02 << 24;
 }
 
 uint8_t OctreeNode::calculateEnabledFace(const std::vector<uint8_t>& voxelPos) {
@@ -360,10 +360,10 @@ void OctreeNode::calculateEnabledFaces() {
 			if (voxel == nullptr)
 				continue;
 			//uint8_t* voxelPos = voxel->getPositionBytes();
-			std::vector<uint8_t> cae = intToBytes(voxel->colorAndEnabledInt);
+			std::vector<uint8_t> cae = intToBytes(voxel->materialAndEnabledInt);
 			std::vector<uint8_t> voxelPos = intToBytes(voxel->positionInt);
 			uint8_t en = calculateEnabledFace(voxelPos);
-			voxel->colorAndEnabledInt = bytesToInt(cae[0], cae[1], cae[2], en);
+			voxel->materialAndEnabledInt = bytesToInt(cae[0], cae[1], cae[2], en);
 		}
 	}
 }
@@ -444,7 +444,7 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, colorAndEnabledInt));
+	glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, sizeof(Voxel), (void*)offsetof(Voxel, materialAndEnabledInt));
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
