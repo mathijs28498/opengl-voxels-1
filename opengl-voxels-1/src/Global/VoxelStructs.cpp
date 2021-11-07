@@ -1,13 +1,14 @@
 #include "../Headers/Global/VoxelStructs.h"
 
 Material materials[mat::empty] = {
-	{ mat::gabbro, { 0.20, 0.26, 0.18, 1 }, 1 },
-	{ mat::basalt, { 0.33, 0.31, 0.30, 1 }, 1 },
-	{ mat::sand, { 0.97, 0.94, 0.64, 1 }, 1 },
-	{ mat::soil, { 0.49, 0.78, 0.31, 1 }, 1 },
-	{ mat::shale, { 0.50, 0.52, 0.53, 1 }, 1 },
-	{ mat::limestone, { 0.75, 0.74, 0.56, 1 }, 1 },
-	{ mat::snow, { 0.9, 0.9, 0.9, 1 }, 1 },
+	{ mat::gabbro, false, true, { 0.20, 0.26, 0.18, 1 }, 1 },
+	{ mat::basalt, false, true, { 0.33, 0.31, 0.30, 1 }, 1 },
+	{ mat::sand, false, true, { 0.97, 0.94, 0.64, 1 }, 1 },
+	{ mat::soil, false, true, { 0.49, 0.78, 0.31, 1 }, 1 },
+	{ mat::shale, false, true, { 0.50, 0.52, 0.53, 1 }, 1 },
+	{ mat::limestone, false, true, { 0.75, 0.74, 0.56, 1 }, 1 },
+	{ mat::snow, false, true, { 0.9, 0.9, 0.9, 1 }, 1 },
+	{ mat::water, true, false, { 0.14, 0.36, 0.99, 0.5 }, 1 },
 };
 
 std::string getMaterialShaderString() {
@@ -42,9 +43,13 @@ glm::vec3 Voxel::getModelPosition(const glm::vec3& modelPosition) const {
 	return position * VOX_SIZE + modelPosition;
 }
 
-bool Voxel::hasSamePosition(const std::vector<uint8_t>& otherPos) const {
-	std::vector<uint8_t> voxPos = intToBytes(positionInt);
+bool Voxel::hasSamePosition(const std::array<uint8_t, 3>& otherPos) const {
+	std::array<uint8_t, 3> voxPos = intToBytes3(positionInt);
 	return voxPos[0] == otherPos[0] && voxPos[1] == otherPos[1] && voxPos[2] == otherPos[2];
+}
+
+Material* Voxel::getMaterial() const {
+	return &materials[intToBytes3(materialAndEnabledInt)[0]];
 }
 
 Voxel Voxel::getVoxelCopy(Voxel originalVoxel) {

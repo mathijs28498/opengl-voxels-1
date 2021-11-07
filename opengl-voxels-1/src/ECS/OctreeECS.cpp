@@ -76,10 +76,10 @@ void OctreeSystem::update(Entity* entity) {
 	}
 }
 
-bool isChunkActive(std::vector<int32_t> curGridPos, OctreeHandlerComp* octreeHandler) {
+bool isChunkActive(std::array<int32_t, 3> curGridPos, OctreeHandlerComp* octreeHandler) {
 	for (Entity* chunkEntity : octreeHandler->chunkEntities) {
 		OctreeComp* chunk = getComponentOfEntity<OctreeComp>(chunkEntity);
-		std::vector<int32_t> chunkGridPos = chunk->pos;
+		std::array<int32_t, 3> chunkGridPos = chunk->pos;
 		if (curGridPos[0] == chunkGridPos[0] && curGridPos[1] == chunkGridPos[1] && curGridPos[2] == chunkGridPos[2]) {
 			return true;
 		}
@@ -96,7 +96,7 @@ void OctreeHandlerSystem::update(Entity* entity) {
 	};
 	for (int x = -chunkRange; x <= chunkRange; x++) {
 		for (int z = -chunkRange; z <= chunkRange; z++) {
-			std::vector<int32_t> curGridPosOffset = { curGridPos[0] + x, curGridPos[1], curGridPos[2] + z };
+			std::array<int32_t, 3> curGridPosOffset = { curGridPos[0] + x, curGridPos[1], curGridPos[2] + z };
 
 			if (!isChunkActive(curGridPosOffset, octreeHandler)) {
 				Entity* entity = new Entity;
@@ -158,7 +158,7 @@ void RayCastSystem::fixedUpdate(Entity* entity) {
 
 	if ((keyInput->keyRepeat[GLFW_KEY_E] || keyInput->keyPress[GLFW_KEY_Q]) && collisionOctreeComp != nullptr) {
 		float power = 5;
-		collisionOctreeComp->octree.removeVoxels(intToBytes(collision.voxel->positionInt), power);
+		collisionOctreeComp->octree.removeVoxels(intToBytes3(collision.voxel->positionInt), power);
 		collisionOctreeComp->octree.fillVoxelRenderer(collisionVoxelRendererComp, 1, true);
 	}
 }

@@ -40,19 +40,20 @@ namespace mat {
 		shale,
 		limestone,
 		snow,
+		water,
 		empty,
 	};
 }
 
 struct Material {
 	mat::MaterialType type;
+	bool isTransparent;
+	bool isBreakable;
 	float color[4];
 	float strength;
 };
 
-//std::array<Material, mat::empty> materials;
 extern Material materials[mat::empty];
-
 std::string getMaterialShaderString();
 
 struct Ray {
@@ -82,7 +83,8 @@ struct Voxel {
 	uint32_t materialAndEnabledInt;
 
 	glm::vec3 getModelPosition(const glm::vec3& modelPosition) const;
-	bool hasSamePosition(const std::vector<uint8_t>& otherPos) const;
+	bool hasSamePosition(const std::array<uint8_t, 3>& otherPos) const;
+	Material* getMaterial() const;
 	static Voxel getVoxelCopy(Voxel originalVoxel);
 };
 

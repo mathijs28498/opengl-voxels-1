@@ -9,15 +9,59 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <array>
 #include <algorithm>
+std::array<int16_t, 3>* getSurrVoxPositions(const std::array<uint8_t, 3> voxelPos) {
+	std::array<int16_t, 3> positions[6] = {
+			{ (int16_t)voxelPos[0] + 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2] },
+			{ (int16_t)voxelPos[0] - 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2] },
+			{ (int16_t)voxelPos[0], (int16_t)voxelPos[1] - 1, (int16_t)voxelPos[2] },
+			{ (int16_t)voxelPos[0], (int16_t)voxelPos[1] + 1, (int16_t)voxelPos[2] },
+			{ (int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - 1 },
+			{ (int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + 1 },
+	};
 
+	return positions;
+}
+
+// TODO: Fix this for water transparency
+bool shouldInsertFace(Voxel* curVoxel, Voxel* otherVoxel, bool inv = false) {
+	if (!inv && otherVoxel == nullptr && !curVoxel->getMaterial()->isTransparent) 
+		return true;
+
+	if (!inv && otherVoxel == nullptr && curVoxel->getMaterial()->isTransparent)
+		return true;
+		//return false;
+	if (otherVoxel == nullptr)
+		//return inv ? false : true;
+		return false;
+
+	if (!inv && curVoxel->getMaterial()->isBreakable != otherVoxel->getMaterial()->isBreakable)
+		return true;
+
+	return inv ? true : false;
+}
+
+uint32_t faceFlags[6] = {
+	0x08,
+	0x04,
+	0x20,
+	0x10,
+	0x02,
+	0x01,
+};
+
+uint32_t faceFlagsInv[6] = {
+	0x04,
+	0x08,
+	0x10,
+	0x20,
+	0x01,
+	0x02,
+};
 
 /// BEGIN OCTREE_NODE ///
 
-OctreeNode::OctreeNode(std::vector<int> pos, int size, OctreeNode* parent) {
-	this->pos.resize(3);
-	this->pos[0] = pos[0];
-	this->pos[1] = pos[1];
-	this->pos[2] = pos[2];
+OctreeNode::OctreeNode(std::array<int, 3> pos, int size, OctreeNode* parent) {
+	this->pos = pos;
 
 	this->size = size;
 	this->parent = parent;
@@ -38,7 +82,7 @@ int OctreeNode::getVoxelIndex(uint8_t x, uint8_t y, uint8_t z) const {
 
 void OctreeNode::insert(Voxel* voxel) {
 	if (size <= LEAF_SIZE) {
-		std::vector<uint8_t> voxPos = intToBytes(voxel->positionInt);
+		std::array<uint8_t, 3> voxPos = intToBytes3(voxel->positionInt);
 		int index = getVoxelIndex(voxPos[0], voxPos[1], voxPos[2]);
 		if (voxels.size() < index + 1) {
 			voxels.resize(std::min(Q3_LEAF_SIZE, index + 100));
@@ -68,10 +112,10 @@ void OctreeNode::insertIntoChildren(Voxel* voxel) {
 }
 
 bool OctreeNode::containsPoint(Voxel* voxel) const {
-	return containsPoint(intToBytes(voxel->positionInt));
+	return containsPoint(intToBytes3(voxel->positionInt));
 }
 
-bool OctreeNode::containsPoint(const std::vector<uint8_t>& position) const {
+bool OctreeNode::containsPoint(const std::array<uint8_t, 3>& position) const {
 	return position[0] >= pos[0] && position[0] < pos[0] + size &&
 		position[1] >= pos[1] && position[1] < pos[1] + size &&
 		position[2] >= pos[2] && position[2] < pos[2] + size;
@@ -118,7 +162,7 @@ void OctreeNode::calculateVAO(std::vector<Voxel>* voxelCloud, uint32_t lod) {
 			for (size_t i = 0; i < voxels.size(); i++) {
 				Voxel voxel = Voxel::getVoxelCopy(*voxels[i]);
 				voxel.materialAndEnabledInt = voxel.materialAndEnabledInt & 0xFFFFFF + 0xFF000000;
-				std::vector<uint8_t> position = intToBytes(voxel.positionInt);
+				std::array<uint8_t, 3> position = intToBytes3(voxel.positionInt);
 				if ((static_cast<uint32_t>(position[0]) % newSize) == 0 &&
 					(static_cast<uint32_t>(position[1]) % newSize) == 0 &&
 					(static_cast<uint32_t>(position[2]) % newSize) == 0) {
@@ -149,6 +193,14 @@ void OctreeNode::calculateBoundingBoxVAO(std::vector<BoundingBoxPoint>* pointClo
 
 glm::vec3 getRealOctreePos(glm::vec3& octreePos) {
 	return octreePos * REAL_OCTREE_SIZE - REAL_HALF_OCTREE_SIZE;
+}
+
+Voxel* OctreeNode::findSiblingVoxel(const std::array<int16_t, 3>& voxPos) const {
+	return findSiblingVoxel(voxPos[0], voxPos[1], voxPos[2]);
+}
+
+Voxel* OctreeNode::findSiblingVoxel(const std::array<uint8_t, 3>& voxPos) const {
+	return findSiblingVoxel(voxPos[0], voxPos[1], voxPos[2]);
 }
 
 Voxel* OctreeNode::findSiblingVoxel(int16_t x, int16_t y, int16_t z) const {
@@ -237,7 +289,7 @@ bool OctreeNode::rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision
 	}
 }
 
-void OctreeNode::removeVoxel(const std::vector<uint8_t>& position) {
+void OctreeNode::removeVoxel(const std::array<uint8_t, 3>& position) {
 	if (voxels.size() > 0) {
 		int index = getVoxelIndex(position[0], position[1], position[2]);
 		if (index < 0 || index > voxels.size() - 1)
@@ -259,7 +311,7 @@ void OctreeNode::removeVoxel(const std::vector<uint8_t>& position) {
 }
 
 
-void OctreeNode::calculateVoxelsToRemove(const std::vector<uint8_t>& position, uint16_t power, std::vector<std::vector<uint8_t>>& toRemoveOut) {
+void OctreeNode::calculateVoxelsToRemove(const std::array<uint8_t, 3>& position, uint16_t power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
 	if (power <= 0) 
 		return;
 
@@ -277,7 +329,7 @@ void OctreeNode::calculateVoxelsToRemove(const std::vector<uint8_t>& position, u
 		Voxel* vox = voxels[index];
 		if (vox == nullptr)
 			return;
-		toRemoveOut.push_back(intToBytes(vox->positionInt)); 
+		toRemoveOut.push_back(intToBytes3(vox->positionInt)); 
 		addSurroundingVoxelsToRemove(position, power, toRemoveOut);
 	}
 	if (!hasChildren) {
@@ -291,13 +343,13 @@ void OctreeNode::calculateVoxelsToRemove(const std::vector<uint8_t>& position, u
 	}
 }
 
-void OctreeNode::addSurroundingVoxelToRemove(const std::vector<int16_t>& voxelPos, uint8_t power, std::vector<std::vector<uint8_t>>& toRemoveOut) {
+void OctreeNode::addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxelPos, uint8_t power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
 	Voxel* voxel;
 	static int amount = 0;
 
 	if ((voxel = findSiblingVoxel(voxelPos[0], voxelPos[1], voxelPos[2])) != nullptr) {
 		bool alreadyRemoved = false;
-		for (std::vector<uint8_t> voxPos : toRemoveOut) {
+		for (std::array<uint8_t, 3> voxPos : toRemoveOut) {
 			if (voxel->hasSamePosition(voxPos)) {
 				alreadyRemoved = true;
 				break;
@@ -309,44 +361,38 @@ void OctreeNode::addSurroundingVoxelToRemove(const std::vector<int16_t>& voxelPo
 	}
 }
 
-void OctreeNode::addSurroundingVoxelsToRemove(const std::vector<uint8_t>& voxelPos, uint8_t power, std::vector<std::vector<uint8_t>>& toRemoveOut) {
+void OctreeNode::addSurroundingVoxelsToRemove(const std::array<uint8_t, 3>& voxelPos, uint8_t power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
 	Voxel* voxel;
-	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0] - (int16_t)1, (int16_t)voxelPos[1], (int16_t)voxelPos[2] }, power, toRemoveOut);
-	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0] + (int16_t)1, (int16_t)voxelPos[1], (int16_t)voxelPos[2] }, power, toRemoveOut);
-	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)voxelPos[1] - (int16_t)1, (int16_t)voxelPos[2] }, power, toRemoveOut);
-	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)voxelPos[1] + (int16_t)1, (int16_t)voxelPos[2] }, power, toRemoveOut);
-	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - (int16_t)1 }, power, toRemoveOut);
-	addSurroundingVoxelToRemove({ (int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + (int16_t)1 }, power, toRemoveOut);
+	std::array<int16_t, 3>* positions = getSurrVoxPositions(voxelPos);
+	addSurroundingVoxelToRemove(positions[0], power, toRemoveOut);
+	addSurroundingVoxelToRemove(positions[1], power, toRemoveOut);
+	addSurroundingVoxelToRemove(positions[2], power, toRemoveOut);
+	addSurroundingVoxelToRemove(positions[3], power, toRemoveOut);
+	addSurroundingVoxelToRemove(positions[4], power, toRemoveOut);
+	addSurroundingVoxelToRemove(positions[5], power, toRemoveOut);
 }
 
-void OctreeNode::calculateSurroundedFaces(const std::vector<uint8_t>& voxelPos) {
+void OctreeNode::calculateSurroundedFaces(const std::array<uint8_t, 3>& voxelPos) {
+	Voxel* curVox = findSiblingVoxel(voxelPos);
 	Voxel* voxel;
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0] + (int16_t)1, (int16_t)voxelPos[1], (int16_t)voxelPos[2])) != nullptr)
-		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x04 << 24;
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0] - (int16_t)1, (int16_t)voxelPos[1], (int16_t)voxelPos[2])) != nullptr)
-		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x08 << 24;
+	std::array<int16_t, 3>* positions = getSurrVoxPositions(voxelPos);
 
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] - (int16_t)1, (int16_t)voxelPos[2])) != nullptr)
-		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x10 << 24;
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] + (int16_t)1, (int16_t)voxelPos[2])) != nullptr)
-		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x20 << 24;
-
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - (int16_t)1)) != nullptr)
-		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x01 << 24;
-	if ((voxel = findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + (int16_t)1)) != nullptr)
-		voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | 0x02 << 24;
+	for (size_t i = 0; i < 6; i++) {
+		Voxel* voxel = findSiblingVoxel(positions[i]);
+		if (shouldInsertFace(curVox, voxel, true))
+			voxel->materialAndEnabledInt = voxel->materialAndEnabledInt | faceFlagsInv[i] << 24;
+	}
 }
 
-uint8_t OctreeNode::calculateEnabledFace(const std::vector<uint8_t>& voxelPos) {
+uint8_t OctreeNode::calculateEnabledFace(const std::array<uint8_t, 3>& voxelPos) {
 	uint8_t en = 0x00;
-	if (findSiblingVoxel((int16_t)voxelPos[0] + 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2]) == nullptr) en |= 0x08;
-	if (findSiblingVoxel((int16_t)voxelPos[0] - 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2]) == nullptr) en |= 0x04;
+	Voxel* curVox = findSiblingVoxel(voxelPos);
+	std::array<int16_t, 3>* positions = getSurrVoxPositions(voxelPos);
 
-	if (findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] - 1, (int16_t)voxelPos[2]) == nullptr) en |= 0x20;
-	if (findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1] + 1, (int16_t)voxelPos[2]) == nullptr) en |= 0x10;
+	for (size_t i = 0; i < 6; i++) {
+		if (shouldInsertFace(curVox, findSiblingVoxel(positions[i]))) en |= faceFlags[i];
+	}
 
-	if (findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - 1) == nullptr) en |= 0x02;
-	if (findSiblingVoxel((int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + 1) == nullptr) en |= 0x01;
 	return en;
 }
 
@@ -360,8 +406,8 @@ void OctreeNode::calculateEnabledFaces() {
 			if (voxel == nullptr)
 				continue;
 			//uint8_t* voxelPos = voxel->getPositionBytes();
-			std::vector<uint8_t> cae = intToBytes(voxel->materialAndEnabledInt);
-			std::vector<uint8_t> voxelPos = intToBytes(voxel->positionInt);
+			std::array<uint8_t, 3> cae = intToBytes3(voxel->materialAndEnabledInt);
+			std::array<uint8_t, 3> voxelPos = intToBytes3(voxel->positionInt);
 			uint8_t en = calculateEnabledFace(voxelPos);
 			voxel->materialAndEnabledInt = bytesToInt(cae[0], cae[1], cae[2], en);
 		}
@@ -372,7 +418,7 @@ void OctreeNode::calculateEnabledFaces() {
 
 /// BEGIN OCTREE ///
 
-Octree::Octree(const std::vector<int> pos, uint32_t size) {
+Octree::Octree(const std::array<int, 3> pos, uint32_t size) {
 	root = OctreeNode({ 0, 0, 0 }, size);
 
 	this->size = size;
@@ -471,7 +517,7 @@ Voxel* Octree::createVoxel(uint8_t x, uint32_t i, uint8_t z, uint8_t matID) {
 }
 
 
-void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
+void Octree::makeNoiseTerrain(std::array<int32_t, 3> pos) {
 
 	using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
@@ -497,29 +543,35 @@ void Octree::makeNoiseTerrain(std::vector<int32_t> pos) {
 
 			y = std::min((float)OCTREE_SIZE, y);
 			int32_t curY = 0;
-			for (int32_t i = curY; i < y && i < 25; i++, curY++) {
-				insert(createVoxel(x, i, z, 0));
-			}
-			for (size_t i = curY; i < y && i < 30; i++, curY++) {
-				insert(createVoxel(x, i, z, 1));
+			for (int32_t i = curY; i < 30; i++, curY++) {
+				if (i >= y) {
+					insert(createVoxel(x, i, z, mat::water));
+				} else if (i < 25) {
+					insert(createVoxel(x, i, z, mat::gabbro));
+				} else {
+					insert(createVoxel(x, i, z, mat::basalt));
+				}
 			}
 			for (size_t i = curY; i < y && i < 35; i++, curY++) {
-				insert(createVoxel(x, i, z, 2));
+				insert(createVoxel(x, i, z, mat::sand));
 			}
 			for (size_t i = curY; i < y && i < 45; i++, curY++) {
-				insert(createVoxel(x, i, z, 3));
+				insert(createVoxel(x, i, z, mat::soil));
 			}
 			for (size_t i = curY; i < y && i < 55; i++, curY++) {
-				insert(createVoxel(x, i, z, 4));
+				insert(createVoxel(x, i, z, mat::shale));
 			}
 			for (size_t i = curY; i < y && i < 65; i++, curY++) {
-				insert(createVoxel(x, i, z, 5));
+				insert(createVoxel(x, i, z, mat::limestone));
 			}
 			for (size_t i = curY; i < y; i++, curY++) {
-				insert(createVoxel(x, i, z, 6));
+				insert(createVoxel(x, i, z, mat::snow));
 			}
+
 		}
 	}
+
+
 
 
 	auto t1 = high_resolution_clock::now();
@@ -554,14 +606,14 @@ bool Octree::rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision& co
 	return true;
 }
 
-void Octree::removeVoxels(const std::vector<uint8_t>& position, uint16_t power) {
-	std::vector<std::vector<uint8_t>> toRemove;
+void Octree::removeVoxels(const std::array<uint8_t, 3>& position, uint16_t power) {
+	std::vector<std::array<uint8_t, 3>> toRemove;
 	root.calculateVoxelsToRemove(position, power, toRemove);
 
-	for (std::vector<uint8_t> voxelPos : toRemove) {
+	for (std::array<uint8_t, 3> voxelPos : toRemove) {
 		root.removeVoxel(voxelPos);
 	}
-	for (std::vector<uint8_t> voxelPos : toRemove) {
+	for (std::array<uint8_t, 3> voxelPos : toRemove) {
 		root.calculateSurroundedFaces(voxelPos);
 	}
 }

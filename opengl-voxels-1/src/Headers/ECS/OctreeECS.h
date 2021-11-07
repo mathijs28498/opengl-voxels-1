@@ -12,9 +12,9 @@
 
 struct OctreeComp : public Component {
 	OctreeComp() {};
-	OctreeComp(std::vector<int> pos, uint32_t size, TransformComp* cameraTransform) :
+	OctreeComp(std::array<int, 3> pos, uint32_t size, TransformComp* cameraTransform) :
 		pos(pos), octree(Octree(pos, size)), cameraTransform(cameraTransform), currentLOD(0) {};
-	std::vector<int> pos;
+	std::array<int, 3> pos;
 	glm::vec3 center;
 	Octree octree;
 	TransformComp* cameraTransform;
