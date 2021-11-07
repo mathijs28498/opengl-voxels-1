@@ -1,4 +1,5 @@
 #include "Headers/Shader.h"
+#include "Headers/Global/VoxelStructs.h"
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 	uint32_t vertex = createShader(vertexPath, GL_VERTEX_SHADER);
@@ -42,12 +43,21 @@ Shader::Shader(const char* vertexPath, const char* geometryPath, const char* fra
 }
 
 uint32_t Shader::createShader(const char* shaderPath, GLuint type) {
+	static std::string materialStr = "Material materials";
+	static std::string insertStr = getMaterialShaderString();
+
 	uint32_t shaderID;
 	int success;
 	char infoLog[512];
 
 	std::string shaderCodeStr;
 	getShaderCode(shaderPath, &shaderCodeStr);
+	size_t materialIndex = shaderCodeStr.find(materialStr);
+	if (materialIndex != std::string::npos) {
+
+		shaderCodeStr.insert(materialIndex + materialStr.size(), insertStr);
+	}
+
 	const char* shaderCode = shaderCodeStr.c_str();
 
 	shaderID = glCreateShader(type);

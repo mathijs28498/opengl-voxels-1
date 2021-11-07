@@ -1,6 +1,6 @@
 #version 330 core
 in vec3 fViewPos;
-in vec3 fColor;
+in vec4 fColor;
 in vec3 fragPos;
 in vec3 normal;
 
@@ -12,7 +12,8 @@ uniform float lightIntensity;
 vec3 calcDirLight(vec3 viewDir);
 
 void main() { 
-    FragColor = vec4(calcDirLight(fViewPos - fragPos), 1.0);   
+//    FragColor = vec4(calcDirLight(fViewPos - fragPos), fColor.a);   
+    FragColor = vec4(calcDirLight(fViewPos - fragPos), fColor.a);   
 //    FragColor = vec4(fColor, 1.0);   
 }  
 
@@ -28,9 +29,9 @@ vec3 calcDirLight(vec3 viewDir) {
     float gb = lightIntensity * 1;
     if (gb > 1) gb = 1;
 
-    vec3 ambient = fColor * 0.1 * lightIntensity + 0.01;
-    vec3 diffuse = diff * fColor * 0.8 * vec3(r, gb, gb);
-    vec3 specular = spec * fColor * vec3(r, gb, gb);
+    vec3 ambient = fColor.rgb * 0.1 * lightIntensity + 0.01;
+    vec3 diffuse = diff * fColor.rgb * 0.8 * vec3(r, gb, gb);
+    vec3 specular = spec * fColor.rgb * vec3(r, gb, gb);
 
 
     return ambient + diffuse;

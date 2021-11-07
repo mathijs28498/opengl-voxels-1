@@ -2,12 +2,12 @@
 layout(points) in;
 layout(triangle_strip, max_vertices = 24) out;
 
-in vec3 gColor[];
+in vec4 gColor[];
 in float gSizeMult[];
 in uint gEnabledFaces[];
 
 
-out vec3 fColor;
+out vec4 fColor;
 out vec3 fragPos;
 out vec3 fViewPos;
 out vec3 normal;

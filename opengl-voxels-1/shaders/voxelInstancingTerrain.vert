@@ -1,24 +1,16 @@
 #version 330 core
 struct Material {
-  vec3 color;
+  vec4 color;
 };
 
 layout (location = 0) in uint positionInt;
 layout (location = 1) in uint materialAndEnabledInt;
 
-out vec3 gColor;
+out vec4 gColor;
 out float gSizeMult;
 out uint gEnabledFaces;
 
-Material materials[7] = Material[7] (
-	Material(vec3(0.2, 0.23, 0.92)),
-	Material(vec3(0.2, 0.56, 0.92)),
-	Material(vec3(0.81, 0.75, 0.27)),
-	Material(vec3(0.29, 0.81, 0.27)),
-	Material(vec3(0.44, 0.48, 0.47)),
-	Material(vec3(0.23, 0.26, 0.25)),
-	Material(vec3(0.9, 0.9, 0.9))
-);
+Material materials;
 
 vec3 intToVec3(uint intArg) {
 	float i0 = int( intArg		  & 0xFFu);

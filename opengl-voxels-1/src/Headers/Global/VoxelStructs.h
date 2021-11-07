@@ -31,6 +31,30 @@ extern Event2<std::vector<Entity*>*, std::string> getEntitiesWithComponentEvent;
 #define Q3_LEAF_SIZE (LEAF_SIZE * LEAF_SIZE * LEAF_SIZE)
 #define Q3_LEAF_SIZE_OVERFLOW (Q_LEAF_SIZE + 2)
 
+namespace mat {
+	enum MaterialType {
+		gabbro,
+		basalt,
+		sand,
+		soil,
+		shale,
+		limestone,
+		snow,
+		empty,
+	};
+}
+
+struct Material {
+	mat::MaterialType type;
+	float color[4];
+	float strength;
+};
+
+//std::array<Material, mat::empty> materials;
+extern Material materials[mat::empty];
+
+std::string getMaterialShaderString();
+
 struct Ray {
 	glm::vec3 origin;
 	glm::vec3 direction;
