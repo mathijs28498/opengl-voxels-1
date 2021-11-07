@@ -58,6 +58,9 @@ void Window::setScenePointer(Scene* scene) {
 void Window::beginLoop() {
 	glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, backgroundColor.w);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
 }
 
 void Window::endLoop() {
