@@ -24,17 +24,10 @@ std::array<int16_t, 3>* getSurrVoxPositions(const std::array<uint8_t, 3> voxelPo
 
 // TODO: Fix this for water transparency
 bool shouldInsertFace(Voxel* curVoxel, Voxel* otherVoxel, bool inv = false) {
-	if (!inv && otherVoxel == nullptr && !curVoxel->getMaterial()->isTransparent) 
-		return true;
+	if (otherVoxel == nullptr) 
+		return inv ? false : true;
 
-	if (!inv && otherVoxel == nullptr && curVoxel->getMaterial()->isTransparent)
-		return true;
-		//return false;
-	if (otherVoxel == nullptr)
-		//return inv ? false : true;
-		return false;
-
-	if (!inv && curVoxel->getMaterial()->isBreakable != otherVoxel->getMaterial()->isBreakable)
+	if (!inv && curVoxel->getMaterial()->isTransparent != otherVoxel->getMaterial()->isTransparent)
 		return true;
 
 	return inv ? true : false;
@@ -543,7 +536,7 @@ void Octree::makeNoiseTerrain(std::array<int32_t, 3> pos) {
 
 			y = std::min((float)OCTREE_SIZE, y);
 			int32_t curY = 0;
-			for (int32_t i = curY; i < 30; i++, curY++) {
+			/*for (int32_t i = curY; i < 30; i++, curY++) {
 				if (i >= y) {
 					insert(createVoxel(x, i, z, mat::water));
 				} else if (i < 25) {
@@ -551,6 +544,13 @@ void Octree::makeNoiseTerrain(std::array<int32_t, 3> pos) {
 				} else {
 					insert(createVoxel(x, i, z, mat::basalt));
 				}
+			}*/
+
+			for (size_t i = curY; i < y && i < 25; i++, curY++) {
+				insert(createVoxel(x, i, z, mat::gabbro));
+			}
+			for (size_t i = curY; i < y && i < 30; i++, curY++) {
+				insert(createVoxel(x, i, z, mat::basalt));
 			}
 			for (size_t i = curY; i < y && i < 35; i++, curY++) {
 				insert(createVoxel(x, i, z, mat::sand));

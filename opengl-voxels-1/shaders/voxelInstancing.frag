@@ -11,10 +11,9 @@ uniform float lightIntensity;
 
 vec3 calcDirLight(vec3 viewDir);
 
-void main() { 
-//    FragColor = vec4(calcDirLight(fViewPos - fragPos), fColor.a);   
+void main() {
     FragColor = vec4(calcDirLight(fViewPos - fragPos), fColor.a);   
-//    FragColor = vec4(fColor, 1.0);   
+//    FragColor = fColor;   
 }  
 
 vec3 calcDirLight(vec3 viewDir) {
