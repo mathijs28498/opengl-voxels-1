@@ -304,10 +304,7 @@ void OctreeNode::removeVoxel(const std::array<uint8_t, 3>& position) {
 }
 
 
-void OctreeNode::calculateVoxelsToRemove(const std::array<uint8_t, 3>& position, uint16_t power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
-	if (power <= 0) 
-		return;
-
+void OctreeNode::calculateVoxelsToRemove(const std::array<uint8_t, 3>& position, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
 	if (!containsPoint(position)) {
 		if (parent == nullptr)
 			return;
@@ -320,8 +317,9 @@ void OctreeNode::calculateVoxelsToRemove(const std::array<uint8_t, 3>& position,
 		if (index < 0 || index > voxels.size() - 1)
 			return;
 		Voxel* vox = voxels[index];
-		if (vox == nullptr)
+		if (vox == nullptr || (power = power - vox->getMaterial()->strength) <= 0.0001f)
 			return;
+
 		toRemoveOut.push_back(intToBytes3(vox->positionInt)); 
 		addSurroundingVoxelsToRemove(position, power, toRemoveOut);
 	}
@@ -336,11 +334,10 @@ void OctreeNode::calculateVoxelsToRemove(const std::array<uint8_t, 3>& position,
 	}
 }
 
-void OctreeNode::addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxelPos, uint8_t power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
+void OctreeNode::addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxelPos, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
 	Voxel* voxel;
-	static int amount = 0;
 
-	if ((voxel = findSiblingVoxel(voxelPos[0], voxelPos[1], voxelPos[2])) != nullptr) {
+	if ((voxel = findSiblingVoxel(voxelPos)) != nullptr) {
 		bool alreadyRemoved = false;
 		for (std::array<uint8_t, 3> voxPos : toRemoveOut) {
 			if (voxel->hasSamePosition(voxPos)) {
@@ -350,11 +347,11 @@ void OctreeNode::addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxel
 		}
 
 		if (!alreadyRemoved)
-			calculateVoxelsToRemove({ (uint8_t) voxelPos[0], (uint8_t)voxelPos[1], (uint8_t) voxelPos[2] }, power - 1, toRemoveOut);
+			calculateVoxelsToRemove({ (uint8_t) voxelPos[0], (uint8_t)voxelPos[1], (uint8_t) voxelPos[2] }, power, toRemoveOut);
 	}
 }
 
-void OctreeNode::addSurroundingVoxelsToRemove(const std::array<uint8_t, 3>& voxelPos, uint8_t power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
+void OctreeNode::addSurroundingVoxelsToRemove(const std::array<uint8_t, 3>& voxelPos, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
 	Voxel* voxel;
 	std::array<int16_t, 3>* positions = getSurrVoxPositions(voxelPos);
 	addSurroundingVoxelToRemove(positions[0], power, toRemoveOut);

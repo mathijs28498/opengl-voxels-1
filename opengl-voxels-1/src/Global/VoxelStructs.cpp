@@ -1,12 +1,12 @@
 #include "../Headers/Global/VoxelStructs.h"
 
 Material materials[mat::empty] = {
-	{ mat::gabbro, false, true, { 0.20, 0.26, 0.18, 1 }, 1 },
-	{ mat::basalt, false, true, { 0.33, 0.31, 0.30, 1 }, 1 },
+	{ mat::gabbro, false, true, { 0.20, 0.26, 0.18, 1 }, 3 },
+	{ mat::basalt, false, true, { 0.33, 0.31, 0.30, 1 }, 2 },
 	{ mat::sand, false, true, { 0.97, 0.94, 0.64, 1 }, 1 },
 	{ mat::soil, false, true, { 0.49, 0.78, 0.31, 1 }, 1 },
-	{ mat::shale, false, true, { 0.50, 0.52, 0.53, 1 }, 1 },
-	{ mat::limestone, false, true, { 0.75, 0.74, 0.56, 1 }, 1 },
+	{ mat::shale, false, true, { 0.50, 0.52, 0.53, 1 }, 5 },
+	{ mat::limestone, false, true, { 0.75, 0.74, 0.56, 1 }, 3 },
 	{ mat::snow, false, true, { 0.9, 0.9, 0.9, 1 }, 1 },
 	{ mat::water, true, false, { 0.14, 0.36, 0.99, 0.5 }, 1 },
 };

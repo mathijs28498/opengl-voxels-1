@@ -43,7 +43,7 @@ public:
 
 	bool rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision& collisionOut);
 	void removeVoxel(const std::array<uint8_t, 3>& position);
-	void calculateVoxelsToRemove(const std::array<uint8_t, 3>& position, uint16_t power, std::vector<std::array<uint8_t, 3>>& toRemoveOut);
+	void calculateVoxelsToRemove(const std::array<uint8_t, 3>& position, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut);
 	void calculateSurroundedFaces(const std::array<uint8_t, 3>& voxelPos);
 
 private:
@@ -53,8 +53,8 @@ private:
 	VoxelAABB getVoxelAABB(glm::vec3& octreePos);
 	int getVoxelIndex(uint8_t x, uint8_t y, uint8_t z) const;
 
-	void addSurroundingVoxelsToRemove(const std::array<uint8_t, 3>& voxelPos, uint8_t power, std::vector<std::array<uint8_t, 3>>& toRemoveOut);
-	void addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxelPos, uint8_t power, std::vector<std::array<uint8_t, 3>>& toRemoveOut);
+	void addSurroundingVoxelsToRemove(const std::array<uint8_t, 3>& voxelPos, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut);
+	void addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxelPos, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut);
 	uint8_t calculateEnabledFace(const std::array<uint8_t, 3>& voxelPos);
 
 	std::vector<Voxel*> voxels;

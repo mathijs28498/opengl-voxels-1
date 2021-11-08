@@ -157,7 +157,7 @@ void RayCastSystem::fixedUpdate(Entity* entity) {
 	}
 
 	if ((keyInput->keyRepeat[GLFW_KEY_E] || keyInput->keyPress[GLFW_KEY_Q]) && collisionOctreeComp != nullptr) {
-		float power = 5;
+		float power = 10;
 		collisionOctreeComp->octree.removeVoxels(intToBytes3(collision.voxel->positionInt), power);
 		collisionOctreeComp->octree.fillVoxelRenderer(collisionVoxelRendererComp, 1, true);
 	}
