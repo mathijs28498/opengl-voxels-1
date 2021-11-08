@@ -14,6 +14,15 @@
 int chunkRange = 0;
 
 std::mutex mtx;
+std::vector<Octree*> getOctreesFromEntities(const std::vector<Entity*> chunkEntities) {
+	std::vector<Octree*> octrees(chunkEntities.size());
+
+	for (size_t i = 0; i < chunkEntities.size(); i++) {
+		octrees[i] = &getComponentOfEntity<OctreeComp>(chunkEntities[i])->octree;
+	}
+
+	return octrees;
+}
 
 void createVoxelTerrain(OctreeComp* octree, BoundingBoxRendererComp* renderer) {
 	octree->octree.makeNoiseTerrain(octree->pos);
@@ -101,6 +110,7 @@ void OctreeHandlerSystem::update(Entity* entity) {
 			if (!isChunkActive(curGridPosOffset, octreeHandler)) {
 				Entity* entity = new Entity;
 				OctreeComp* octreeComp = new OctreeComp(curGridPosOffset, OCTREE_SIZE, octreeHandler->cameraTransform);
+				octreeComp->octree.setSiblings(getOctreesFromEntities(octreeHandler->chunkEntities));
 				entity->insertComponent(octreeComp);
 				entity->insertComponent(new VoxelRendererComp(octreeHandler->voxelRenderer->shader, octreeHandler->voxelRenderer->camera, 0, 0));
 				entity->insertComponent(new BoundingBoxRendererComp(octreeHandler->boundingBoxRenderer->shader, octreeHandler->voxelRenderer->camera, 0, 0, false));

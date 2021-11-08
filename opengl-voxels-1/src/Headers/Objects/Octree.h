@@ -16,17 +16,34 @@ int* getColorFromInt(int colorInt);
 int getIntFromColor(const int* colorArray); 
 glm::vec3 getRealOctreePos(glm::vec3& octreePos);
 
+
+namespace DIR {
+	enum Side {
+		LEFT,
+		RIGHT,
+		DOWN,
+		UP,
+		BACK,
+		FRONT,
+	};
+	
+	Side getOpposite(int otherSide);
+}
+
 struct BoundingBoxPoint {
 	float position[3];
 	float color[3];
 	float size;
 };
 
+class Octree;
+
 class OctreeNode {
 public:
 	std::array<int, 3> pos;
 
-	OctreeNode(std::array<int, 3> pos, int size, OctreeNode* parent = nullptr);
+	OctreeNode(std::array<int, 3> pos, int size, OctreeNode* parent);
+	OctreeNode(std::array<int, 3> pos, int size, Octree* parent);
 	OctreeNode();
 	~OctreeNode();
 
@@ -60,8 +77,14 @@ private:
 	std::vector<Voxel*> voxels;
 	uint16_t size;
 	bool hasChildren = false;
-	OctreeNode* parent;
+
+	enum {NODE, OCTREE} parentType;
+	union {
+		OctreeNode* parent;
+		Octree* parentOctree;
+	};
 	OctreeNode* children[8];
+
 };
 
 class Octree {
@@ -85,9 +108,14 @@ public:
 
 	bool rayCastCollision(Ray& ray, glm::vec3& pos, VoxelCollision& collisionOut);
 	void removeVoxels(const std::array<uint8_t, 3>& position, uint16_t power);
+	//void setSiblings(const std::vector<Octree>& octrees); 
+	void setSibling(Octree* octree, int side);
+	void setSiblings(const std::vector<Octree*>& octrees);
 
 private:
+	std::array<int, 3> pos;
 	OctreeNode root;
+	Octree* siblings[6];
 	std::map<uint32_t, uint32_t> voxelVAOs;
 	std::map<uint32_t, uint32_t> voxelVBOs;
 	std::map<uint32_t, uint32_t> voxelAmounts;

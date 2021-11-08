@@ -9,20 +9,44 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <array>
 #include <algorithm>
-std::array<int16_t, 3>* getSurrVoxPositions(const std::array<uint8_t, 3> voxelPos) {
-	std::array<int16_t, 3> positions[6] = {
-			{ (int16_t)voxelPos[0] + 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2] },
-			{ (int16_t)voxelPos[0] - 1, (int16_t)voxelPos[1], (int16_t)voxelPos[2] },
-			{ (int16_t)voxelPos[0], (int16_t)voxelPos[1] - 1, (int16_t)voxelPos[2] },
-			{ (int16_t)voxelPos[0], (int16_t)voxelPos[1] + 1, (int16_t)voxelPos[2] },
-			{ (int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] - 1 },
-			{ (int16_t)voxelPos[0], (int16_t)voxelPos[1], (int16_t)voxelPos[2] + 1 },
+
+template<class T_I, class T_O>
+std::array<T_O, 3>* getSurroundingPositions(const std::array<T_I, 3>& voxelPos) {
+	std::array<T_O, 3> positions[6] = {
+			{ (T_O)voxelPos[0] - 1, (T_O)voxelPos[1], (T_O)voxelPos[2] },
+			{ (T_O)voxelPos[0] + 1, (T_O)voxelPos[1], (T_O)voxelPos[2] },
+			{ (T_O)voxelPos[0], (T_O)voxelPos[1] - 1, (T_O)voxelPos[2] },
+			{ (T_O)voxelPos[0], (T_O)voxelPos[1] + 1, (T_O)voxelPos[2] },
+			{ (T_O)voxelPos[0], (T_O)voxelPos[1], (T_O)voxelPos[2] - 1 },
+			{ (T_O)voxelPos[0], (T_O)voxelPos[1], (T_O)voxelPos[2] + 1 },
 	};
 
 	return positions;
 }
 
-// TODO: Fix this for water transparency
+template<class T>
+bool isSamePosition(const std::array<T, 3>& pos0, const std::array<T, 3>& pos1) {
+	return pos0[0] == pos1[0] && pos0[1] == pos1[1] && pos0[2] == pos1[2];
+} 
+
+uint32_t faceFlags[6] = {
+	0x04,
+	0x08,
+	0x20,
+	0x10,
+	0x02,
+	0x01,
+};
+
+uint32_t faceFlagsInv[6] = {
+	0x08,
+	0x04,
+	0x10,
+	0x20,
+	0x01,
+	0x02,
+};
+
 bool shouldInsertFace(Voxel* curVoxel, Voxel* otherVoxel, bool inv = false) {
 	if (otherVoxel == nullptr) 
 		return inv ? false : true;
@@ -33,31 +57,22 @@ bool shouldInsertFace(Voxel* curVoxel, Voxel* otherVoxel, bool inv = false) {
 	return inv ? true : false;
 }
 
-uint32_t faceFlags[6] = {
-	0x08,
-	0x04,
-	0x20,
-	0x10,
-	0x02,
-	0x01,
-};
-
-uint32_t faceFlagsInv[6] = {
-	0x04,
-	0x08,
-	0x10,
-	0x20,
-	0x01,
-	0x02,
-};
-
 /// BEGIN OCTREE_NODE ///
 
 OctreeNode::OctreeNode(std::array<int, 3> pos, int size, OctreeNode* parent) {
 	this->pos = pos;
 
 	this->size = size;
+	this->parentType = NODE;
 	this->parent = parent;
+}
+
+OctreeNode::OctreeNode(std::array<int, 3> pos, int size, Octree* parent) {
+	this->pos = pos;
+
+	this->size = size;
+	this->parentType = OCTREE;
+	this->parentOctree = parent;
 }
 
 OctreeNode::OctreeNode() {}
@@ -218,7 +233,7 @@ Voxel* OctreeNode::findSiblingVoxel(int16_t x, int16_t y, int16_t z) const {
 		return nullptr;
 	}
 
-	if (parent == nullptr) 
+	if (parentType == OCTREE) 
 		return nullptr;
 
 	return parent->findSiblingVoxel(x, y, z);
@@ -306,7 +321,7 @@ void OctreeNode::removeVoxel(const std::array<uint8_t, 3>& position) {
 
 void OctreeNode::calculateVoxelsToRemove(const std::array<uint8_t, 3>& position, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
 	if (!containsPoint(position)) {
-		if (parent == nullptr)
+		if (parentType == OCTREE)
 			return;
 
 		parent->calculateVoxelsToRemove(position, power, toRemoveOut);
@@ -353,7 +368,7 @@ void OctreeNode::addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxel
 
 void OctreeNode::addSurroundingVoxelsToRemove(const std::array<uint8_t, 3>& voxelPos, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut) {
 	Voxel* voxel;
-	std::array<int16_t, 3>* positions = getSurrVoxPositions(voxelPos);
+	std::array<int16_t, 3>* positions = getSurroundingPositions<uint8_t, int16_t>(voxelPos);
 	addSurroundingVoxelToRemove(positions[0], power, toRemoveOut);
 	addSurroundingVoxelToRemove(positions[1], power, toRemoveOut);
 	addSurroundingVoxelToRemove(positions[2], power, toRemoveOut);
@@ -365,7 +380,7 @@ void OctreeNode::addSurroundingVoxelsToRemove(const std::array<uint8_t, 3>& voxe
 void OctreeNode::calculateSurroundedFaces(const std::array<uint8_t, 3>& voxelPos) {
 	Voxel* curVox = findSiblingVoxel(voxelPos);
 	Voxel* voxel;
-	std::array<int16_t, 3>* positions = getSurrVoxPositions(voxelPos);
+	std::array<int16_t, 3>* positions = getSurroundingPositions<uint8_t, int16_t>(voxelPos);
 
 	for (size_t i = 0; i < 6; i++) {
 		Voxel* voxel = findSiblingVoxel(positions[i]);
@@ -377,7 +392,7 @@ void OctreeNode::calculateSurroundedFaces(const std::array<uint8_t, 3>& voxelPos
 uint8_t OctreeNode::calculateEnabledFace(const std::array<uint8_t, 3>& voxelPos) {
 	uint8_t en = 0x00;
 	Voxel* curVox = findSiblingVoxel(voxelPos);
-	std::array<int16_t, 3>* positions = getSurrVoxPositions(voxelPos);
+	std::array<int16_t, 3>* positions = getSurroundingPositions<uint8_t, int16_t>(voxelPos);
 
 	for (size_t i = 0; i < 6; i++) {
 		if (shouldInsertFace(curVox, findSiblingVoxel(positions[i]))) en |= faceFlags[i];
@@ -409,8 +424,9 @@ void OctreeNode::calculateEnabledFaces() {
 /// BEGIN OCTREE ///
 
 Octree::Octree(const std::array<int, 3> pos, uint32_t size) {
-	root = OctreeNode({ 0, 0, 0 }, size);
+	root = OctreeNode({ 0, 0, 0 }, size, this);
 
+	this->pos = pos;
 	this->size = size;
 	glGenVertexArrays(1, &boundingBoxVAO);
 }
@@ -615,6 +631,28 @@ void Octree::removeVoxels(const std::array<uint8_t, 3>& position, uint16_t power
 	}
 }
 
+
+void Octree::setSibling(Octree* octree, int side) {
+	siblings[side] = octree;
+}
+
+void Octree::setSiblings(const std::vector<Octree*>& octrees) {
+	if (octrees.size() == 0) return;
+
+	std::array<int, 3>* surrPositions = getSurroundingPositions<int, int>(pos);
+
+	for (Octree* octree : octrees) {
+		// TODO OPTIMIZATION: Calculate if the distance from current is more than 1, then continue
+		for (size_t i = 0; i < 6; i++) {
+			if (isSamePosition<int>(octree->pos, surrPositions[i])) {
+				siblings[i] = octree;
+				octree->setSibling(this, DIR::getOpposite(i));
+				break;
+			}
+		}
+	}
+}
+
 /// END OCTREE ///
 
 int getIntFromColor(const int* colorArray) {
@@ -631,4 +669,23 @@ int* getColorFromInt(int colorInt) {
 	colorArray[1] = (colorInt & 0x0000FF00) >> 8;
 	colorArray[2] = colorInt & 0x000000FF;
 	return colorArray;
+}
+
+DIR::Side DIR::getOpposite(int otherSide){
+	switch (otherSide) {
+	case LEFT:
+		return RIGHT;
+	case RIGHT:
+		return LEFT;
+	case DOWN:
+		return UP;
+	case UP:
+		return DOWN;
+	case BACK:
+		return FRONT;
+	case FRONT:
+		return BACK;
+	}
+
+	return LEFT;
 }
