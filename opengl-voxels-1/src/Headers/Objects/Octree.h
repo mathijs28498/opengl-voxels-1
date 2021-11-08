@@ -12,6 +12,9 @@
 #include <thread>
 #include <array>
 
+class Octree;
+class OctreeNode;
+
 int* getColorFromInt(int colorInt);
 int getIntFromColor(const int* colorArray); 
 glm::vec3 getRealOctreePos(glm::vec3& octreePos);
@@ -36,7 +39,12 @@ struct BoundingBoxPoint {
 	float size;
 };
 
-class Octree;
+
+
+struct FoundVoxel {
+	OctreeNode* node;
+	Voxel* voxel;
+};
 
 class OctreeNode {
 public:
@@ -59,19 +67,25 @@ public:
 	void calculateEnabledFaces();
 
 	bool rayCastCollision(Ray& ray, glm::vec3& octreePos, VoxelCollision& collisionOut);
+	void removeVoxel(Voxel* voxel);
 	void removeVoxel(const std::array<uint8_t, 3>& position);
-	void calculateVoxelsToRemove(const std::array<uint8_t, 3>& position, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut);
+	void calculateVoxelsToRemove(const std::array<uint8_t, 3>& position, float power, std::vector<FoundVoxel>& toRemoveOut);
+	void calculateVoxelsToRemove(const FoundVoxel& fv, float power, std::vector<FoundVoxel>& toRemoveOut);
+	void calculateSurroundedFaces(Voxel* voxel);
 	void calculateSurroundedFaces(const std::array<uint8_t, 3>& voxelPos);
+	FoundVoxel findSiblingVoxel(int16_t x, int16_t y, int16_t z);
+	Octree* getParentOctree();
 
 private:
-	Voxel* findSiblingVoxel(const std::array<int16_t, 3>& voxPos) const;
-	Voxel* findSiblingVoxel(const std::array<uint8_t, 3>& voxPos) const;
-	Voxel* findSiblingVoxel(int16_t x, int16_t y, int16_t z) const;
+	FoundVoxel findSiblingVoxel(const std::array<int16_t, 3>&voxPos);
+	FoundVoxel findSiblingVoxel(const std::array<uint8_t, 3>& voxPos);
+
+
 	VoxelAABB getVoxelAABB(glm::vec3& octreePos);
 	int getVoxelIndex(uint8_t x, uint8_t y, uint8_t z) const;
 
-	void addSurroundingVoxelsToRemove(const std::array<uint8_t, 3>& voxelPos, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut);
-	void addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxelPos, float power, std::vector<std::array<uint8_t, 3>>& toRemoveOut);
+	void addSurroundingVoxelsToRemove(const std::array<uint8_t, 3>& voxelPos, float power, std::vector<FoundVoxel>& toRemoveOut);
+	void addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxelPos, float power, std::vector<FoundVoxel>& toRemoveOut);
 	uint8_t calculateEnabledFace(const std::array<uint8_t, 3>& voxelPos);
 
 	std::vector<Voxel*> voxels;
@@ -107,10 +121,11 @@ public:
 	void fillBoundingBoxRenderer(BoundingBoxRendererComp* renderer);
 
 	bool rayCastCollision(Ray& ray, glm::vec3& pos, VoxelCollision& collisionOut);
-	void removeVoxels(const std::array<uint8_t, 3>& position, uint16_t power);
-	//void setSiblings(const std::vector<Octree>& octrees); 
+	std::vector<FoundVoxel> removeVoxels(const std::array<uint8_t, 3>& position, uint16_t power);
+
 	void setSibling(Octree* octree, int side);
 	void setSiblings(const std::vector<Octree*>& octrees);
+	FoundVoxel findSiblingVoxel(int16_t x, int16_t y, int16_t z);
 
 private:
 	std::array<int, 3> pos;

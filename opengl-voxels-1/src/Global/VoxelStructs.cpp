@@ -43,6 +43,10 @@ glm::vec3 Voxel::getModelPosition(const glm::vec3& modelPosition) const {
 	return position * VOX_SIZE + modelPosition;
 }
 
+bool Voxel::hasSamePosition(Voxel* otherVoxel) const {
+	return hasSamePosition(intToBytes3(otherVoxel->positionInt));
+}
+
 bool Voxel::hasSamePosition(const std::array<uint8_t, 3>& otherPos) const {
 	std::array<uint8_t, 3> voxPos = intToBytes3(positionInt);
 	return voxPos[0] == otherPos[0] && voxPos[1] == otherPos[1] && voxPos[2] == otherPos[2];

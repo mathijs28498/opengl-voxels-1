@@ -24,6 +24,16 @@ std::vector<Octree*> getOctreesFromEntities(const std::vector<Entity*> chunkEnti
 	return octrees;
 }
 
+std::vector<OctreeComp*> getOctreeCompsFromEntities(const std::vector<Entity*> chunkEntities) {
+	std::vector<OctreeComp*> octreeComps(chunkEntities.size());
+
+	for (size_t i = 0; i < chunkEntities.size(); i++) {
+		octreeComps[i] = getComponentOfEntity<OctreeComp>(chunkEntities[i]);
+	}
+
+	return octreeComps;
+}
+
 void createVoxelTerrain(OctreeComp* octree, BoundingBoxRendererComp* renderer) {
 	octree->octree.makeNoiseTerrain(octree->pos);
 	octree->octree.calculateBoundingBoxVAO();
@@ -154,7 +164,7 @@ void RayCastSystem::fixedUpdate(Entity* entity) {
 		if (octreeComp->octree.rayCastCollision(ray, octreePos, collision)) {
 			if (!isCollision) isCollision = true;
 			collisionOctreePos = octreePos;
-			collisionOctreeComp = (OctreeComp*)entities[i]->getComponent(octreeCompName);
+			collisionOctreeComp = octreeComp;
 			collisionVoxelRendererComp = voxelRendererComp;
 		}
 	}
@@ -168,7 +178,40 @@ void RayCastSystem::fixedUpdate(Entity* entity) {
 
 	if ((keyInput->keyRepeat[GLFW_KEY_E] || keyInput->keyPress[GLFW_KEY_Q]) && collisionOctreeComp != nullptr) {
 		float power = 10;
-		collisionOctreeComp->octree.removeVoxels(intToBytes3(collision.voxel->positionInt), power);
-		collisionOctreeComp->octree.fillVoxelRenderer(collisionVoxelRendererComp, 1, true);
+		std::vector<FoundVoxel> foundVoxels = collisionOctreeComp->octree.removeVoxels(intToBytes3(collision.voxel->positionInt), power);
+
+		std::vector<VoxelRendererComp*> affectedVoxelRenderers;
+		std::vector<Octree*> affectedOctrees;
+
+		std::vector<OctreeComp*> octreeComps = getOctreeCompsFromEntities(entities);
+
+		for (FoundVoxel fv : foundVoxels) {
+			Octree* octreeParent = fv.node->getParentOctree();
+			bool addOctree = true;
+			for (Octree* octree : affectedOctrees) {
+				if (octree == octreeParent) {
+					addOctree = false;
+					break;
+				}
+			}
+
+			if (addOctree) {
+				affectedOctrees.push_back(fv.node->getParentOctree());
+				for (size_t i = 0; i < octreeComps.size(); i++) {
+					if (&octreeComps[i]->octree == octreeParent) {
+						affectedVoxelRenderers.push_back(getComponentOfEntity<VoxelRendererComp>(entities[i]));
+						break;
+					}
+				}
+			}
+		}
+
+		for (size_t i = 0; i < affectedVoxelRenderers.size(); i++) {
+			VoxelRendererComp* vrc = affectedVoxelRenderers[i];
+			Octree* octree = affectedOctrees[i];
+
+			octree->fillVoxelRenderer(vrc, 1, true);
+		}
+		
 	}
 }

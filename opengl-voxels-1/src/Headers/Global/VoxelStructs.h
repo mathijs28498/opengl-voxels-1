@@ -83,6 +83,7 @@ struct Voxel {
 	uint32_t materialAndEnabledInt;
 
 	glm::vec3 getModelPosition(const glm::vec3& modelPosition) const;
+	bool hasSamePosition(Voxel* voxel) const;
 	bool hasSamePosition(const std::array<uint8_t, 3>& otherPos) const;
 	Material* getMaterial() const;
 	static Voxel getVoxelCopy(Voxel originalVoxel);
