@@ -71,34 +71,34 @@ public:
 	void removeVoxel(const std::array<uint8_t, 3>& position);
 	void calculateVoxelsToRemove(const std::array<uint8_t, 3>& position, float power, std::vector<FoundVoxel>& toRemoveOut);
 	void calculateVoxelsToRemove(const FoundVoxel& fv, float power, std::vector<FoundVoxel>& toRemoveOut);
-	void calculateSurroundedFaces(Voxel* voxel);
 	void calculateSurroundedFaces(const std::array<uint8_t, 3>& voxelPos);
 	void calculateEnabledFace(const FoundVoxel& curFv, DIR::Side side);
 	FoundVoxel findSiblingVoxel(int16_t x, int16_t y, int16_t z);
 	Octree* getParentOctree();
 
 private:
-	FoundVoxel findSiblingVoxel(const std::array<int16_t, 3>&voxPos);
-	FoundVoxel findSiblingVoxel(const std::array<uint8_t, 3>& voxPos);
+	std::vector<Voxel> voxels;
+	uint16_t size;
+	bool hasChildren = false;
 
+	enum { NODE, OCTREE } parentType;
+	union {
+		OctreeNode* parent;
+		Octree* parentOctree;
+	};
+	OctreeNode* children[8];
+
+	FoundVoxel findSiblingVoxel(const std::array<int16_t, 3>& voxPos);
+	FoundVoxel findSiblingVoxel(const std::array<uint8_t, 3>& voxPos);
+	uint8_t calculateEnabledFace(const std::array<uint8_t, 3>& voxelPos);
 
 	VoxelAABB getVoxelAABB(glm::vec3& octreePos);
 	int getVoxelIndex(uint8_t x, uint8_t y, uint8_t z) const;
 
 	void addSurroundingVoxelsToRemove(const std::array<uint8_t, 3>& voxelPos, float power, std::vector<FoundVoxel>& toRemoveOut);
 	void addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxelPos, float power, std::vector<FoundVoxel>& toRemoveOut);
-	uint8_t calculateEnabledFace(const std::array<uint8_t, 3>& voxelPos);
 
-	std::vector<Voxel*> voxels;
-	uint16_t size;
-	bool hasChildren = false;
-
-	enum {NODE, OCTREE} parentType;
-	union {
-		OctreeNode* parent;
-		Octree* parentOctree;
-	};
-	OctreeNode* children[8];
+	
 
 };
 

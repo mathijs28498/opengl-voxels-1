@@ -86,6 +86,8 @@ struct Voxel {
 	bool hasSamePosition(Voxel* voxel) const;
 	bool hasSamePosition(const std::array<uint8_t, 3>& otherPos) const;
 	Material* getMaterial() const;
+	bool isNull();
+	void clear();
 	static Voxel getVoxelCopy(Voxel originalVoxel);
 };
 

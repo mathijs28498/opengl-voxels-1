@@ -209,7 +209,6 @@ void RayCastSystem::fixedUpdate(Entity* entity) {
 
 		for (size_t i = 0; i < affectedOctrees.size(); i++) {
 			Octree* octree = affectedOctrees[i];
-			octree->reFillRenderer = true;
 		}
 		
 	}

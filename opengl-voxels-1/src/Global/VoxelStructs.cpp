@@ -56,6 +56,15 @@ Material* Voxel::getMaterial() const {
 	return &materials[intToBytes3(materialAndEnabledInt)[0]];
 }
 
+bool Voxel::isNull() {
+	return positionInt == 0x00 && materialAndEnabledInt == 0x00;
+}
+
+void Voxel::clear() {
+	positionInt = 0x00;
+	materialAndEnabledInt = 0x00;
+}
+
 Voxel Voxel::getVoxelCopy(Voxel originalVoxel) {
 	Voxel voxel{ originalVoxel.positionInt, originalVoxel.materialAndEnabledInt };
 	return voxel;
