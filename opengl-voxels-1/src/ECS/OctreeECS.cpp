@@ -39,7 +39,12 @@ void createVoxelTerrain(OctreeComp* octree, BoundingBoxRendererComp* renderer) {
 	octree->octree.calculateBoundingBoxVAO();
 	octree->octree.fillBoundingBoxRenderer(renderer);
 	//octree->terrainCreationPromise.set_value(true);
-	octree->threadBusy = true;
+
+	std::vector<Entity*> entities;
+	getEntitiesWithComponentEvent.notify(&entities, gcn(OctreeComp()));
+	
+	octree->octree.setSiblings(getOctreesFromEntities(entities));
+	octree->threadBusy = false;
 }
 
 void OctreeSystem::start(Entity* entity) {
@@ -65,13 +70,18 @@ void OctreeSystem::start(Entity* entity) {
 
 void OctreeSystem::update(Entity* entity) {
 	OctreeComp* octree = getComponentOfEntity<OctreeComp>(entity);
-	if (!octree->threadBusy)
+	if (octree->threadBusy)
 		return;
+
 
 	bool useLOD = false;
 
 	TransformComp* transform = getComponentOfEntity<TransformComp>(entity);
 	VoxelRendererComp* renderer = getComponentOfEntity<VoxelRendererComp>(entity);
+
+	if (octree->octree.reFillRenderer) {
+		octree->octree.fillVoxelRenderer(renderer, 1, true);
+	}
 
 	float distThreshold0 = octree->octree.size * VOX_SIZE;
 	float distThreshold1 = distThreshold0 * 3;
@@ -120,7 +130,6 @@ void OctreeHandlerSystem::update(Entity* entity) {
 			if (!isChunkActive(curGridPosOffset, octreeHandler)) {
 				Entity* entity = new Entity;
 				OctreeComp* octreeComp = new OctreeComp(curGridPosOffset, OCTREE_SIZE, octreeHandler->cameraTransform);
-				octreeComp->octree.setSiblings(getOctreesFromEntities(octreeHandler->chunkEntities));
 				entity->insertComponent(octreeComp);
 				entity->insertComponent(new VoxelRendererComp(octreeHandler->voxelRenderer->shader, octreeHandler->voxelRenderer->camera, 0, 0));
 				entity->insertComponent(new BoundingBoxRendererComp(octreeHandler->boundingBoxRenderer->shader, octreeHandler->voxelRenderer->camera, 0, 0, false));
@@ -180,7 +189,6 @@ void RayCastSystem::fixedUpdate(Entity* entity) {
 		float power = 10;
 		std::vector<FoundVoxel> foundVoxels = collisionOctreeComp->octree.removeVoxels(intToBytes3(collision.voxel->positionInt), power);
 
-		std::vector<VoxelRendererComp*> affectedVoxelRenderers;
 		std::vector<Octree*> affectedOctrees;
 
 		std::vector<OctreeComp*> octreeComps = getOctreeCompsFromEntities(entities);
@@ -195,22 +203,13 @@ void RayCastSystem::fixedUpdate(Entity* entity) {
 				}
 			}
 
-			if (addOctree) {
+			if (addOctree) 
 				affectedOctrees.push_back(fv.node->getParentOctree());
-				for (size_t i = 0; i < octreeComps.size(); i++) {
-					if (&octreeComps[i]->octree == octreeParent) {
-						affectedVoxelRenderers.push_back(getComponentOfEntity<VoxelRendererComp>(entities[i]));
-						break;
-					}
-				}
-			}
 		}
 
-		for (size_t i = 0; i < affectedVoxelRenderers.size(); i++) {
-			VoxelRendererComp* vrc = affectedVoxelRenderers[i];
+		for (size_t i = 0; i < affectedOctrees.size(); i++) {
 			Octree* octree = affectedOctrees[i];
-
-			octree->fillVoxelRenderer(vrc, 1, true);
+			octree->reFillRenderer = true;
 		}
 		
 	}

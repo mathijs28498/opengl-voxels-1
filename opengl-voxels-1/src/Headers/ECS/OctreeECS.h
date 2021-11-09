@@ -20,7 +20,7 @@ struct OctreeComp : public Component {
 	TransformComp* cameraTransform;
 	uint32_t currentLOD;
 
-	bool threadBusy = false;
+	bool threadBusy = true;
 	std::thread terrainCreationThread; 
 	std::promise<bool> terrainCreationPromise;
 	std::future<bool> terrainCreationFuture;

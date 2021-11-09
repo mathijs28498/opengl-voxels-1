@@ -73,6 +73,7 @@ public:
 	void calculateVoxelsToRemove(const FoundVoxel& fv, float power, std::vector<FoundVoxel>& toRemoveOut);
 	void calculateSurroundedFaces(Voxel* voxel);
 	void calculateSurroundedFaces(const std::array<uint8_t, 3>& voxelPos);
+	void calculateEnabledFace(const FoundVoxel& curFv, DIR::Side side);
 	FoundVoxel findSiblingVoxel(int16_t x, int16_t y, int16_t z);
 	Octree* getParentOctree();
 
@@ -104,6 +105,7 @@ private:
 class Octree {
 public:
 	uint16_t size;
+	bool reFillRenderer = false;
 
 	Octree() {};
 	Octree(const std::array<int, 3> pos, uint32_t size);
@@ -128,6 +130,8 @@ public:
 	FoundVoxel findSiblingVoxel(int16_t x, int16_t y, int16_t z);
 
 private:
+	FoundVoxel getSideFoundVoxel(int16_t i, int16_t j, int side);
+
 	std::array<int, 3> pos;
 	OctreeNode root;
 	Octree* siblings[6];

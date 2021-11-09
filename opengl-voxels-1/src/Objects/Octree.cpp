@@ -27,7 +27,7 @@ std::array<T_O, 3>* getSurroundingPositions(const std::array<T_I, 3>& voxelPos) 
 template<class T>
 bool isSamePosition(const std::array<T, 3>& pos0, const std::array<T, 3>& pos1) {
 	return pos0[0] == pos1[0] && pos0[1] == pos1[1] && pos0[2] == pos1[2];
-} 
+}
 
 uint32_t faceFlags[6] = {
 	0x04,
@@ -52,7 +52,7 @@ bool shouldInsertFace(FoundVoxel cur, FoundVoxel other, bool inv = false) {
 		return false;
 	}
 
-	if (other.voxel == nullptr) 
+	if (other.voxel == nullptr)
 		return inv ? false : true;
 
 	if (!inv && cur.voxel->getMaterial()->isTransparent != other.voxel->getMaterial()->isTransparent)
@@ -98,7 +98,6 @@ void OctreeNode::insert(Voxel* voxel) {
 		int index = getVoxelIndex(voxPos[0], voxPos[1], voxPos[2]);
 		if (voxels.size() < index + 1) {
 			voxels.resize(std::min(Q3_LEAF_SIZE, index + 100));
-			//PRINT(voxels.size());
 		}
 		voxels[index] = voxel;
 		return;
@@ -219,13 +218,13 @@ FoundVoxel OctreeNode::findSiblingVoxel(int16_t x, int16_t y, int16_t z) {
 	if (containsPoint(x, y, z)) {
 		if (voxels.size() > 0) {
 			int index = getVoxelIndex(x, y, z);
-			if (voxels.size() < index + 1) 
+			if (voxels.size() < index + 1)
 				return { this, nullptr };
 
 			return { this, voxels[index] };
 		}
 
-		if (!hasChildren) 
+		if (!hasChildren)
 			return { this, nullptr };
 
 		for (OctreeNode* child : children) {
@@ -394,6 +393,15 @@ void OctreeNode::calculateSurroundedFaces(const std::array<uint8_t, 3>& voxelPos
 	}
 }
 
+void OctreeNode::calculateEnabledFace(const FoundVoxel& curFv, DIR::Side side) {
+	std::array<int16_t, 3>* positions = getSurroundingPositions<uint8_t, int16_t>(intToBytes3(curFv.voxel->positionInt));
+
+	FoundVoxel voxel = findSiblingVoxel(positions[side]);
+	if (voxel.node != nullptr && voxel.voxel == nullptr) {
+		curFv.voxel->materialAndEnabledInt = curFv.voxel->materialAndEnabledInt | faceFlags[side] << 24;
+	}
+}
+
 uint8_t OctreeNode::calculateEnabledFace(const std::array<uint8_t, 3>& voxelPos) {
 	uint8_t en = 0x00;
 	FoundVoxel curVox = findSiblingVoxel(voxelPos);
@@ -428,11 +436,13 @@ void OctreeNode::calculateEnabledFaces() {
 
 /// BEGIN OCTREE ///
 
-Octree::Octree(const std::array<int, 3> pos, uint32_t size) {
+Octree::Octree(const std::array<int, 3> pos, uint32_t size) : pos(pos), size(size) {
 	root = OctreeNode({ 0, 0, 0 }, size, this);
 
-	this->pos = pos;
-	this->size = size;
+	for (size_t i = 0; i < 6; i++) {
+		siblings[i] = nullptr;
+	}
+
 	glGenVertexArrays(1, &boundingBoxVAO);
 }
 
@@ -491,8 +501,6 @@ void Octree::calculateVoxelVAO(uint32_t lod) {
 		voxelAmounts[lod] = voxelCloud.size();
 	}
 
-
-	
 	glBindVertexArray(voxelVAOs[lod]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, voxelVBOs[lod]);
@@ -528,7 +536,6 @@ Voxel* Octree::createVoxel(uint8_t x, uint32_t i, uint8_t z, uint8_t matID) {
 }
 
 FoundVoxel Octree::findSiblingVoxel(int16_t x, int16_t y, int16_t z) {
-	//PRINT("Outside of tree");
 	if (x < 0) {
 		x += 256;
 		return siblings[0] == nullptr ? FoundVoxel{ nullptr, nullptr } : siblings[0]->root.findSiblingVoxel(x, y, z);
@@ -544,15 +551,17 @@ FoundVoxel Octree::findSiblingVoxel(int16_t x, int16_t y, int16_t z) {
 	} else if (z < 0) {
 		z += 256;
 		return siblings[4] == nullptr ? FoundVoxel{ nullptr, nullptr } : siblings[4]->root.findSiblingVoxel(x, y, z);
-	} else {
+	} else if (z > 255) {
 		z -= 256;
 		return siblings[5] == nullptr ? FoundVoxel{ nullptr, nullptr } : siblings[5]->root.findSiblingVoxel(x, y, z);
 	}
+
+	PRINT("Something went horribly wrong! Rethink your life choices. Also findsibling of Octree you know");
+	return { nullptr, nullptr };
 }
 
 
 void Octree::makeNoiseTerrain(std::array<int32_t, 3> pos) {
-
 	using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
 	using std::chrono::duration;
@@ -627,6 +636,7 @@ void Octree::calculateEnabledFaces() {
 }
 
 void Octree::fillVoxelRenderer(VoxelRendererComp* renderer, uint32_t lod, bool reFill) {
+	reFillRenderer = false;
 	if (reFill || !voxelVAOs.count(lod))
 		calculateVoxelVAO(lod);
 
@@ -653,8 +663,6 @@ std::vector<FoundVoxel> Octree::removeVoxels(const std::array<uint8_t, 3>& posit
 
 	std::vector<Octree*> affectedOctrees;
 
-	
-
 	for (FoundVoxel fv : toRemove) {
 		fv.node->removeVoxel(fv.voxel);
 	}
@@ -666,9 +674,40 @@ std::vector<FoundVoxel> Octree::removeVoxels(const std::array<uint8_t, 3>& posit
 }
 
 
+FoundVoxel Octree::getSideFoundVoxel(int16_t i, int16_t j, int side) {
+	switch (side) {
+	case DIR::LEFT:
+		return root.findSiblingVoxel(0, i, j);
+	case DIR::RIGHT:
+		return root.findSiblingVoxel(255, i, j);
+	case DIR::DOWN:
+		return root.findSiblingVoxel(i, 0, j);
+	case DIR::UP:
+		return root.findSiblingVoxel(i, 255, j);
+	case DIR::BACK:
+		return root.findSiblingVoxel(i, j, 0);
+	case DIR::FRONT:
+		return root.findSiblingVoxel(i, j, 255);
+	}
+}
+
 void Octree::setSibling(Octree* octree, int side) {
 	// TODO: Recalculate the faces on this side edge
 	siblings[side] = octree;
+
+	DIR::Side opp = DIR::getOpposite(side);
+
+	for (int16_t i = 0; i < 256; i++) {
+		for (int16_t j = 0; j < 256; j++) {
+			FoundVoxel fv = getSideFoundVoxel(i, j, side);
+			if (fv.voxel != nullptr)
+				fv.node->calculateEnabledFace(fv, (DIR::Side)side);
+		}
+	}
+
+	reFillRenderer = true;
+
+	//fillVoxelRenderer(1, true);
 }
 
 void Octree::setSiblings(const std::vector<Octree*>& octrees) {
@@ -682,6 +721,7 @@ void Octree::setSiblings(const std::vector<Octree*>& octrees) {
 			if (isSamePosition<int>(octree->pos, surrPositions[i])) {
 				siblings[i] = octree;
 				octree->setSibling(this, DIR::getOpposite(i));
+				//octree->fillVoxelRenderer(1, true);
 				break;
 			}
 		}
@@ -706,7 +746,7 @@ int* getColorFromInt(int colorInt) {
 	return colorArray;
 }
 
-DIR::Side DIR::getOpposite(int otherSide){
+DIR::Side DIR::getOpposite(int otherSide) {
 	switch (otherSide) {
 	case LEFT:
 		return RIGHT;
