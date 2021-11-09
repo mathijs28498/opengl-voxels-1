@@ -89,7 +89,7 @@ private:
 	void addSurroundingVoxelToRemove(const std::array<int16_t, 3>& voxelPos, float power, std::vector<FoundVoxel>& toRemoveOut);
 	uint8_t calculateEnabledFace(const std::array<uint8_t, 3>& voxelPos);
 
-	std::vector<Voxel*> voxels;
+	std::vector<Voxel> voxels;
 	uint16_t size;
 	bool hasChildren = false;
 

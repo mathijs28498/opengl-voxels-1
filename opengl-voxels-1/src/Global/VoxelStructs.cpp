@@ -52,11 +52,15 @@ bool Voxel::hasSamePosition(const std::array<uint8_t, 3>& otherPos) const {
 	return voxPos[0] == otherPos[0] && voxPos[1] == otherPos[1] && voxPos[2] == otherPos[2];
 }
 
+bool Voxel::isNull() const {
+	return positionInt == 0x00 && materialAndEnabledInt == 0x00;
+}
+
 Material* Voxel::getMaterial() const {
 	return &materials[intToBytes3(materialAndEnabledInt)[0]];
 }
 
-Voxel Voxel::getVoxelCopy(Voxel originalVoxel) {
+Voxel Voxel::getVoxelCopy(const Voxel& originalVoxel) {
 	Voxel voxel{ originalVoxel.positionInt, originalVoxel.materialAndEnabledInt };
 	return voxel;
 }

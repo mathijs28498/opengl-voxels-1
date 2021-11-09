@@ -79,14 +79,15 @@ struct Ray {
 //	static Voxel getVoxelCopy(Voxel originalVoxel);
 //};
 struct Voxel {
-	uint32_t positionInt;
-	uint32_t materialAndEnabledInt;
+	uint32_t positionInt = 0x00;
+	uint32_t materialAndEnabledInt = 0x00;
 
 	glm::vec3 getModelPosition(const glm::vec3& modelPosition) const;
 	bool hasSamePosition(Voxel* voxel) const;
 	bool hasSamePosition(const std::array<uint8_t, 3>& otherPos) const;
+	bool isNull() const;
 	Material* getMaterial() const;
-	static Voxel getVoxelCopy(Voxel originalVoxel);
+	static Voxel getVoxelCopy(const Voxel& originalVoxel);
 };
 
 struct VoxelCollision {
