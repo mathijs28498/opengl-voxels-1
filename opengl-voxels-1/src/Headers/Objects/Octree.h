@@ -15,8 +15,6 @@
 class Octree;
 class OctreeNode;
 
-int* getColorFromInt(int colorInt);
-int getIntFromColor(const int* colorArray); 
 glm::vec3 getRealOctreePos(glm::vec3& octreePos);
 
 

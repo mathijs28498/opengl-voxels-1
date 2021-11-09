@@ -738,22 +738,6 @@ void Octree::setSiblingSides() {
 
 /// END OCTREE ///
 
-int getIntFromColor(const int* colorArray) {
-	int red = (colorArray[0] << 16) & 0x00FF0000;
-	int green = (colorArray[1] << 8) & 0x0000FF00;
-	int blue = colorArray[2] & 0x000000FF;
-
-	return 0xFF000000 | red | green | blue;
-}
-
-int* getColorFromInt(int colorInt) {
-	int colorArray[3];
-	colorArray[0] = (colorInt & 0x00FF0000) >> 16;
-	colorArray[1] = (colorInt & 0x0000FF00) >> 8;
-	colorArray[2] = colorInt & 0x000000FF;
-	return colorArray;
-}
-
 DIR::Side DIR::getOpposite(int otherSide) {
 	switch (otherSide) {
 	case LEFT:
