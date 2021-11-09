@@ -92,8 +92,7 @@ OctreeNode::OctreeNode(std::array<int, 3> pos, int size, Octree* parent) {
 
 OctreeNode::OctreeNode() {}
 
-OctreeNode::~OctreeNode() {
-}
+OctreeNode::~OctreeNode() {}
 
 int OctreeNode::getVoxelIndex(uint8_t x, uint8_t y, uint8_t z) const {
 	return (z - pos[2]) * Q_LEAF_SIZE + (y - pos[1]) * LEAF_SIZE + (x - pos[0]);
@@ -694,21 +693,20 @@ FoundVoxel Octree::getSideFoundVoxel(int16_t i, int16_t j, int side) {
 	}
 }
 
-void Octree::setSibling(Octree* octree, int side) {
-	// TODO: Recalculate the faces on this side edge
-	siblings[side] = octree;
-
-	DIR::Side opp = DIR::getOpposite(side);
-
+void Octree::calculateSideEnabledFaces(DIR::Side side) {
 	for (int16_t i = 0; i < 256; i++) {
 		for (int16_t j = 0; j < 256; j++) {
 			FoundVoxel fv = getSideFoundVoxel(i, j, side);
-			if (fv.voxel != nullptr)
-				fv.node->calculateEnabledFace(fv, (DIR::Side)side);
+			if (fv.voxel != nullptr) 
+				fv.node->calculateEnabledFace(fv, side);
 		}
 	}
 
 	reFillRenderer = true;
+}
+
+void Octree::setSibling(Octree* octree, int side) {
+	siblings[side] = octree;
 }
 
 void Octree::setSiblings(const std::vector<Octree*>& octrees) {
@@ -724,6 +722,16 @@ void Octree::setSiblings(const std::vector<Octree*>& octrees) {
 				octree->setSibling(this, DIR::getOpposite(i));
 				break;
 			}
+		}
+	}
+}
+
+void Octree::setSiblingSides() {
+	for (size_t i = 0; i < 6; i++) {
+		Octree* octree = siblings[i];
+		if (octree != nullptr) {
+			PRINT("Calculating sides");
+			octree->calculateSideEnabledFaces(DIR::getOpposite(i));
 		}
 	}
 }

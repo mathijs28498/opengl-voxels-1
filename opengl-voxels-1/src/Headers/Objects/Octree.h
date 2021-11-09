@@ -125,12 +125,15 @@ public:
 	bool rayCastCollision(Ray& ray, glm::vec3& pos, VoxelCollision& collisionOut);
 	std::vector<FoundVoxel> removeVoxels(const std::array<uint8_t, 3>& position, uint16_t power);
 
-	void setSibling(Octree* octree, int side);
-	void setSiblings(const std::vector<Octree*>& octrees);
+	void setSiblings(const std::vector<Octree*>& octrees); 
+	void setSiblingSides();
+
 	FoundVoxel findSiblingVoxel(int16_t x, int16_t y, int16_t z);
 
 private:
 	FoundVoxel getSideFoundVoxel(int16_t i, int16_t j, int side);
+	void setSibling(Octree* octree, int side);
+	void calculateSideEnabledFaces(DIR::Side side);
 
 	std::array<int, 3> pos;
 	OctreeNode root;

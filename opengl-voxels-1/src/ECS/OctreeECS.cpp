@@ -35,15 +35,18 @@ std::vector<OctreeComp*> getOctreeCompsFromEntities(const std::vector<Entity*> c
 }
 
 void createVoxelTerrain(OctreeComp* octree, BoundingBoxRendererComp* renderer) {
+	std::vector<Entity*> entities;
+	getEntitiesWithComponentEvent.notify(&entities, gcn(OctreeComp()));
+
+	octree->octree.setSiblings(getOctreesFromEntities(entities));
+
 	octree->octree.makeNoiseTerrain(octree->pos);
 	octree->octree.calculateBoundingBoxVAO();
 	octree->octree.fillBoundingBoxRenderer(renderer);
 	//octree->terrainCreationPromise.set_value(true);
 
-	std::vector<Entity*> entities;
-	getEntitiesWithComponentEvent.notify(&entities, gcn(OctreeComp()));
-	
-	octree->octree.setSiblings(getOctreesFromEntities(entities));
+	octree->octree.setSiblingSides();
+
 	octree->threadBusy = false;
 }
 
