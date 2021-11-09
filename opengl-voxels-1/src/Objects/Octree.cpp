@@ -436,8 +436,9 @@ void OctreeNode::calculateEnabledFaces() {
 
 /// BEGIN OCTREE ///
 
-Octree::Octree(const std::array<int, 3> pos, uint32_t size) : pos(pos), size(size) {
-	root = OctreeNode({ 0, 0, 0 }, size, this);
+Octree::Octree(const std::array<int, 3> pos, uint32_t size) : root(OctreeNode({ 0, 0, 0 }, size, this)), pos(pos), size(size) {
+	/*static int amount = 0;
+	PRINT("Amount of octrees: " << amount++);*/
 
 	for (size_t i = 0; i < 6; i++) {
 		siblings[i] = nullptr;
