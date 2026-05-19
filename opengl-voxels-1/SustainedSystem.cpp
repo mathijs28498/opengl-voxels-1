@@ -1,6 +1,7 @@
 #include "SustainedSystem.h"
 #include "VertexData.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
 
 void VoxelRenderSystem::update(Entity* entity) {
