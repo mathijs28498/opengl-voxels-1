@@ -34,7 +34,7 @@ You will need the following dependencies:
    ```bash
    git clone https://github.com/mathijs28498/opengl-voxels-1.git
    ```
-2. Create a `libraries` folder in the root directory.
+2. Create `opengl-voxels-1/libraries` folder.
 3. Place the downloaded `include` and `bin` folders from your dependencies into the `libraries` folder. The `.vcxproj` expects the following structure:
    * `libraries/include/glfw`
    * `libraries/include/glew`
