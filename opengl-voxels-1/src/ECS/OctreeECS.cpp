@@ -2,6 +2,7 @@
 #include "../Headers/Observer pattern/SceneObserver.h"
 #include "../Headers/Global/GLHelperFunctions.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/norm.hpp>
 #include <mutex>
 #include <chrono>
