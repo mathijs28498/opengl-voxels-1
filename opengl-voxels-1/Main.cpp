@@ -10,8 +10,8 @@
 
 #include <iostream>
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
+const int WIDTH = 1600;
+const int HEIGHT = 1200;
 const char* TITLE = "Voxels everywhere";
 
 void addCameraEntity(Scene* scene, Camera* cam) {
