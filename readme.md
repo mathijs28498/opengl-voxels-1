@@ -17,6 +17,7 @@ A voxel renderer built from scratch in C++ and OpenGL. It features a custom Enti
 * **Asynchronous Generation:** Procedural chunk generation and mesh building are offloaded to a background thread to ensure the main render loop remains smooth. 
 * **Vox Model Loading:**  The engine includes a custom `.vox` file loader, allowing MagicaVoxel models to be imported and inserted directly into the generated world. 
 * **Destructible Terrain:** Real-time terrain modification and destruction are in a late stage of development.
+* **Input handling:** GLFW key and mouse callbacks are converted into custom KeyboardInput and MouseCursorInput APIs integrated with the custom ECS system.
 
 ## Build Instructions (Windows / MSVC)
 
@@ -45,6 +46,15 @@ You will need the following dependencies:
 4. Open the Visual Studio solution/project file in **Visual Studio 2022 or newer**.
 5. Set the build configuration to **Release** or **Debug** and platform to **x64**.
 6. Build the solution and run.
+
+## Controls
+
+| Key            | Action                              |
+| :------------- | :---------------------------------- |
+| **W, A, S, D** | Move Forward, Left, Backward, Right |
+| **Space**      | Move Up                             |
+| **Shift**      | Move Down                           |
+| **T**          | Toggle Octree Bounding Boxes        |
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
